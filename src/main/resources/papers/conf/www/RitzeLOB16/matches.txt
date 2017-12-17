@@ -1,0 +1,4 @@
+Christian_Bizer:yaser@informatik.uni-mannheim.de
+Dominique_Ritze:oli@informatik.uni-mannheim.de
+Yaser_Oulabi:chris@informatik.uni-mannheim.de
+Oliver_Lehmberg:dominique@informatik.uni-mannheim.de

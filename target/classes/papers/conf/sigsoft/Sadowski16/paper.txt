@@ -1,0 +1,20 @@
+Developer Workflow at Google (Showcase)
+
+Caitlin Sadowski
+Google, USA
+supertri@google.com
+
+ABSTRACT
+This talk describes the developer workflow at Google, and our use of program analysis, testing, metrics, and tooling to reduce errors when creating and committing changes to source code. Software development at Google has several unique characteristics such as our monolithic codebase and distributed hermetic build system. Changes are vetted both manually, via our internal code review tool, and automatically, via sources such as the Tricorder program analysis platform and our automated testing infrastructure.
+CCS Concepts
+· Software and its engineeringSoftware notations and tools
+Keywords
+Developer tools; developer workflow
+
+BIOGRAPHY
+Caitlin Sadowski is a Software Engineer in the Developer Infrastructure group at Google. She has worked on a variety of internal developer workflow tools, including tools for reviewing, searching, editing and analyzing source code. She created the Tricorder analysis platform, which analyzes 30k code review changes each workday. She is furthermore the author of several papers related to developer workflow at Google. Caitlin received her computer science Ph.D. from the University of California at Santa Cruz, where she worked with Cormac Flanagan and Jim Whitehead on a variety of research topics related to Programming Languages, Software Engineering and Human Computer Interaction.
+
+Permission to make digital or hard copies of part or all of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. Copyrights for third-party components of this work must be honored. For all other uses, contact the Owner/Author. Copyright is held by the owner/author(s). FSE'16, November 13­18, 2016, Seattle, WA, USA ACM. 978-1-4503-4218-6/16/11...$15.00 http://dx.doi.org/10.1145/2950290.2994156
+26
+
+

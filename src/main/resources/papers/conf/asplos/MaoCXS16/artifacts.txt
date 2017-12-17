@@ -1,0 +1,8 @@
+http://dx.doi.org/10.1145/2872362.2872389
+http://smtlib.cs.uiowa.edu/
+http://j00ru.vexillium.org/dump/
+https://gcc-python-plugin.readthedocs.org/
+http://www.open-std.org/jtc1/sc22/wg21/
+https://docs.python
+http://svn.python
+http://www

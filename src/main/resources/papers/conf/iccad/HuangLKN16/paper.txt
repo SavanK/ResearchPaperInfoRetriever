@@ -1,0 +1,55 @@
+Overview of the 2016 CAD Contest at ICCAD
+Invited Paper
+Shih-Hsu Huang1, Rung-Bin Lin2, Myung-Chul Kim3, Shigetoshi Nakatake4
+1Department of Electronic Engineering, Chung Yuan Christian University, Taoyuan 32023, Taiwan 2Department of Computer Science & Engineering, Yuan Ze University, Taoyuan 32003, Taiwan 3IBM Corporation, Austin, TX 78758, USA
+4Department of Information and Media Engineering, The University of Kitakyushu, Fukuoka 808-0135, Japan Email: shhuang@cycu.edu.tw, csrlin@cs.yzu.edu.tw, mckima@us.ibm.com, nakatake@kitakyu-u.ac.jp
+
+ABSTRACT
+The CAD Contest at ICCAD is a challenging, multi-month competition, focusing on advanced, real-world problems in the field of Electronic Design Automation (EDA). In its fifth year, the 2016 CAD Contest at ICCAD attracted 135 teams from 11 regions/countries. Three critical EDA problems, in the areas of design verification, logic synthesis, and design for manufacturing (DFM), were called for competition this year. We hope that the contest benchmark suites and evaluation infrastructure boost research in the related areas and help EDA community find novel and high-quality solutions to the problems.
+
+CCS Concepts
+•Hardware➝Electronic design automation
+Hardware validation
+
+•Hardware➝
+
+Keywords
+Design verification; Logic synthesis; Design for manufacturing.
+
+1. INTRODUCTION
+The CAD contest at ICCAD [1-5] is among the premier academic research and development contests in the field of EDA. Since its inaugural year of 2012, the CAD contest at ICCAD has been a worldwide competition, conducted with the joint sponsorship from the IEEE Council on EDA (CEDA) and the Ministry of Education (MOE), Taiwan. Over the years, the contest has presented challenging and critical problems in varied topic areas, including system-level design, logic synthesis, logic verification, physical design, and design for manufacturing (DFM). Along with real-world benchmarks from industry experts, the CAD Contests at ICCAD and common evaluation framework have been instrumental in advancing the state-of-the-art in EDA, while fostering productive industry-academia collaboration. In the past four years, the contest has witnessed a progressive increase in worldwide participation: 56 teams from 7 regions in 2012, 87 teams from 9 regions in 2013, 93 teams from 9 regions in 2014,
+
+Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. Copyrights for components of this work owned by others than ACM must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior specific permission and/or a fee. Request permissions from Permissions@acm.org. ICCAD '16, November 07-10, 2016, Austin, TX, USA © 2016 ACM. ISBN 978-1-4503-4466-1/16/11…$15.00
+DOI: http://dx.doi.org/10.1145/2966986.2980070
+
+and 112 teams from 12 regions in 2015. It has also lead to numerous publications in top-tier journals and conferences, which have undoubtedly boosted EDA research in the related areas and extended the impact of the contest.
+Being another year of continued success and growth, the 2016 CAD contest [5] at ICCAD is among the largest worldwide EDA contests and attracted 135 teams from 11 regions/countries, including Taiwan, Mainland China, Hong Kong, Japan, Korea, India, Iran, Canada, USA, Brazil, and Russian Federation. This year’s contest was jointly sponsored by IEEE CEDA, the Taiwan MOE, Taiwan IC Design Society (TICD), and also National Chip Implementation Center, Taiwan, which provided the infrastructure support for the contest programming and evaluation environments. In line with previous four years, the contest was open to multiperson teams worldwide. Contestants could participate in one or more problems in the three areas of design verification, logic synthesis, and DFM.
+2. CONTEST PROBLEMS
+The 2016 CAD Contest at ICCAD features three critical and representative problems formulated by leading industry experts from Synopsys Taiwan Co., Ltd., Cadence Design Systems Inc., Taiwan, and IBM Corporation, USA. The details about the problem formulations, the benchmark suites, and the evaluation methodologies are available on the contest website [5] and associated publication for each topic.
+Problem A: Identical Fault Search [6,7] is administered by Tien-Chun (Tangent) Wei and Kuo-Ching (Luke) Lin, from Synopsys Taiwan Co., Ltd., Taiwan. This problem provides some faulty design cases, and the contestants must identify all sets of identical faults.
+Problem B: NP3: Non-exact Projective NPNP Boolean Matching [8,9] is administered by Chi-An (Rocky) Wu and ChihJen (Jacky) Hsu, from Cadence Design Systems Inc., Taiwan. The objective of this problem is to develop a more flexible and powerful Boolean matching engine.
+Problem C: Pattern Classification for Integrated Circuit Design Space Analysis [10,11] is administered by Rasit O. Topaloglu, from IBM Corporation, USA. Given a circuit layout and various markers, the contestants are asked to find a reduced set of representative layout clips around these markers.
+3. CAD CONTEST SPECIAL SESSION
+Each year the winners are awarded at an ICCAD special session dedicated to this contest. The special session gives an overview of the contest, presents the contest problems, releases the associated
+
+benchmark suites, and announces the winners. It includes a presentation from the contest chair and co-chairs for the overview, followed by three presentations from the administrators (topic chairs) for the contest problems, and an award ceremony. The administrators (topic chairs) of each contest problem present the detailed problem description, the associated benchmark suites, the evaluation methodologies, and the team rankings. Moreover, the special session also provides a venue for the top-performing teams to demonstrate their key ideas through short video presentations.
+4. CONCLUSIONS
+In its fifth year, the 2016 CAD Contest at ICCAD attracted 135 teams from 11 regions/countries. Three critical and representative EDA problems and the corresponding benchmark suites derived from real-world industrial designs have been released. These problems require novel, efficient and effective algorithms and methodologies. We believe that the benchmark suites will play a vital role to push the advancement of related EDA research. We also expect that the participants will submit their approaches to the top-tier conferences and journals to boost EDA research and extend the impacts of this contest.
+5. ACKNOWLEDGMENTS
+We thank a lot for the financial sponsorship to the 2016 CAD Contest from the industry, including Synopsys Taiwan Co., Ltd., Taiwan, Cadence Design Systems Inc., Taiwan, and MediaTek, Inc., Taiwan.
+6. REFERENCES
+[1] Iris Hui-Ru Jiang, Zhuo Li, and Yih-Lang Li, “Opening: Introduction to CAD Contest at ICCAD 2012: CAD contest”, Proc. of IEEE/ACM International Conference of ComputerAided Design (ICCAD), 2012.
+[2] Iris Hui-Ru Jiang, Zhuo Li, Hwei-Tseng Wang, and Natarajan Viswanathan, “The Overview of 2013 CAD Contest at ICCAD”, Proc. of IEEE/ACM International Conference of Computer-Aided Design (ICCAD), 2013.
+[3] Iris Hui-Ru Jiang, Natarajan Viswanathan, Tai-Chen Chen, and Jin-Fu Li, “The Overview of 2014 CAD Contest at
+
+ICCAD: Special session paper: CAD contest”, Proc. of IEEE/ACM International Conference of Computer-Aided Design (ICCAD), 2014.
+[4] Natarajan Viswanathan, Shih-Hsu Huang, Rung-Bin Lin, and Myung-Chul Kim, “Overview of the 2015 CAD Contest at ICCAD”, Proc. of IEEE/ACM International Conference of Computer-Aided Design (ICCAD), 2015.
+[5] 2016 CAD Contest at ICCAD. Website: http://cad-contest2016.el.cycu.edu.tw/CAD-contest-at-ICCAD2016.
+[6] Tien-Chun (Tangent) Wei and Kuo-Ching (Luke) Lin, “ICCAD-2016 CAD Contest in Identical Fault Search and Benchmark Suite”, Proc. of IEEE/ACM International Conference of Computer-Aided Design (ICCAD), 2016.
+[7] ICCAD-2016 CAD Contest in Identical Fault Search and Benchmark Suite. Website: http://cad-contest2016.el.cycu.edu.tw/problem_A/default.html
+[8] Chi-An (Rocky) Wu, Chih-Jen (Jacky) Hsu, and Kei-Yong Khoo, “ICCAD-2016 CAD Contest in Non-exact Projective NPNP Boolean Matching and Benchmark Suite”, Proc. of IEEE/ACM International Conference of Computer-Aided Design (ICCAD), 2016.
+[9] ICCAD-2016 CAD Contest in Non-exact Projective NPNP Boolean Matching and Benchmark Suite. Website: http://cad-contest2016.el.cycu.edu.tw/problem_B/default.html
+[10] Rasit O. Topaloglu, “ICCAD-2016 CAD Contest in Pattern Classification for Integrated Circuit Design Space Analysis and Benchmark Suite”, Proc. of IEEE/ACM International Conference of Computer-Aided Design (ICCAD), 2016.
+[11] ICCAD-2016 CAD Contest in Pattern Classification for Integrated Circuit Design Space Analysis and Benchmark Suite. Website: http://cad-contest2016.el.cycu.edu.tw/problem_C/default.html
+
+

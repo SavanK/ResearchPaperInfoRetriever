@@ -1,0 +1,606 @@
+Kolmogorov Extension, Martingale Convergence, and Compositionality of Processes
+Dexter Kozen
+Cornell University kozen@cs.cornell.edu
+
+Abstract
+We show that the Kolmogorov extension theorem and the Doob martingale convergence theorem are two aspects of a common generalization, namely a colimit-like construction in a category of Radon spaces and reversible Markov kernels. The construction provides a compositional denotational semantics for lossless iteration in probabilistic programming languages, even in the absence of a natural partial order.
+Categories and Subject Descriptors G.3 [Probability and Statistics]: Markov processes, Stochastic processes; F.1.2 [Modes of Computation]: Probabilistic computation; F.3.2 [Semantics of Programming Languages]: Algebraic approaches to semantics, Denotational semantics, Operational semantics
+Keywords Markov processes, Kolmogorov extension, martingale convergence, compositionality, probabilistic computation
+1. Introduction
+Compositionality is a key desideratum in programming language semantics. The behavior of a large complex program depends on the behavior of its constituent parts, and it is essential for effective reasoning that this dependence be properly understood. This is no less true of probabilistic programs than deterministic ones.
+Classical foundations of probability and measure theory provide little support for compositional reasoning. Standard formalizations of iterative processes prefer to construct a single monolithic sample space from which all random choices are made at once. The central result in this regard is the Kolmogorov extension theorem [16] (see [1] or [6, Theorem 3.3.6]), which identiﬁes conditions under which a family of measures on ﬁnite subproducts of an inﬁnite product space extend to a measure on the whole space. This theorem is typically used to construct a large sample space for an inﬁnite iterative process when the behavior of each individual step of the process is known.
+The Kolmogorov extension theorem is normally formulated in terms of measures alone, but for purposes of compositional reasoning, a more general formulation is needed. Probabilistic programs are commonly interpreted denotationally as Markov kernels [7, 19, 24, 25]. The chief beneﬁt of this characterization is that it allows programs to be composed sequentially via Lebesgue integra-
+Permission to make digital or hard copies of part or all of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for proﬁt or commercial advantage and that copies bear this notice and the full citation on the ﬁrst page. Copyrights for components of this work owned by others than ACM must be honored. Abstracting with credit is permitted. To copy otherwise, to republish, to post on servers, or to redistribute to lists, contact the Owner/Author. Request permissions from permissions@acm.org or Publications Dept., ACM, Inc., fax +1 (212) 869-0481. Copyright 2016 held by Owner/Author. Publication Rights Licensed to ACM. LICS ’16, July 05–08, 2016, New York, NY, USA Copyright c 2016 ACM 978-1-4503-4391-6/16/07. . . $15.00 DOI: http://dx.doi.org/10.1145/2933575.2933610
+
+tion. In [12], this formulation of the theorem was used to provide a compositional semantics for a lossless iteration operator * in a probabilistic language for packet switching networks.
+Another important classical result that is relevant in this context is the martingale convergence theorem of Doob [8] (see [20] or [10, Theorem VII.9.2]). This theorem states that a martingale has a pointwise limit that is unique up to a nullset. Martingales are normally presented in introductory texts as a model of betting strategies, but in fact they are much more general and quite relevant in the semantics of probabilistic programming languages, as they characterize the evolution of conditional probabilities as an inﬁnite process progresses.
+Modern presentations of martingales go even further toward the removal of any compositional aspect. They are typically formulated in terms of a ﬁltration, a sequence of ever ﬁner σ-algebras on a common set of states S. Intuitively, the states of S are inﬁnite sequences of intermediate states in an iterative process, but the formalism does not reﬂect that intuition.1
+Recently, martingales have emerged as a useful tool in the analysis of probabilistic algorithms. Dubhashi and Panconesi [9] give a generalization of Chernoff-Hoeffding bounds using martingales. These bounds exploit the tendency of certain smooth functions of random variables to concentrate asymptotically in a narrow range. Dubhashi and Panconesi’s generalization applies to more general functions than just the sum and applies under weaker independence conditions. Chakarovand and Sankaranarayanan [3, 4] present general techniques based on martingales and supermartingales for the synthesis of expectation invariants for probabilistic loops and almost sure termination. Fioriti and Hermanns [11] also treat almost sure termination using supermartingales and provide soundness and completeness results.
+In this paper we derive an unexpected connection between Kolmogorov extension and martingale convergence: they are different aspects of a common generalization, namely a colimit-like construction in a category of Radon spaces and reversible Markov kernels. A Markov kernel is reversible if it has a deterministic right2 inverse; this is simply an abstract way of remembering history. We show that the limit object in the construction of [12], when applied to reversible kernels, is again reversible. Moreover, the martingale convergence theorem is essentially the statement of universality; intuitively, given an event in a continuation following an iteration, the ﬁnite approximants to the iteration comprise a martingale, which converges to the probability of the event conditioned on the ﬁnal outcome of the iteration.
+1 Dubhashi and Panconesi [9] remark that “the concept of martingales, as found in probability textbooks, poses quite a barrier to the computer scientist who is unfamiliar with the language of ﬁlters, partitions and measurable sets from measure theory.”
+2 in diagrammatic order
+
+We say the construction is colimit-like because it is not a colimit or even a weak colimit in the strict sense of the word. The exact nature of the discrepancy is technical, but it is essentially due to the fact that certain key properties hold only up to a nullset. Whether the construction can be characterized as a true colimit or weak colimit under stronger assumptions or using a point-free approach is a tantalizing topic for future investigation.
+This construction can be used to give a compositional denotational semantics for iteration operators even when iteration is lossless. Normally, iteration is lossy in the sense that the probability of halting may be strictly less than unity [7, 18, 19, 22, 24, 25]. This is usually modeled by allowing the output of a program to be a subprobability distribution. However, in the system of [12], iteration is lossless: a program is a packet ﬁlter that consumes an input set of packets and produces an output set of packets according to some probability distribution. “Halting” is not a relevant concept; with probability one, the program “halts” and produces a set of packets (which may be the empty set). An important distinction is that lossy iteration aligns more closely with traditional domaintheoretic semantics, as there is a natural partial order of approximation by which the partial executions of a loop approximate the loop. With lossless iteration, there is no obvious partial order and no notion of least ﬁxpoint. The system of [12] identiﬁes an appropriate notion of convergence, but it is not order-theoretic.
+Kolmogorov’s original formulation of the extension theorem was in terms of ﬁnite subproducts of an inﬁnite product space. Many authors [2, 5, 13, 21, 23, 26, 27] have observed that this is essentially a projective limit construction. Our development involves a projective limit as well, but it is important to note that, unlike projections, the morphisms of our category (reversible Markov kernels) go in the chronologically positive direction. Connections between Kolmogorov extension and martingale theory have also been previously drawn in earlier work [21, 23, 27], although the relationship presented here seems to have escaped notice.
+2. Deﬁnitions and Notation
+In this section we brieﬂy review some basic deﬁnitions and notation. More comprehensive treatments can be found in [1, 6, 10, 14].
+Let (S, B) be a Borel space. A probability measure µ : B → [0, 1] is said to be inner regular if the measure of any A ∈ B can be approximated arbitrarily closely from below by compact sets. Formally, µ is inner regular if for all A ∈ B and ε > 0, there exists a compact set C such that C ⊆ A and µ(A − C) < ε (see e.g. [1]). A Borel space in which every probability measure is inner regular is called a Radon space.
+We will restrict our attention to Radon spaces. This assumption is quite weak. Most natural spaces in real-life applications, including all Polish and Suslin spaces, are Radon. This assumption is needed for the Kolmogorov extension theorem.
+Markov Kernels Let (S, BS) and (T, BT ) be Borel spaces. A Markov kernel (Markov transition, measurable kernel, stochastic kernel, stochastic relation) is a function P : S × BT → [0, 1] such that
+• for ﬁxed A ∈ BT , the map P (−, A) : S → [0, 1] is a measurable function; and
+• for ﬁxed s ∈ S, the map P (s, −) : BT → [0, 1] is a probability measure.
+Programs will be interpreted as Markov kernels. Some authors allow subprobability measures in which the universal event may occur with probability less than one; however, we will allow this only in the form of guards (see below).
+The Markov kernels are the morphisms of a category whose objects are measurable spaces, the Kleisli category of the Giry
+
+monad; see [7, 24, 25]. In this context, we write P : (S, BS) → (T, BT ) or just P : S → T . Sequential composition is given by Lebesgue integration: for P : S → T and Q : T → U ,
+(P ; Q)(s, A) = P (s, dt) · Q(t, A).
+t∈T
+Associativity of composition is essentially Fubini’s theorem (see [14, VII.36.C] or [6, p. 59]). The the identity kernels
+1, s ∈ A, 1(s, A) = χA(s) = δs(A) = 0, s ∈ A
+are left and right identities for composition. Here χA is the characteristic function of A ∈ BS and δs is the Dirac (point mass) measure on s ∈ S.
+If P : S → T1 and Q : S → T2, the kernel P × Q : S → T1 × T2 on a given s ∈ S gives the product measure P (s, −) × Q(s, −) on T1 × T2. Thus for A ∈ BT1 and B ∈ BT2 ,
+(P × Q)(s, A × B) = P (s, A) · Q(s, B).
+Convergence We will have the occasion to consider convergence of sequences of kernels. A common mode of convergence is pointwise almost everywhere (a.e.) convergence with respect to an ambient measure µ. A sequence Pn converges pointwise a.e. to Q with respect to µ if for all B, the measurable functions Pn(−, B) converge to the measurable function Q(−, B) pointwise outside a µnullset. Note that this does not immediately imply that Q is a kernel, as it may not be countably additive in its second argument; that has to be established separately. Note also that the µ-nullsets on which the Pn(−, B) fail to converge may differ for different B.
+Deterministic Kernels A Markov kernel S → T is deterministic iff there is a measurable function f : S → T such that the kernel’s value on s ∈ S and A ∈ BT is
+1T (f (s), A) = 1S(s, f −1(A)).
+Every measurable function f : S → T gives a deterministic kernel of this form, thus the deterministic kernels and the measurable functions are in one-to-one correspondence. We write f for both the set function and its associated kernel, thus
+f (s, A) = 1T (f (s), A) = 1S(s, f −1(A)).
+Deterministic kernels compose on the left and right with arbitrary kernels as follows:
+(f ; P )(s, A) = 1(f (s), dt) · P (t, A) = P (f (s), A)
+t
+(P ; f )(s, A) = P (s, dt) · 1(t, f −1(A)) = P (s, f −1(A)).
+t
+Guards Every measurable set A ∈ BS gives rise to an associated guard A : S → S of the same name, a subprobability kernel
+A(s, B) = 1S(s, A ∩ B).
+Guards can be used in sequential composition expressions to limit integration:
+(P ; A ; Q)(s, B) = P (s, dt) · Q(t, B).
+t∈A
+Reversible Kernels A Markov kernel P : S → T is reversible if it has a deterministic right inverse f : T → S; thus P ; f = 1. If P : S → T and Q : T → U are reversible with inverses f : T → S and g : U → T respectively, then P ; Q is reversible with inverse g ; f . The measurable spaces and reversible kernels form a subcategory of the Kleisli category of the Giry monad.
+Reversibility is simply an abstract way of saying that history is preserved. Normally this is done with projections as in the usual
+
+formulation of the Kolmogorov extension theorem. Any Markov kernel P : S → T gives rise to a reversible kernel P : S → S ×T by just remembering the ﬁrst argument:
+
+P (s, A × B) =
+
+P (s, B), 0,
+
+s ∈ A, s ∈ A.
+
+The inverse is then the projection onto the ﬁrst component.
+Lemma 1.
+(i) For any A ∈ BS and reversible P : S → T with right inverse f : T → S, we have A ; P = P ; f −1(A).
+(ii) For A ∈ BS and deterministic f : T → S, we have f −1(A) ; f = f ; A.
+(iii) The right inverse of any reversible kernel is surjective.
+
+Proof. (i) For any s ∈ S and B ∈ BT ,
+
+(A ; P )(s, B) = A(s, dt) · P (t, B)
+
+=
+
+P (s, B), 0,
+
+s ∈ A, s ∈ A,
+
+(P ; f −1(A))(s, B) = P (s, dt) · (f −1(A))(t, B)
+= P (s, B ∩ f −1(A)).
+If s ∈ A, then P (s, B ∩ f −1(A)) ≤ P (s, f −1(A)) = (P ; f )(s, A) = 1(s, A) = 0,
+thus A ; P and P ; f −1(A) agree in that case. If s ∈ A, then s ∈ ∼A. By the above argument, P (s, B ∩ f −1(∼A)) = 0. Then P (s, B ∩ f −1(A)) = P (s, B ∩ f −1(A)) + P (s, B ∩ f −1(∼A))
+= P (s, B),
+therefore A ; P and P ; f −1(A) agree in that case as well. (ii) For any s ∈ S and B ∈ BT ,
+(f −1(A) ; f )(s, B) = f −1(A)(s, f −1(B)) = 1(s, f −1(A ∩ B)) = (1 ; f )(s, A ∩ B) = f (s, A ∩ B)) = (f ; A)(s, B).
+(iii) Suppose P is reversible with right inverse f . By (i), for any s ∈ S,
+(P ; f −1({s}) ; f )(s, S) = ({s} ; P ; f )(s, S) = {s}(s, S) = 1(s, {s}) = 1,
+so it cannot be that f −1({s}) = 0.
+
+Conditional Expectation Let (S, B, µ) be a measure space with µ a probability measure. The conditional expectation E(X | F ) of a B-measurable function X with respect to a σ-subalgebra F of B is any F-measurable function such that for A ∈ F ,
+
+E(X | F )(s) · µ(ds) = X(s) · µ(ds).
+AA
+The conditional expectation exists and is unique up to a µ-nullset. It can be obtained as a Radon–Nikody´m derivative, as the integral on the right-hand side, as a function of A ∈ F, is absolutely continuous with respect to µ; that is, the integral vanishes whenever A ∈ F and µ(A) = 0.
+Applied to characteristic functions of measurable sets B ∈ B, conditional expectations are also measures as functions of B. As such, they are Markov kernels EF : (S, F ) → (S, B) with
+
+EF (s, B) = E(χB | F )(s). This representation affords some notational advantages:
+(2.1) A well-known property is that for F ⊆ G ⊆ B,
+E(E(X | G) | F ) = E(X | F ).
+In our notation, this translates to
+EF ; EG = EF .
+(2.2) Suppose that F ⊆ G and we are given two kernels P : (S, F) → T and Q : (S, G) → T , and we wish to show that P (−, B) = E(Q(−, B) | F ) with respect to an ambient measure µ. We would need to show that for all A ∈ F,
+
+P (s, B) · µ(ds) = Q(s, B) · µ(ds).
+AA
+Regarding µ as a kernel µ : S0 → S on a one-point space S0, it sufﬁces to show
+µ;A;P =µ;A;Q
+for all A ∈ F. This gives the desired equation for all B ∈ BT uniformly. In particular, if Q(−, B) = χB, so Q = 1, then it sufﬁces to show
+µ ; A ; P = µ ; A.
+
+(2.3) A special case of the martingale convergence theorem is the Le´vy zero-one law, which states that if Fn is a sequence of σ-algebras on S such that Fm ⊆ Fn for m ≤ n, and if Fω is the smallest σ-algebra containing n Fn, then for any X : S → R measurable with respect to Fω, E(X | Fn) converges to E(X | Fω) pointwise outside of a µ-nullset. In our notation, this becomes
+EFn → EFω pointwise a.e.
+Martingales Let (S, Fω, µ) be a measure space. A sequence of random variables and σ-algebras (Xn, Fn) on S, n ≥ 0, is called a martingale if
+(i) Fm ⊆ Fn for m ≤ n,
+(ii) Fω is the σ-algebra generated by n Fn, (iii) Xn is Fn-measurable,
+(iv) Xm = E(Xn | Fm) for all m ≤ n.
+The martingale convergence theorem of Doob [8] (see [20] or [10, Theorem VII.9.2]) states that the sequence Xn has a pointwise limit Xω outside a µ-nullset.
+By property (iv) of martingales and the deﬁnition of conditional expectation, for all Am ∈ Fm and n ≥ m,
+
+Xm(s) · µ(ds) = E(Xn | Fm)(s) · µ(ds)
+
+Am
+
+Am
+
+= Xn(s) · µ(ds),
+Am
+thus by the martingale convergence theorem,
+
+Xm(s) · µ(ds) = Xω(s) · µ(ds)
+
+Am
+
+Am
+
+= E(Xω | Fm) · µ(ds).
+Am
+Again by the deﬁnition of conditional expectation, we have that
+
+Xm = E(Xω | Fm).
+
+(2.4)
+
+3. Main Results
+Suppose we have a chain of Radon spaces (Sn, Bn), n ∈ ω along with reversible Markov kernels Pmn : Sm → Sn for each m ≤ n such that
+Pkn = Pkm ; Pmn, k ≤ m ≤ n Pnn = 1Sn . (3.1)
+Since the Pmn are reversible, their deterministic inverses fnm : Sn → Sm for m ≤ n satisfy
+fnk = fnm ; fmk, k ≤ m ≤ n fnn = 1Sn . (3.2)
+The chain Sn has a projective limit Sω, where
+Sω = {(sn | n ∈ ω) ∈ Sn | ∀m ≤ n fnm(sn) = sm}.
+n∈ω
+Let Bω be the weakest σ-algebra on Sω such that all projections πm : Sω → Sm are measurable. Then (Sω, Bω) is the limit of the spaces (Sn, Bn) in the category of Radon spaces and measurable functions.
+The following local consistency condition corresponds to the premise needed to apply the Kolmogorov extension theorem (see [6, Theorem 3.3.6]).
+Lemma 2. For all k ≤ m ≤ n, Pkm(s, A) = Pkn(s, fn−m1 (A)).
+
+Proof. This is equivalent to the assertion that Pkm = Pkn ; fnm. But
+Pkm = Pkm ; 1Sm = Pkm ; Pmn ; fnm = Pkn ; fnm.
+Let Fn = {πn−1(An) | An ∈ Bn} ⊆ Bω. Then n Fn is a Boolean subalgebra of Bω. By the monotone class theorem ([14, Theorem I.6.B] or [6, Theorem 2.1.1]), Bω is the smallest class containing n Fn and closed under unions of countable ascending chains and intersections of countable descending chains.
+Lemma 3.
+(i) If m ≤ n, Am ∈ Fm, and An ∈ Fn, then πn−1(An) = πm−1(Am) if and only if An = fn−m1 (Am).
+(ii) If m ≤ n, then Fm ⊆ Fn.
+
+Proof. Clause (ii) and the reverse implication of clause (i) follow from the fact that πm = πn ; fnm. Thus
+πm−1(Am) = πn−1(fn−m1 (Am)) ∈ Fn.
+For the forward implication of clause (i), assume that πn(s) ∈ An iff πm(s) ∈ Am. Since πm = πn ; fnm, we have that
+πn(s) ∈ An ⇔ fnm(πn(s)) ∈ Am ⇔ πn(s) ∈ fn−m1 (Am).
+It follows from Lemma 1(ii) that the πn : Sω → Sn are surjective, thus An = fn−m1 (Am).
+
+We now wish to show that (Sω, Bω) is the colimiting object of the chain. We need to deﬁne reversible Markov kernels Pmω : Sm → Sω that commute with the Pmn. As with the Kolmogorov extension theorem, inner regularity is needed for this part of the argument; once this is done, the assumption of inner regularity is no longer needed.
+For each πn−1(An) ∈ Fn with m ≤ n, deﬁne
+
+Pmω(s, πn−1(An)) = Pmn(s, An).
+
+(3.3)
+
+We must argue that Pmω is well deﬁned. If k ≤ m ≤ n with πm−1(Am) = πn−1(An), we have by Lemma 3(i) that An = fn−m1 (Am). Then
+Pkn(s, An) = Pkn(s, fn−m1 (Am))
+
+= (Pkn ; fnm)(s, Am) = Pkm(s, Am).
+
+Theorem 1. The map Pnω : Sn × n Fn → [0, 1] extends to a reversible Markov kernel Pnω : Sn → Sω with right inverse πn.
+
+Proof. We must show:
+(i) For ﬁxed s ∈ Sn, the map Pnω(s, −) : n Fn → [0, 1] extends to a measure Pnω(s, −) : Bω → [0, 1].
+(ii) For ﬁxed A ∈ Bω, the map Pnω(−, A) : Sn → [0, 1] is a measurable function.
+For (i), using inner regularity one can show that for ﬁxed s ∈ Sn, the map Pnω(s, −) : n Fn → [0, 1] is countably additive on
+n Fn, therefore by the Carathe´odory extension theorem (see [14, Theorem 13.A] or [17, Theorem 7.27.7]) extends to a measure Pnω(s, −) : Sω → [0, 1]. This is essentially the Kolmogorov extension theorem in this setting.
+For (ii), the proof is by induction on the stage at which A becomes an element of Bω via the monotone class theorem. The basis is (3.3). For the induction step, we use the fact that the pointwise supremum of a countable ascending chain of uniformly bounded measurable functions is measurable. If A = n An for a chain A0 ⊆ A1 ⊆ · · · , we have that the functions Pnω(−, Ai) are measurable by the inductive hypothesis, and Pnω(−, i Ai) is the pointwise supremum of the Pnω(−, Ai), therefore measurable. The argument for intersections of countable descending chains is similar.
+That πn is the right inverse of Pnω, that is, Pnω ; πn = 1Sn , is just (3.3) with m = n.
+
+The next theorem establishes a universality property of the space (Sω, Bω) as a form of colimit of the (Sn, Bn) with coprojections Pnω : Sn → Sω in the category of Radon spaces and
+reversible Markov kernels. As mentioned, it is not a true colimit or even a weak colimit; nevertheless, the space (Sω, Bω) is universal
+in a sense to be made precise by part (ii) of the theorem.
+
+Theorem 2.
+
+(i) The kernels Pnω commute with the kernels Pmn in the sense that for all m ≤ n, Pmω = Pmn ; Pnω.
+(ii) Let (T, BT ) be any measurable space with reversible Markov kernels Qn : Sn → T , each with a deterministic right inverse gn : T → Sn such that Qm = Pmn ; Qn for all m ≤ n. There exists a reversible Markov kernel
+Qω : Sω → T
+
+such that Qn = Pnω ; Qω, where T is the completion of T with respect to the pseudometric
+
+2−n, if n is the least number 
+
+dT (t, t ) =
+
+such that gn(t) = gn(t ),
+
+0, if gn(t) = gn(t ) for all n.
+
+(3.4)
+
+Proof. (i) We have by (3.3) and Theorem 1 that for k ≥ n,
+Pmω ; πk = Pmk = Pmn ; Pnk = Pmn ; Pnω ; πk.
+Because of the composition with πk on the right, Pmω and Pmn ; Pnω agree on the generators of Bω, therefore also on all of Bω.
+(ii) Under the premises of the theorem, gm = gn ; fnm and Qm ; gn = Pmn for all m ≤ n. Since (Sω, Bω) is the limit of the (Sn, Bn) in the category of measurable spaces and measurable functions, there is a measurable function g : T → Sω such that gn = g ; πn for all n.
+For all n ≥ m, we have
+Qm ; g ; πn = Pmn ; Qn ; gn = Pmn = Pmω ; πn.
+
+Because of the composition with πn on the right, (Qm ; g)(sm, −) and Pmω(sm, −) agree on the generators n Fn of Fω, therefore also on Fω. Thus
+
+Qm ; g = Pmω.
+
+(3.5)
+
+We now construct a kernel Qω with right inverse g. Unfortunately, the limit construction does not guarantee that g is surjective, which by Lemma 1(iii) it must be in order to be the right inverse of a kernel. However, its image g(T ) = {g(t) | t ∈ T } is dense in Sω with respect to a certain metric, and we can form the comple-
+tion T of T without affecting the values of the Qn. This will allow
+g to be extended to a surjective function g : T → Sω, which will
+allow the construction of a kernel Sω → T . Moreover, the ideal {A ∈ BSω | A ∩ g(T ) = ∅} contains only Pmω-nullsets, since if A ∩ g(T ) = ∅, then by (3.5),
+
+Pmω(sm, A) = (Qm ; g)(sm, A) = Qm(sm, g−1(A)) = 0,
+
+thus points not in g(T ) can be deleted from Sω to give a kernel g(T ) → T if desired.
+
+The completion T of T is taken with respect to the pseudometric
+
+dT , where
+
+2−n, if n is the least number
+
+dSω (s, s ) =
+
+such that πn(s) = πn(s ),
+
+0, if s = s
+
+dT (t, t ) = dSω (g(t), g(t )). Concretely, let T be the disjoint union of T and Sω − g(T ). Deﬁne
+
+g(t), t ∈ T, g(t) =
+t, t ∈ Sω − g(T ),
+
+gn(t) =
+
+gn(t), πn(t),
+
+t ∈ T, t ∈ Sω − g(T ).
+
+Extend BT to BT by including all subsets of Sω − g(T ). Extend Qn : S → T to Qn : S → T by taking subsets of Sω − g(T )
+as nullsets; that is, Qn(sn, B) = Qn(s, B ∩ T ). Note that g(T )
+is dense in Sω under the metric dSω . One can show that Qn is reversible with right inverse gn and that Pmn ; Qn = Qm.
+Moreover, g : T → Sω is surjective. Let us therefore assume
+henceforth that the original g is surjective and that T = T . We now show that the kernels Qn give rise to two collections
+of martingales. For the ﬁrst collection, ﬁx B ∈ BT and s0 ∈ S0. We show that the measurable functions (πn ; Qn)(−, B) form a martingale with respect to the ﬁltration {Fn | n ≥ 0} and the ambient measure P0ω(s0, −) on Sω. Let us check the four properties of martingales listed in §2.
+
+(i) Fm ⊆ Fn for m ≤ n,
+(ii) Fω is the σ-algebra generated by n Fn, (iii) (πn ; Qn)(−, B) is Fn-measurable,
+(iv) (πm ; Qm)(−, B) = E((πn ; Qn)(−, B) | Fm) for m ≤ n.
+
+Properties (i) and (ii) are immediate from Lemma 3. For (iii), (πn ; Pnω)(−, B) is Fn-measurable because πn is. Finally, for property (iv), by (2.2) it sufﬁces to show that for any Am ∈ Bm,
+P0ω ; πm−1(Am) ; πm ; Qm = P0ω ; πm−1(Am) ; πn ; Qn. (3.6)
+Let An = fn−m1 (Am). By Lemma 3(i), πm−1(Am) = πn−1(An). Using this, Lemma 1(ii), Theorem 1, and the fact Qm = Pmn ; Qn, (3.6) reduces to
+Am ; Pmn = Pmn ; An.
+
+But this is just Lemma 1(i). By the martingale convergence theorem, the (πn ; Qn)(−, B)
+converge pointwise to an Fω-measurable function Qω(−, B) outside a P0ω(s0, −)-nullset, thus the πn ; Qn converge pointwise a.e. to Qω.
+The map Qω will be our desired kernel. However, note that we have not yet shown that Qω is a measure in its second variable nor that it is reversible with right inverse g. We will do this below, but we must be careful not to inadvertently use these properties until they are established.
+The Qk factor through Qω as desired: for k ≤ m ≤ n,
+Pkω ; πm ; Qm = Pkω ; πn ; Qn = Qk,
+therefore
+Pkω ; Qω = lim Pkω ; πn ; Qn = lim Qk = Qk. nn
+The second collection of martingales is deﬁned on T . Deﬁne the ﬁltration
+Gn = {gn−1(A) | A ∈ Bn} = {g−1(A) | A ∈ Fn} ∈ BT
+and let Gω ⊆ BT be the σ-algebra generated by n Gn. As above, ﬁx B ∈ BT and s0 ∈ S0. We claim that the functions (gn ; Qn)(−, B) form a martingale with respect to the ﬁltration {Gn | n ≥ 0} and the ambient measure Q0(s0, −) on T . The four properties of martingales we must check are
+(i) Gm ⊆ Gn for m ≤ n, (ii) Gω is the σ-algebra generated by n Gn, (iii) (gn ; Qn)(−, B) is Gn-measurable, (iv) (gm ; Qm)(−, B) = E((gn ; Qn)(−, B) | Gm) for m ≤ n.
+As above, properties (i)–(iii) are straightforward: (i) is immediate from Lemma 3, (ii) is by deﬁnition, and (iii) is from the fact that gn is Gn-measurable. Finally, for (iv), by (2.2) we must show that for any Am ∈ Bm,
+Q0 ; gm−1(Am) ; gm ; Qm = Q0 ; gm−1(Am) ; gn ; Qn. (3.7)
+Let An = fn−m1 (Am). By the fact that gm = gn ; fnm, we have gm−1(Am) = gn−1(An). Using this, Lemma 1(ii), and Theorem 1, (3.7) reduces to
+Qk ; gm ; Am ; Qm = Qk ; gn ; An ; Qn,
+which follows by equational reasoning from Lemma 1(i) and the properties
+Qm = Pmn ; Qn Qm ; gm = 1 Pkm ; Pmn = Pkn.
+Again using the martingale convergence theorem, the (gn ; Qn)(−, B) converge pointwise to a Gω-measurable function outside a Q0(s0, −)-nullset. In this case, the limit is (g ; Qω)(−, B):
+lim gn ; Qn = lim g ; πn ; Qn = g ; Qω. nn
+As above, the gn ; Qn converge pointwise a.e. to g ; Qω. Note that none of these calculations required integration with
+respect to the second argument of Qω. As the reader will recall, we have yet to establish that Qω is countably additive in its second argument. We do that now.
+Lemma 4. gn ; Qn = EGn , the conditional expectation with respect to the measure Q0(s0, −) on T .
+Proof. Using Lemma 1,
+Q0 ; gn−1(An) ; gn ; Qn = Q0 ; gn ; An ; Qn = P0n ; Qn ; gn−1(An) = Q0 ; gn−1(An).
+
+By the Le´vy zero-one theorem (2.3), EGn converges pointwise a.e. to EGω . We have already argued that g ; Qω is the a.e. pointwise limit of the gn ; Qn. Thus by Lemma 4, g ; Qω = EGω a.e. This says that for all t ∈ T ,
+Qω(g(t), −) = (g ; Qω)(t, −) = EGω (t, −).
+The kernel EGω is a conditional probability, therefore a measure in its second argument. As g is surjective, Qω(s, −) is also measure for all s ∈ Sω, therefore it is a Markov kernel.
+It remains to show that Qω is reversible with right inverse g. Observe that
+Pnω ; πn = 1Sn = Qn ; gn = Pnω ; Qω ; gn.
+Thus Qω ; gn and πn agree outside a Pnω-nullset, and this is true for arbitrary n. By the universality of g to the projective limit Bω of the spaces Bn, we have Qω ; g = 1Sω .
+
+3.1 Discussion
+
+The kernel Qω constructed in the proof of Theorem 2 is not unique, as the martingale convergence theorem determines Qω only up to a nullset for each B ∈ BT . Moreover, there is some ﬂexibility in
+the formation of the completion T . Thus the construction is at best a weak colimit.
+If g is not surjective, the kernel Qω does not give a universal arrow in the strict sense of the word, as it is not necessarily of type
+
+Sω → T . An extension of T to T may be required to accommodate the orphans s ∈ Sω. This can always be done in a straightforward
+way as we have done in the proof of Theorem 2, but the type of
+
+the arrow is then Sω → T , not Sω → T . As we have noted, the orphans can be omitted, giving a kernel of type Sω → T for a dense subset Sω ⊆ Sω, but this is not of the correct type either. However, under the assumption that T is complete with respect to
+the pseudometric (3.4), the construction becomes a genuine weak
+colimit.
+We made use of inner regularity in the construction of the Pkω. Moy [23, p. 907] seems to suggest that this assumption is not
+necessary. But Moy is working in the space of real sequences,
+which is implicitly inner regular. The claim does not hold more generally, as the following counterexample shows. Let Fn be the σ-algebra on N generated by the sets {0}, {1}, . . . , {n − 1} and {n, n + 1, n + 2, . . .}. Then Fn is ﬁnite and n Fn consists of all ﬁnite and coﬁnite sets. The σ-algebra Fω generated by n Fn is the full powerset of N, as every set is a countable union of singletons.
+Now let U be a nonprinciple ultraﬁlter and let
+
+µ(A)
+
+=
+
+1
+
+
+
+  
+
+2
+
++
+
+2−(n+2) ,
+n∈A
+
+ 
+
+2−(n+2) ,
+
+
+
+
+
+n∈A
+
+A ∈ U, A ∈ U.
+
+Then µ is nonnegative, ﬁnite-valued, and countably additive on
+
+every Fn, but not countably additive on n∈N Fn, since
+
+µ({n}) = 1 2
+n∈N
+
+µ(N) = 1.
+
+The space is not inner regular, as any set in U is at least 1/2 heavier than any compact subset.
+
+3.2 Encoding Kolmogorov Extension
+
+The standard Kolmogorov extension theorem is a special case involving measures on product spaces
+
+n∞
+
+Sn = Sn
+
+Sω = Sn.
+
+n=0
+
+n=0
+
+The functions fnm : Sn → Sm for m ≤ n and πn : Sω → Sn are simply the projections onto lower-dimensional products:
+fnm(s0, . . . , sn) = (s0, . . . , sm), m ≤ n
+πn(s0, s1, . . . ) = (s0, . . . , sn).
+The generalization to projective limits of spaces connected by measurable functions fnm has been observed by several authors [2, 5, 13, 21, 26, 27].
+In the classical treatment, we are given component probability measures µn on the Sn satisfying the consistency condition µm = µn ◦ fn−m1 for all m ≤ n. The Kolmogorov extension theorem guarantees the existence of a unique probability measure µ on Sω such that µn = µ ◦ πn−1 for every n.
+In our framework, the kernels Pmn : Sm → Sn are the conditional expectations Pmn(s, A) = Em(s, A) for s ∈ Sm and A a measurable subset of Sn. The kernels compose properly by virtue of (2.1). The necessary consistency condition among the component measures is given by Lemma 2: for k ≤ m ≤ n, s ∈ Sk, and A a measurable subset of Sm, Ek(s, A) = Ek(s, fn−m1 (A)).
+
+3.3 Encoding Martingales
+
+The martingale convergence theorem is also a special case. Given a [0, 1]-valued martingale (Xn, Fn) on a space (S, Fω, µ), we can encode it as a cocone on a chain of measurable spaces and reversible kernels. This can be done in two distinct but equivalent ways, the ﬁrst closer in spirit to classical martingale theory on a single space with a ﬁltration of σ-algebras, the second closer to probabilistic semantics involving a chain of state transition systems.
+In the ﬁrst approach, we deﬁne Sn = S, Bn = Fn, and for m ≤ n, s ∈ S, and A ∈ Fn,
+
+Pmn(s, A) = Em(s, A)
+
+fnm(s) = s.
+
+As observed in §2, the conditional expectation Em(s, A) is a measurable function in s and a measure in A, thus a Markov kernel. Note that Pmn(s, A) does not depend on n. The standard property (2.1) of conditional expectations implies that composition works correctly: for k ≤ m ≤ n and A ∈ Fn,
+
+(Pkm ; Pmn)(s, A) =
+
+Ek(s, dt) · Em(t, A)
+
+t∈S
+
+= Ek(s, A) = Pkn(s, A).
+
+The function fnm is a measurable function with respect to the measurable sets Fn on its domain and Fm on its range, since Fm ⊆ Fn. Moreover, fnm is the right inverse of Pmn: for Am ∈ Fm,
+
+(Pmn ; fnm)(s, Am) =
+
+Em(s, dt) · 1(t, Am)
+
+t∈S
+
+= Em(s, Am) = 1(s, Am).
+
+The projective limit Sω of the Sn is just S itself, and πn(s) = s. This gives
+
+Pmω(s, A) = Pmω(s, πn−1(A)) = Pmn(s, A) = Em(s, A), A ∈ Fn.
+
+Since Pmω(s, −) and Em(s, −) agree on n Fn, they agree on all of Fω.
+Now to encode the martingale Xn, let Xω be the pointwise limit of the Xn as guaranteed by the martingale convergence theorem. Let
+
+T = S × {0, 1} g(s, 0) = g(s, 1) = s Gα = {g−1(A) | A ∈ Fα}
+= {A × {0, 1} | A ∈ Fα}, α ∈ ω ∪ {ω} BT = {(A × {1}) ∪ (B × {0}) | A, B ∈ Gω}.
+
+The set BT is the σ-algebra generated by Gω ∪ {S × {1}}. Deﬁne the kernel Q : S → T by
+Q(s, (A × {1}) ∪ (B × {0}))
+= Xω(s) · 1(s, A) + (1 − Xω(s)) · 1(s, B)
+for A, B ∈ Gω. In other words, Q(s, −) is a weighted sum of Dirac measures on (s, 1) and (s, 0) with weights Xω(s) and 1 − Xω(s), respectively:
+Q(s, S × {1}) = Q(s, {(s, 1)}) = Xω(s)
+Q(s, S × {0}) = Q(s, {(s, 0)}) = 1 − Xω(s).
+Intuitively, from state s, ﬂip an Xω(s)-biased coin and enter state (s, 1) on heads and (s, 0) on tails. This Q will turn out to be Qω : Sω → T for the sequence Qn : Sn → T we are about to deﬁne.
+For A ∈ Fω, we have
+
+(Q ; g)(s, A) = Q(s, dt) · g(t, A)
+t∈T
+= Q(s, {(s, i)}) · 1(g(s, i), A)
+i∈{0,1}
+= Xω(s) · 1(s, A) + (1 − Xω(s)) · 1(s, A) = 1(s, A),
+
+therefore g is the right inverse of Q. Now deﬁne
+
+Qn = Pnω ; Q
+
+gn(s, 0) = gn(s, 1) = s.
+
+Then
+
+Qm = Pmω ; Q = Pmn ; Pnω ; Q = Pmn ; Qn, and for A ∈ Fn,
+(Qn ; gn)(s, A) = (Pnω ; Q ; g)(s, A) = Pnω(s, A),
+
+and since Pnω agrees with Pnn on A ∈ Fn, this is 1(s, A), thus gn is the right inverse of Qn.
+Finally, to show that Qn encodes the martingale,
+Qn(s, S × {1}) = (Pnω ; Q)(s, S × {1})
+
+= Pnω(s, dt) · Q(t, S × {1})
+t∈S
+= En(s, dt) · Xω(t)
+t∈S
+= E(Xω | Fn)(s) = Xn(s).
+
+3.4 An Alternative Construction
+There is another construction equivalent to the one of §3.3 but closer in spirit to state transition systems as they arise in programming language semantics. As above, suppose we are given a martingale (Xn, Fn) on a probability space (S, Fω, µ). For s, t ∈ S, deﬁne
+s ≡n t ⇔ ∀A ∈ Fn (s ∈ A ⇔ t ∈ A)
+[s]n = {t ∈ S | s ≡n t}
+A/≡n = {[s]n | s ∈ A}, A ∈ Fn
+Sn = S/≡n
+Bn = {A/≡n | A ∈ Fn}.
+The Boolean operations on Fn respect the equivalence relation ≡n, therefore (Sn, Bn) is a measurable space.
+For A/≡n ∈ Bn and m ≤ n, we deﬁne
+Pmn([s]m, A/≡n) = Em(s, A) fnm([s]n) = [s]m.
+
+The standard deﬁnition of conditional expectation as a Radon– Nikody´m derivative ensures that E(An | Fm) is Fm-measurable, so if s ≡n t, then E(An | Fm) takes the same value on s and
+t, thus Pmn is well deﬁned up to a µ-nullset. Also, fnm is well deﬁned, since Fm ⊆ Fn, therefore ≡n reﬁnes ≡m.
+One can deﬁne T , g, BT , Gn, Qn, gn, and Q as in §3.3. The collection of maps [ · ]α : (S, Fα) → (Sα, Bα) for α ∈ ω ∪ {ω} constitute a natural isomorphism between the two cocones (S, Fα) and (Sα, Bα). As such, they preserve all relevant measure-theoretic
+structure.
+
+4. An Application
+
+In [12], operational and denotational semantics are given for prob-
+abilistic NetKAT, a probabilistic language for reasoning about
+packet switching networks. In this language, programs are inter-
+preted as packet ﬁlters that consume an input set of packet histo-
+ries (nonnull sequences of packets) and produce an output set of
+packet histories according to some probability distribution. There
+are atomic actions for querying ﬁelds of the packet header, modi-
+fying these ﬁelds, and duplicating the head packet. Denotationally, programs p are interpreted as Markov kernels
+p : 2H → 2H , where H is the set of packet histories. The relevant measurable space is (2H , B) whose points a ∈ 2H are sets of packet histories and whose events A ∈ B are the Borel sets of the Cantor space 2H .
+Programs can be composed using parallel composition (&), se-
+quential composition (;, typically elided in expressions), probabilistic choice (⊕r), and iteration (∗). The parallel composition operator & supplants the choice operator + of Kleene algebra. Operationally, to determine p & q (a, A), we sample p (a, −) and q (a, −)
+independently, then take the union of the two outcomes and ask whether it is in A. Denotationally,
+
+p&q =( p × q ); ,
+
+Where p × q : 2H → (2H )2 is the product kernel deﬁned in §2 and : (2H )2 → 2H is the deterministic union kernel
+(a, b) = a ∪ b. Of course, the most interesting part of the language is iteration. Intuitively, p∗ says “do p zero or more times.” The while loop is deﬁned in terms of star as in propositional dynamic logic or Kleene algebra with tests:
+while b do p = (bp)∗¯b,
+
+where the test b is the deterministic kernel b (a, −) = δa∩b. As
+
+noted in [12], the usual deﬁnition of star as a sum of powers does
+
+not work in the probabilistic case. Instead, we deﬁne an operational
+
+semantics in terms of an inﬁnite stochastic process. To determine p∗ (c0, A), we start with the input set c0 ∈ 2H and create a
+
+sequence c0, c1, c2, . . . inductively. After constructing c0, . . . , cn, let cn+1 be the outcome obtained by sampling 2H according to
+the distribution p (cn, −). We continue this process forever to get an inﬁnite sequence c0, c1, c2, . . . ∈ (2H )ω. We take the union
+
+of the resulting sequence probability of this event is
+
+denﬁncnedatnodbaeskp∗wh(ect0h,eAr )i.t
+
+is
+
+in
+
+A.
+
+The
+
+Unlike KAT and NetKAT, p∗ is not the same as the inﬁnite
+
+sum of powers &n pn . The latter fails to capture the sequential
+
+nature of iteration in the presence of probabilistic choice.
+
+This process is shown to satisfy the crucial ﬁxpoint equation
+
+p∗ = skip & pp∗,
+
+(4.8)
+
+where skip is the identity kernel, although it is by no means the only solution.
+The operational deﬁnition of the star operator can be justiﬁed denotationally, but the formal development as given [12] is quite
+
+involved. Now with Theorem 1, we can give a more streamlined
+account. Let hd : (2H )ω → 2H and tl : (2H )ω → (2H )ω be the
+deterministic kernels
+
+hd(c0, c1, c2, . . .) = c0 tl(c0, c1, c2, . . .) = c1, c2, . . .
+
+The kernel p : 2H → 2H gives rise to reversible kernels
+
+pmn : (2H )m+1 → (2H )n+1, m ≤ n
+
+deﬁned inductively as follows:
+
+p0,n+1 = 1 × ( p ; p0n ) pm+1,n+1 = hd × (tl ; pmn )
+
+and p00 = 1. One can show that the composition property (3.1) is satisﬁed. By Theorem 1, we have kernels pmω : (2H )m+1 → (2H )ω. Moreover,
+
+p0ω = p01 ; p1ω = (1 × p ) ; (hd × (tl ; p0ω )) = 1 × ( p ; p0ω ).
+
+Composing on the right with the (continuous) union operator (2H )ω → 2H gives p∗ by deﬁnition:
+p∗ = p1ω ; : 2H → 2H .
+
+:
+
+The ﬁxpoint equation (4.8) is satisﬁed: p∗ = p0ω ; = (1 × ( p ; p0ω )) ; = (1 × ( p ; p0ω ; )) ;
+= (1 & ( p ; p0ω ; )) = skip & pp∗ .
+
+5. Conclusion
+We have characterized the Kolmogorov extension theorem as a colimit-like construction in a category of Radon spaces and reversible Markov kernels. The Doob martingale convergence theorem is used to establish universality. These results provide a compositional denotational semantics for standard iteration operators in programming languages as a limit of ﬁnite approximants, even in the lossless case in which there is no natural approximation order. This is the case, for example, with the system reported in [12].
+In Theorem 2(ii), the function g would already be surjective and
+one would not need to take the completion T if T were already complete with respect to the pseudometric (3.4). It would be interesting to identify the weakest possible completeness assumptions on T that guarantee this. Another intriguing question is whether a point-free approach as in [15] might yield a true colimit.
+We have forgone several possible generalizations: continuous time, signed measures, and more general colimits. Such matters present themselves as interesting topics for future investigation.
+
+Acknowledgments
+Sincere thanks to Nate Foster, Jean Goubault-Larrecq, Lionel Levine, Konstantinos Mamouras, Prakash Panangaden, John Pike, Mark Reitblatt, Alexandra Silva, Alex Simpson, Steffen Smolka, Ana Sokolova, and Harald Woracek. Support from the National Science Foundation under grant CCF-1535952 is gratefully acknowledged.
+
+References
+[1] P. Billingsley. Convergence of probability measures. Wiley, 2nd edition, 1999.
+
+[2] S. Bochner. Harmonic Analysis and the Theory of Probability. Univ. California Press, 1955.
+[3] A. Chakarov and S. Sankaranarayanan. Probabilistic program analysis with martingales. In N. Sharygina and H. Veith, editors, 25th Int. Conf. Computer Aided Veriﬁcation (CAV 2013), volume 8044 of Lecture Notes in Computer Science, pages 511–526. Springer, 2013.
+[4] A. Chakarov and S. Sankaranarayanan. Expectation invariants as ﬁxed points of probabilistic programs. In Static Analysis Symposium (SAS 2014), volume 8723 of Lecture Notes in Computer Science, pages 85– 100. Springer, 2014.
+[5] J. R. Choksi. Inverse limits of measure spaces. Proc. London Math. Soc., 8:321–342, 1958.
+[6] K. L. Chung. A Course in Probability Theory. Academic Press, 2nd edition, 1974.
+[7] E.-E. Doberkat. Stochastic Relations: Foundations for Markov Transition Systems. Studies in Informatics. Chapman Hall, 2007.
+[8] J. L. Doob. Stochastic Processes, volume 2. Wiley, New York; Chapman & Hall, London, 1953.
+[9] D. Dubhashi and A. Panconesi. Concentration of Measure for the Analysis of Randomized Algorithms. Cambridge University Press, 2009.
+[10] W. Feller. An Introduction to Probability Theory and Its Applications, volume 2. Wiley, 2nd edition, 1971.
+[11] L. M. F. Fioriti and H. Hermanns. Probabilistic termination: Soundness, completeness, and compositionality. In S. K. Rajamani and D. Walker, editors, Proc. 42nd ACM Symp. Principles of Programming Languages (POPL 2015), pages 489–501. ACM, January 2015.
+[12] N. Foster, D. Kozen, K. Mamouras, M. Reitblatt, and A. Silva. Probabilistic NetKAT. Technical Report http://hdl.handle.net/ 1813/40335, Computing and Information Science, Cornell University, July 2015. 25th European Symposium on Programming (ESOP 2016), to appear.
+[13] Z. Frol´ık. Projective limits of measure spaces. In L. L. Cam, J. Neyman, and E. L. Scott, editors, Proc. 6th Berkeley Symp. Math. Statistics and Probability. Univ. California Press, June–July 1970.
+[14] P. R. Halmos. Measure Theory. Van Nostrand, 1950.
+[15] M. Jackson. A Sheaf Theoretic Approach to Measure Theory. PhD thesis, University of Pittsburgh, 2006.
+[16] A. Kolmogorov. Foundations of the Theory of Probability. Chelsea, 2nd edition, 1956.
+[17] A. N. Kolmogorov and S. V. Fomin. Introductory Real Analysis. Prentice Hall, 1970.
+[18] D. Kozen. Semantics of probabilistic programs. J. Comput. Syst. Sci., 22:328–350, 1981.
+[19] D. Kozen. A probabilistic PDL. J. Comput. Syst. Sci., 30(2):162–178, April 1985.
+[20] C. W. Lamb. Shorter notes: A short proof of the martingale convergence theorem. Proceedings of the American Mathematical Society, 38(1):215–217, 1973.
+[21] J. D. Mallory and M. Sion. Limits of inverse systems of measures. Annales de l’Institut Fourier, 21(1):25–57, 1971.
+[22] A. McIver and C. Morgan. Abstraction, Reﬁnement And Proof For Probabilistic Systems. Springer, 2004.
+[23] S.-T. C. Moy. Measure extensions and the martingale convergence theorem. Proc. Amer. Math. Soc., 4:902–907, December 1953.
+[24] P. Panangaden. The category of Markov kernels. Electronic Notes in Theoretical Computer Science, 22:171–187, 1999.
+[25] P. Panangaden. Labelled Markov Processes. Imperial College Press, 2009.
+[26] Y. V. Prokhorov. Convergence of random processes and limit theorems in probability theory. Theor. Probability Appl., 1(2):157–214, 1956.
+[27] M. Rao. Projective limits of probability spaces. Journal of Multivariate Analysis, 1(1):28–57, 1971.
+
+

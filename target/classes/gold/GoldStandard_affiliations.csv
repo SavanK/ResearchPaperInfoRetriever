@@ -1,0 +1,299 @@
+key,authorIndex,name,thenInstitution,thenDepartment
+conf/asplos/AbadalCAT16,0,Sergi Abadal,University of Illinois at Urbana-Champaign Univ. Politècnica de Catalunya,
+conf/asplos/AbadalCAT16,1,Albert Cabellos-Aparicio,Univ. Politècnica de Catalunya,
+conf/asplos/AbadalCAT16,2,Eduard Alarcón,Univ. Politècnica de Catalunya,
+conf/asplos/AbadalCAT16,3,Josep Torrellas,University of Illinois at Urbana-Champaign,
+conf/asplos/AwadMHSH16,0,Amro Awad,North Carolina State University,
+conf/asplos/AwadMHSH16,1,Pratyusa K. Manadhata,Hewlett Packard Labs,
+conf/asplos/AwadMHSH16,2,Stuart Haber,Hewlett Packard Labs,
+conf/asplos/AwadMHSH16,3,Yan Solihin,North Carolina State University,
+conf/asplos/AwadMHSH16,4,William Horne,Hewlett Packard Labs,
+conf/asplos/BornholtKLKTW16,0,James Bornholt,University of Washington,
+conf/asplos/BornholtKLKTW16,1,Antoine Kaufmann,University of Washington,
+conf/asplos/BornholtKLKTW16,2,Jialin Li,University of Washington,
+conf/asplos/BornholtKLKTW16,3,Arvind Krishnamurthy,University of Washington,
+conf/asplos/BornholtKLKTW16,4,Emina Torlak,University of Washington,
+conf/asplos/BornholtKLKTW16,5,Xi Wang,University of Washington,
+conf/asplos/FanZL16,0,Songchun Fan,Duke University,
+conf/asplos/FanZL16,1,Seyed Majid Zahedi,Duke University,
+conf/asplos/FanZL16,2,Benjamin C. Lee,Duke University,
+conf/asplos/KimKBNW16,0,Wook-Hee Kim,Ulsan National Institute of Science and Technology,
+conf/asplos/KimKBNW16,1,Jinwoong Kim,Ulsan National Institute of Science and Technology,
+conf/asplos/KimKBNW16,2,Woongki Baek,Ulsan National Institute of Science and Technology,
+conf/asplos/KimKBNW16,3,Beomseok Nam,Ulsan National Institute of Science and Technology,
+conf/asplos/KimKBNW16,4,Youjip Won,Hanyang University,
+conf/asplos/LinCLMHXS16,0,Xiaofeng Lin,Sina Corporation ZHIHU Corporation,
+conf/asplos/LinCLMHXS16,1,Yu Chen,Tsinghua University,Department of Computer Science and Technology
+conf/asplos/LinCLMHXS16,2,Xiaodong Li,Sina Corporation,
+conf/asplos/LinCLMHXS16,3,Junjie Mao,Tsinghua University,Department of Computer Science and Technology
+conf/asplos/LinCLMHXS16,4,Jiaquan He,Tsinghua University,Department of Computer Science and Technology
+conf/asplos/LinCLMHXS16,5,Wei Xu,Tsinghua University,Department of Computer Science and Technology
+conf/asplos/LinCLMHXS16,6,Yuanchun Shi,Tsinghua University,Department of Computer Science and Technology
+conf/asplos/MaoCXS16,0,Junjie Mao,Tsinghua University,Department of Computer Science and Technology
+conf/asplos/MaoCXS16,1,Yu Chen,Tsinghua University,Department of Computer Science and Technology
+conf/asplos/MaoCXS16,2,Qixue Xiao,Tsinghua University,Department of Computer Science and Technology
+conf/asplos/MaoCXS16,3,Yuanchun Shi,Tsinghua University,Department of Computer Science and Technology
+conf/asplos/McKinley16,0,Kathryn S. McKinley,Microsoft Research,
+conf/asplos/Williams16,0,R. Stanley Williams,Hewlett Packard Labs,
+conf/asplos/Witchel16,0,Emmett Witchel,University of Texas at Austin,
+conf/iccad/AbusultanK16,0,Monther Abusultan,Texas A&M University,ECE Department
+conf/iccad/AbusultanK16,1,Sunil P. Khatri,Texas A&M University,ECE Department
+conf/iccad/BatselierCLW16,0,Kim Batselier,The University of Hong Kong,Department of Electrical and Electronic Engineering
+conf/iccad/BatselierCLW16,1,Zhongming Chen,The University of Hong Kong,Department of Electrical and Electronic Engineering
+conf/iccad/BatselierCLW16,2,Haotian Liu,"Cadence Design Systems, Inc. USA",
+conf/iccad/BatselierCLW16,3,Ngai Wong,The University of Hong Kong,Department of Electrical and Electronic Engineering
+conf/iccad/ChenS16,0,Quan Chen,University of Hong Kong,Department of Electrical and Electronic Engineering
+conf/iccad/ChenS16,1,Wim Schoenmaker,Magwel N.V.,
+conf/iccad/HuangLKN16,0,Shih-Hsu Huang,Chung Yuan Christian University,Department of Electronic Engineering
+conf/iccad/HuangLKN16,1,Rung-Bin Lin,Yuan Ze University,Department of Computer Science and Engineering
+conf/iccad/HuangLKN16,2,Myung-Chul Kim,IBM Corporation,
+conf/iccad/HuangLKN16,3,Shigetoshi Nakatake,University of Kitakyushu,Department of Information and Media Engineering
+conf/iccad/KannanS16,0,Parivallal Kannan,Xilinx Inc.,
+conf/iccad/KannanS16,1,Satish Sivaswamy,Xilinx Inc.,
+conf/iccad/KuDMRL16,0,Bon Woong Ku,Georgia Institute of Technology,School of ECE
+conf/iccad/KuDMRL16,1,Peter Debacker,IMEC,
+conf/iccad/KuDMRL16,2,Dragomir Milojevic,IMEC,
+conf/iccad/KuDMRL16,3,Praveen Raghavan,IMEC,
+conf/iccad/KuDMRL16,4,Sung Kyu Lim,Georgia Institute of Technology,School of ECE
+conf/iccad/PattisonAAGV16,0,Ryan Pattison,University of Guelph,School of Engineering
+conf/iccad/PattisonAAGV16,1,Ziad Abuowaimer,University of Guelph,School of Engineering
+conf/iccad/PattisonAAGV16,2,Shawki Areibi,University of Guelph,School of Engineering
+conf/iccad/PattisonAAGV16,3,Gary Gréwal,University of Guelph,School of Computer Science
+conf/iccad/PattisonAAGV16,4,Anthony Vannelli,University of Guelph,School of Engineering
+conf/iccad/PeanoRGNB16,0,Andrea Peano,University of Ferrara - Via,
+conf/iccad/PeanoRGNB16,1,Luca Ramini,University of Ferrara - Via,
+conf/iccad/PeanoRGNB16,2,Marco Gavanelli,University of Ferrara - Via,
+conf/iccad/PeanoRGNB16,3,Maddalena Nonato,University of Ferrara - Via,
+conf/iccad/PeanoRGNB16,4,Davide Bertozzi,University of Ferrara - Via,
+conf/iccad/SinhaZHRBC16,0,Debjit Sinha,"IBM Systems, Poughkeepsie",
+conf/iccad/SinhaZHRBC16,1,Vladimir Zolotov,"IBM Systems, Poughkeepsie IBM T J Watson Research",
+conf/iccad/SinhaZHRBC16,2,Jin Hu,"IBM Systems, Poughkeepsie",
+conf/iccad/SinhaZHRBC16,3,Sheshashayee K. Raghunathan,"IBM Systems, Bangalore",
+conf/iccad/SinhaZHRBC16,4,Adil Bhanji,"IBM Systems, Poughkeepsie",
+conf/iccad/SinhaZHRBC16,5,Christine M. Casey,"IBM Systems, Poughkeepsie",
+conf/iccad/Topaloglu16,0,Rasit Onur Topaloglu,IBM,
+conf/icml/GaoLZ16,0,Chao Gao,Yale University,
+conf/icml/GaoLZ16,1,Yu Lu,Yale University,
+conf/icml/GaoLZ16,2,Dengyong Zhou,Microsoft Research,
+conf/icml/KawakitaT16,0,Masanori Kawakita,Kyushu University,
+conf/icml/KawakitaT16,1,Jun'ichi Takeuchi,Kyushu University,
+conf/icml/MnihR16,0,Andriy Mnih,Google DeepMind,
+conf/icml/MnihR16,1,Danilo Jimenez Rezende,Google DeepMind,
+conf/icml/NatarajanKRD16,0,Nagarajan Natarajan,"Microsoft Research, INDIA",
+conf/icml/NatarajanKRD16,1,Oluwasanmi Koyejo,"Stanford University University of Illinois at Urbana-Champaign, IL, USA",
+conf/icml/NatarajanKRD16,2,Pradeep Ravikumar,University of Texas at Austin,
+conf/icml/NatarajanKRD16,3,Inderjit S. Dhillon,"University of Illinois at Urbana-Champaign, IL, USA",
+conf/icml/PuleoM16,0,Gregory J. Puleo,"University of Illinois at Urbana-Champaign, Urbana, IL 61801 USA",Coordinated Science Lab
+conf/icml/PuleoM16,1,Olgica Milenkovic,"University of Illinois at Urbana-Champaign, Urbana, IL 61801 USA",Department of Electrical and Computer Engineering
+conf/icml/Shalev-Shwartz16,0,Shai Shalev-Shwartz,Hebrew University of Jerusalem,School of Computer Science and Engineering
+conf/icml/ShenLX16,0,Jie Shen,Rutgers,Department of Computer Science
+conf/icml/ShenLX16,1,Ping Li,Rutgers Rutgers,Dept. of Statistics & Biostatistics Dept. of Computer Science
+conf/icml/ShenLX16,2,Huan Xu,"National University of Singapore, Singapore",Department of Industrial and Systems Engineering
+conf/icml/SyrgkanisKS16,0,Vasilis Syrgkanis,"Microsoft Research, 641 Avenue of the Americas, New York, NY 10011 USA",
+conf/icml/SyrgkanisKS16,1,Akshay Krishnamurthy,"Microsoft Research, 641 Avenue of the Americas, New York, NY 10011 USA",
+conf/icml/SyrgkanisKS16,2,Robert E. Schapire,"Microsoft Research, 641 Avenue of the Americas, New York, NY 10011 USA",
+conf/icml/XuZCL16,0,Zhiqiang Xu,"A*STAR, Singapore",Institute for Infocomm Research
+conf/icml/XuZCL16,1,Peilin Zhao,"A*STAR, Singapore",Institute for Infocomm Research
+conf/icml/XuZCL16,2,Jianneng Cao,"A*STAR, Singapore",Institute for Infocomm Research
+conf/icml/XuZCL16,3,Xiaoli Li,"A*STAR, Singapore",Institute for Infocomm Research
+conf/icml/YoonAHS16,0,Jinsung Yoon,"University of California, Los Angeles (UCLA), CA, 90095, USA",Electrical Engineering Department
+conf/icml/YoonAHS16,1,Ahmed M. Alaa,"University of California, Los Angeles (UCLA), CA, 90095, USA",Electrical Engineering Department
+conf/icml/YoonAHS16,2,Scott Hu,"University of Texas at Austin, TX 78712, USA",David Geffen School of Medicine
+conf/icml/YoonAHS16,3,Mihaela van der Schaar,"University of California, Los Angeles (UCLA), CA, 90095, USA",Electrical Engineering Department
+conf/imc/AlcockMN16,0,Shane Alcock,University of Waikato,
+conf/imc/AlcockMN16,1,Jean-Pierre Möller,University of Waikato,
+conf/imc/AlcockMN16,2,Richard Nelson,University of Waikato,
+conf/imc/GhobadiM16,0,Monia Ghobadi,Microsoft Research,
+conf/imc/GhobadiM16,1,Ratul Mahajan,Microsoft Research,
+conf/imc/HastingsFH16,0,Marcella Hastings,University of Pennsylvania,
+conf/imc/HastingsFH16,1,Joshua Fried,University of Pennsylvania,
+conf/imc/HastingsFH16,2,Nadia Heninger,University of Pennsylvania,
+conf/imc/KlickLW016,0,Johannes Klick,Freie Universität Berlin,
+conf/imc/KlickLW016,1,Stephan Lau,Freie Universität Berlin,
+conf/imc/KlickLW016,2,Matthias Wählisch,Freie Universität Berlin,
+conf/imc/KlickLW016,3,Volker Roth,Freie Universität Berlin,
+conf/imc/KrencF16,0,Thomas Krenc,TU Berlin,
+conf/imc/KrencF16,1,Anja Feldmann,TU Berlin,
+conf/imc/LeeS16,0,Youndo Lee,University of Maryland,
+conf/imc/LeeS16,1,Neil Spring,University of Maryland,
+conf/imc/LeungRCW16,0,Christophe Leung,Northeastern University,
+conf/imc/LeungRCW16,1,Jingjing Ren,Northeastern University,
+conf/imc/LeungRCW16,2,David R. Choffnes,Northeastern University,
+conf/imc/LeungRCW16,3,Christo Wilson,Northeastern University,
+conf/imc/LiuTZZZZ16,0,Qingyun Liu,UC Santa Barbara,Computer Science
+conf/imc/LiuTZZZZ16,1,Shiliang Tang,UC Santa Barbara,Computer Science
+conf/imc/LiuTZZZZ16,2,Xinyi Zhang,UC Santa Barbara,Computer Science
+conf/imc/LiuTZZZZ16,3,Xiaohan Zhao,UC Santa Barbara,Computer Science
+conf/imc/LiuTZZZZ16,4,Ben Y. Zhao,UC Santa Barbara,Computer Science
+conf/imc/LiuTZZZZ16,5,Haitao Zheng,UC Santa Barbara,Computer Science
+conf/imc/SenPPFSCG16,0,Rijurekha Sen,MPI-SWS,
+conf/imc/SenPPFSCG16,1,Hasnain Ali Pirzada,University of Wisconsin-Madison,
+conf/imc/SenPPFSCG16,2,Amreesh Phokeer,University of Cape Town,
+conf/imc/SenPPFSCG16,3,Zaid Ahmed Farooq,LUMS,
+conf/imc/SenPPFSCG16,4,Satadal Sengupta,IIT Kharagpur,
+conf/imc/SenPPFSCG16,5,David R. Choffnes,Northeastern University,
+conf/imc/SenPPFSCG16,6,Krishna P. Gummadi,MPI-SWS,
+conf/imc/VanderSlootABDB16,0,Benjamin VanderSloot,University of Michigan,
+conf/imc/VanderSlootABDB16,1,Johanna Amann,International Computer Science Inst.,
+conf/imc/VanderSlootABDB16,2,Matthew Bernhard,University of Michigan,
+conf/imc/VanderSlootABDB16,3,Zakir Durumeric,University of Michigan International Computer Science Inst.,
+conf/imc/VanderSlootABDB16,4,Michael Bailey,University of Illinois at Urbana-Champaign,
+conf/imc/VanderSlootABDB16,5,J. Alex Halderman,International Computer Science Inst.,
+conf/lics/BenediktBB16,0,Michael Benedikt,University of Oxford,
+conf/lics/BenediktBB16,1,Pierre Bourhis,Université Lille INRIA,CNRS CRIStAL
+conf/lics/BenediktBB16,2,Michael Vanden Boom,University of Oxford,
+conf/lics/BenediktBCP16,0,Michael Benedikt,,
+conf/lics/BenediktBCP16,1,Pierre Bourhis,,
+conf/lics/BenediktBCP16,2,Balder ten Cate,,
+conf/lics/BenediktBCP16,3,Gabriele Puppis,,
+conf/lics/Chatterjee016,0,Krishnendu Chatterjee,IST Austria,
+conf/lics/Chatterjee016,1,Laurent Doyen,ENS Cachan CNRS,LSV
+conf/lics/ChatterjeeHO16,0,Krishnendu Chatterjee,IST Austria,
+conf/lics/ChatterjeeHO16,1,Thomas A. Henzinger,IST Austria,
+conf/lics/ChatterjeeHO16,2,Jan Otop,University of Wrocław,
+conf/lics/Galicki16,0,Alex Galicki,University of Auckland,
+conf/lics/HerlihyM16,0,Maurice Herlihy,Brown University Oracle Labs,
+conf/lics/HerlihyM16,1,Mark Moir,Oracle Labs,
+conf/lics/HughesH16,0,Dominic J. D. Hughes,University of California - Berkeley,Logic Group
+conf/lics/HughesH16,1,Willem Heijltjes,University of Bath,Department of Computer Science
+conf/lics/Kopczynski16,0,Eryk Kopczynski,University of Warsaw,
+conf/lics/Kozen16,0,Dexter Kozen,Cornell University,
+conf/lics/Kozik16,0,Marcin Kozik,Jagiellonian University Jagiellonian University,Theoretical Computer Science Department The Faculty of Mathematics and Computer Science
+conf/micro/AlwaniCFM16,0,Manoj Alwani,Stony Brook University,
+conf/micro/AlwaniCFM16,1,Han Chen,Stony Brook University,
+conf/micro/AlwaniCFM16,2,Michael Ferdman,Stony Brook University,
+conf/micro/AlwaniCFM16,3,Peter Milder,Stony Brook University,
+conf/micro/GogteKCDW16,0,Vaibhav Gogte,University of Michigan,
+conf/micro/GogteKCDW16,1,Aasheesh Kolli,University of Michigan,
+conf/micro/GogteKCDW16,2,Michael J. Cafarella,University of Michigan,
+conf/micro/GogteKCDW16,3,Loris D'Antoni,University of Wisconsin - Madison,
+conf/micro/GogteKCDW16,4,Thomas F. Wenisch,University of Michigan,
+conf/micro/JainHLKHLMTM16,0,Animesh Jain,University of Michigan,
+conf/micro/JainHLKHLMTM16,1,Parker Hill,University of Michigan,
+conf/micro/JainHLKHLMTM16,2,Shih-Chieh Lin,University of Michigan,
+conf/micro/JainHLKHLMTM16,3,Muneeb Khan,Uppsala University,
+conf/micro/JainHLKHLMTM16,4,Md E. Haque,University of Michigan,
+conf/micro/JainHLKHLMTM16,5,Michael A. Laurenzano,University of Michigan,
+conf/micro/JainHLKHLMTM16,6,Scott A. Mahlke,University of Michigan,
+conf/micro/JainHLKHLMTM16,7,Lingjia Tang,University of Michigan,
+conf/micro/JainHLKHLMTM16,8,Jason Mars,University of Michigan,
+conf/micro/JainLTM16,0,Animesh Jain,University of Michigan - Ann Arbor,
+conf/micro/JainLTM16,1,Michael A. Laurenzano,University of Michigan - Ann Arbor,
+conf/micro/JainLTM16,2,Lingjia Tang,University of Michigan - Ann Arbor,
+conf/micro/JainLTM16,3,Jason Mars,University of Michigan - Ann Arbor,
+conf/micro/JeffreySAES16,0,Mark C. Jeffrey,Massachusetts Institute of Technology,
+conf/micro/JeffreySAES16,1,Suvinay Subramanian,Massachusetts Institute of Technology,
+conf/micro/JeffreySAES16,2,Maleen Abeydeera,Massachusetts Institute of Technology,
+conf/micro/JeffreySAES16,3,Joel S. Emer,NVIDIA Massachusetts Institute of Technology,
+conf/micro/JeffreySAES16,4,Daniel Sanchez,Massachusetts Institute of Technology,
+conf/micro/KallurkarS16,0,Prathmesh Kallurkar,"Indian Institute of Technology, New Delhi",Department of Computer Science
+conf/micro/KallurkarS16,1,Smruti R. Sarangi,"Indian Institute of Technology, New Delhi",Department of Computer Science
+conf/micro/Martonosi16,0,Margaret Martonosi,Princeton University,
+conf/micro/SantriajiH16,0,Muhammad Husni Santriaji,Surya University University of Chicago,
+conf/micro/SantriajiH16,1,Henry Hoffmann,University of Chicago,
+conf/micro/YazdaniSAG16,0,Reza Yazdani,Universitat Politecnica de Catalunya,Computer Architecture Department
+conf/micro/YazdaniSAG16,1,Albert Segura,Universitat Politecnica de Catalunya,Computer Architecture Department
+conf/micro/YazdaniSAG16,2,Jose-Maria Arnau,Universitat Politecnica de Catalunya,Computer Architecture Department
+conf/micro/YazdaniSAG16,3,Antonio Gonzalez,Universitat Politecnica de Catalunya,Computer Architecture Department
+conf/micro/ZhangCS16,0,Guowei Zhang,Massachusetts Institute of Technology,Computer Science and Artiﬁcial Intelligence Laboratory
+conf/micro/ZhangCS16,1,Virginia Chiu,Massachusetts Institute of Technology,Computer Science and Artiﬁcial Intelligence Laboratory
+conf/micro/ZhangCS16,2,Daniel Sanchez,Massachusetts Institute of Technology,Computer Science and Artiﬁcial Intelligence Laboratory
+conf/naacl/BootenH16,0,Kyle Booten,UC Berkeley,
+conf/naacl/BootenH16,1,Marti A. Hearst,UC Berkeley,
+conf/naacl/FerreiraV16,0,William Ferreira,University College London,Department of Computer Science
+conf/naacl/FerreiraV16,1,Andreas Vlachos,University of Shefﬁeld,Department of Computer Science
+conf/naacl/GirleaGA16,0,Codruta Gîrlea,University of Illinois,
+conf/naacl/GirleaGA16,1,Roxana Girju,University of Illinois,
+conf/naacl/GirleaGA16,2,Eyal Amir,University of Illinois,
+conf/naacl/KiritchenkoM16a,0,Svetlana Kiritchenko,National Research Council Canada,
+conf/naacl/KiritchenkoM16a,1,Saif M. Mohammad,National Research Council Canada,
+conf/naacl/LacroixAWY16,0,Ophélie Lacroix,CNRS Université Paris-Saclay,LIMSI Univ. Paris-Sud
+conf/naacl/LacroixAWY16,1,Lauriane Aufrant,CNRS Université Paris-Saclay DGA,LIMSI Univ. Paris-Sud
+conf/naacl/LacroixAWY16,2,Guillaume Wisniewski,CNRS Université Paris-Saclay,LIMSI Univ. Paris-Sud
+conf/naacl/LacroixAWY16,3,François Yvon,CNRS Université Paris-Saclay,LIMSI Univ. Paris-Sud
+conf/naacl/Moosavi016,0,Nafise Sadat Moosavi,Heidelberg Institute for Theoretical Studies gGmbH,
+conf/naacl/Moosavi016,1,Michael Strube,Heidelberg Institute for Theoretical Studies gGmbH,
+conf/naacl/PaetzoldS16,0,Gustavo Paetzold,University of Shefﬁeld,Department of Computer Science
+conf/naacl/PaetzoldS16,1,Lucia Specia,University of Shefﬁeld,Department of Computer Science
+conf/naacl/SchwartzRR16,0,Roy Schwartz,The Hebrew University,Institute of Computer Science
+conf/naacl/SchwartzRR16,1,Roi Reichart,Technion – Israel Institute of Technology,Faculty of Industrial Engineering and Management
+conf/naacl/SchwartzRR16,2,Ari Rappoport,The Hebrew University,Institute of Computer Science
+conf/naacl/SennrichHB16,0,Rico Sennrich,University of Edinburgh,School of Informatics
+conf/naacl/SennrichHB16,1,Barry Haddow,University of Edinburgh,School of Informatics
+conf/naacl/SennrichHB16,2,Alexandra Birch,University of Edinburgh,School of Informatics
+conf/naacl/SharmaGMBSMS16,0,Arnav Sharma,"International Institute of Information Technology, Hyderabad",Kohli Center on Intelligent Systems
+conf/naacl/SharmaGMBSMS16,1,Sakshi Gupta,"International Institute of Information Technology, Hyderabad",Kohli Center on Intelligent Systems
+conf/naacl/SharmaGMBSMS16,2,Raveesh Motlani,"International Institute of Information Technology, Hyderabad",Kohli Center on Intelligent Systems
+conf/naacl/SharmaGMBSMS16,3,Piyush Bansal,"International Institute of Information Technology, Hyderabad",Kohli Center on Intelligent Systems
+conf/naacl/SharmaGMBSMS16,4,Manish Shrivastava,"International Institute of Information Technology, Hyderabad",Kohli Center on Intelligent Systems
+conf/naacl/SharmaGMBSMS16,5,Radhika Mamidi,"International Institute of Information Technology, Hyderabad",Kohli Center on Intelligent Systems
+conf/naacl/SharmaGMBSMS16,6,Dipti Misra Sharma,"International Institute of Information Technology, Hyderabad",Kohli Center on Intelligent Systems
+conf/sigsoft/Alimadadi16,0,Saba Alimadadi,University of British Columbia,
+conf/sigsoft/Gullapalli16,0,Sachith Gullapalli,Yale University,
+conf/sigsoft/Hammoudi16,0,Mouna Hammoudi,"University of Nebraska - Lincoln, USA",Department of Computer Science and Engineering
+conf/sigsoft/Hilton16,0,Michael Hilton,Oregon State University,
+conf/sigsoft/Huang16,0,Shan Shan Huang,"LogicBlox, USA",
+conf/sigsoft/JacksonV16,0,Daniel Jackson,Massachusetts Institute of Technology,
+conf/sigsoft/JacksonV16,1,Mandana Vaziri,"IBM, USA",
+conf/sigsoft/Kurtz16,0,Bob Kurtz,George Mason University,Software Engineering
+conf/sigsoft/Mahmud16,0,Gazi Mahmud,Sonatype,
+conf/sigsoft/Panchekha16,0,Pavel Panchekha,University of Washington,
+conf/sigsoft/Sadowski16,0,Caitlin Sadowski,Google,
+conf/vr/BeraKM16,0,Aniket Bera,University of North Carolina at Chapel Hill,
+conf/vr/BeraKM16,1,Sujeong Kim,University of North Carolina at Chapel Hill,
+conf/vr/BeraKM16,2,Dinesh Manocha,University of North Carolina at Chapel Hill,
+conf/vr/Bickmore16,0,Timothy W. Bickmore,Northeastern University,College Of Computer And Information Science
+conf/vr/BodenheimerWMR16,0,Bobby Bodenheimer,Vanderbilt University,
+conf/vr/BodenheimerWMR16,1,Yiming Wang,Vanderbilt University,
+conf/vr/BodenheimerWMR16,2,Divine Maloney,University of the South,
+conf/vr/BodenheimerWMR16,3,John J. Rieser,Vanderbilt University,
+conf/vr/HollererILS16,0,Tobias Höllerer,University of California - Santa Barbara,
+conf/vr/HollererILS16,1,Victoria Interrante,"University of Minnesota, USA",
+conf/vr/HollererILS16,2,Anatole Lécuyer,"Inria, France",
+conf/vr/HollererILS16,3,Evan A. Suma,Mississippi State University,
+conf/vr/Lin16,0,Ming Lin,University of North Carolina at Chapel Hill,
+conf/vr/LinJ16,0,Lorraine Lin,Clemson University,
+conf/vr/LinJ16,1,Sophie Jörg,Clemson University,
+conf/vr/PeerP16,0,Alex Peer,University of Wisconsin-Madison,Living Environments Lab
+conf/vr/PeerP16,1,Kevin Ponto,University of Wisconsin-Madison,Living Environments Lab
+conf/vr/TeofiloNSASN16,0,Mauro Teófilo,Samsung Research Institutee Amazon Federal University,
+conf/vr/TeofiloNSASN16,1,Josiane Nascimento,Samsung Research Institute,
+conf/vr/TeofiloNSASN16,2,Jonathan Santos,Samsung Research Institute,
+conf/vr/TeofiloNSASN16,3,Yves Albuquerque,Samsung Research Institute,
+conf/vr/TeofiloNSASN16,4,Andre L. Souza,The University of Alabama,
+conf/vr/TeofiloNSASN16,5,Daniel Nogueira,Samsung Research Institute,
+conf/vr/ZielaskoHFWK16,0,Daniel Zielasko,RWTH Aachen University JARA - High-Performance Computing,Visual Computing Institute
+conf/vr/ZielaskoHFWK16,1,Sven Horn,RWTH Aachen University JARA - High-Performance Computing,Visual Computing Institute
+conf/vr/ZielaskoHFWK16,2,Sebastian Freitag,RWTH Aachen University JARA - High-Performance Computing,Visual Computing Institute
+conf/vr/ZielaskoHFWK16,3,Benjamin Weyers,RWTH Aachen University JARA - High-Performance Computing,Visual Computing Institute
+conf/vr/ZielaskoHFWK16,4,Torsten W. Kuhlen,RWTH Aachen University JARA - High-Performance Computing,Visual Computing Institute
+conf/vr/ZielinskiRPAK16,0,David J. Zielinski,Duke University,
+conf/vr/ZielinskiRPAK16,1,Hrishikesh Rao,Duke University,
+conf/vr/ZielinskiRPAK16,2,Nick Potter,Duke University,
+conf/vr/ZielinskiRPAK16,3,Lawrence G. Appelbaum,Duke University,
+conf/vr/ZielinskiRPAK16,4,Regis Kopper,Duke University,
+conf/www/BensonKT16a,0,Austin R. Benson,Stanford University,
+conf/www/BensonKT16a,1,Ravi Kumar,Google Inc.,
+conf/www/BensonKT16a,2,Andrew Tomkins,Google Inc.,
+conf/www/ChopraS16,0,Amit K. Chopra,"Lancaster University Lancaster, LA1 4WA, UK",School of Computing and Communications
+conf/www/ChopraS16,1,Munindar P. Singh,North Carolina State University,Department of Computer Science
+conf/www/Fox16,0,Martha Lane Fox,Open University,
+conf/www/Kawamae16,0,Noriaki Kawamae,"NTT Comware 1-6 Nakase, Mihama-ku, Chiba, Japan Japan 261-0023",
+conf/www/LemePV16,0,Renato Paes Leme,Google,
+conf/www/LemePV16,1,Martin Pál,Google,
+conf/www/LemePV16,2,Sergei Vassilvitskii,Google,
+conf/www/NobataTTMC16,0,Chikashi Nobata,"Yahoo Labs Sunnyvale, CA, USA",
+conf/www/NobataTTMC16,1,Joel R. Tetreault,"Yahoo Labs Sunnyvale, CA, USA",
+conf/www/NobataTTMC16,2,Achint Thomas,"Embibe Bangalore, India",
+conf/www/NobataTTMC16,3,Yashar Mehdad,"Yahoo Labs Sunnyvale, CA, USA",
+conf/www/NobataTTMC16,4,Yi Chang,"Yahoo Labs Sunnyvale, CA, USA",
+conf/www/RahmanW16,0,Md Mustafizur Rahman,"University of Virginia Charlottesville VA, 22903 USA",Department of Computer Science
+conf/www/RahmanW16,1,Hongning Wang,University of Virginia,
+conf/www/RitzeLOB16,0,Dominique Ritze,"University of Mannheim, B6, 26 68159 Mannheim, Germany",Data and Web Science Group
+conf/www/RitzeLOB16,1,Oliver Lehmberg,"University of Mannheim, B6, 26 68159 Mannheim, Germany",Data and Web Science Group
+conf/www/RitzeLOB16,2,Yaser Oulabi,"University of Mannheim, B6, 26 68159 Mannheim, Germany",Data and Web Science Group
+conf/www/RitzeLOB16,3,Christian Bizer,"University of Mannheim, B6, 26 68159 Mannheim, Germany",Data and Web Science Group
+conf/www/YangIF16,0,Pu Yang,Cornell University,School of Operations Research and Information Engineering
+conf/www/YangIF16,1,Krishnamurthy Iyer,Cornell University,School of Operations Research and Information Engineering
+conf/www/YangIF16,2,Peter I. Frazier,Cornell University,School of Operations Research and Information Engineering
+conf/www/Zurko16,0,Mary Ellen Zurko,Cisco Systems,

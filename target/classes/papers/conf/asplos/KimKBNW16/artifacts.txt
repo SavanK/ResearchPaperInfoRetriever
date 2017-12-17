@@ -1,0 +1,7 @@
+http://dx.doi.org/10.1145/2872362.2872392
+https://github.com/ESOS-Lab/HEAPO
+https://github.com/ESOS-Lab/Mobibench
+http://opennvram.org/
+http://www.sqlite.org/
+http://www.hpl.hp.com/techreports/2012/HPL2012-236.pdf
+http://dx.doi.org/10.1109/TC.2015.2428708

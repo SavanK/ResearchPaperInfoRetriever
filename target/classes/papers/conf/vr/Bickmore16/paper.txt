@@ -1,0 +1,15 @@
+Capstone Speaker
+Agents? Seriously.
+Timothy Bickmore College Of Computer And Information Science, Northeastern University
+
+Abstract
+
+Bio
+
+Virtual agents, aka embodied conversational agents or virtual humans, are anthropomorphic animated characters that engage people in simulated face-to-face conversation. Applications of virtual agents have moved beyond entertainment and demos to real-world, serious interventions in health, training, education, and other domains. In this talk, I will focus on several conversational agents that have been developed as virtual health counselors and evaluated in large-scale randomized clinical trials. These interventions span cancer self-care, antipsychotic medication adherence, breastfeeding promotion, depression counseling, meditation and yoga guidance for treating chronic pain, preconception care promotion, exercise promotion for geriatrics patients, and more. I will discuss the technical challenges in building conversational agents for the real world, capable of interacting with thousands of patients for months or years, and the evidence base of their efficacy. I will also present a vision for how such agents can be effectively deployed in VR, and a range of promising serious applications that could be deployed using this technology.
+
+Dr. Timothy Bickmore is an Associate Professor in the College of Computer and Information Science at Northeastern University. The focus of his research is on the development and evaluation of computer agents that emulate face-to-face interactions between health providers and patients for use in health education and long-term health behavior change interventions, with a particular focus on the emotional and relational aspects of these interactions. Prior to Northeastern, he was an Assistant Professor of Medicine at the Boston University School of Medicine. Dr. Bickmore received his Ph.D. from MIT, doing his dissertation work in the Media Lab studying emotional interactions between people and animated computer characters.
+
+xviii
+
+

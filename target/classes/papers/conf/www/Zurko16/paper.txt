@@ -1,0 +1,25 @@
+La Sécurité Ouverte How We Doin' So Far?
+
+Mary Ellen Zurko
+Cisco Systems
+mez@alum.mit.edu
+
+ABSTRACT
+Open has meant a lot of things in the web thus far. The openness of the web has had profound implications for web security, from the beginning through to today. Each time the underlying web technology changes, we do a reset on the security it provides. Patterns and differences emerge in each round of security responses and challenges. What has that brought us as web users, technologists, researchers, and as a global community? What can we expect going forward? And what should we work towards as web technologists and caretakers?
+
+security and the web, public key infrastructures, distributed
+authorization, active content security, and user-centered security. She is a contributor to the O'Reilly book "Security and Usability: Designing Secure Systems that People Can Use." She is on the
+steering committees of New Security Paradigms Workshop and
+Symposium on Useable Privacy and Security. Mez received S.B
+and S.M. degrees in computer science from MIT.
+
+General Terms
+Security, Human Factors.
+
+Short Bio
+Mary Ellen Zurko (Mez) is a member of the Office of the CTO, Security Business Group, at Cisco Systems, and a Principal Engineer on the Next Generation Firewall team there. Mez is a seminal member of the National Academies of Sciences Forum on Cyber Resilience. She was security architect of one of IBM's earliest clouds; SaaS for business collaboration. She defined the field of User-Centered Security in 1996. As a senior research fellow at the Open Group Research Institute, she led several innovative security initiatives in authorization policies, languages, and mechanisms that incorporate user-centered design elements. She started her security career at DEC working on a high assurance A1 Virtual Machine Monitor. She has written on
+
+Copyright is held by the author/owner(s). WWW 2016, April 11­15, 2016, Montréal, Québec, Canada. ACM 978-1-4503-4143-1/16/04. http://dx.doi.org/10.1145/2872427.2883583
+5
+
+

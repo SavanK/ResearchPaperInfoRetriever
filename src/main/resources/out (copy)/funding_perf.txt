@@ -1,0 +1,7 @@
+Total - 100
+TP - 89
+FP - 5
+FN - 6
+
+Precision = TP / (TP+FP) = 0.9468
+Recall = TP / (TP+FN) = 0.9368

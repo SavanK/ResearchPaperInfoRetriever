@@ -1,0 +1,798 @@
+Correlation Clustering and Biclustering with Locally Bounded Errors
+
+Gregory J. Puleo
+
+PULEO@ILLINOIS.EDU
+
+Coordinated Science Lab, University of Illinois at Urbana-Champaign, Urbana, IL 61801 USA
+
+Olgica Milenkovic
+
+MILENKOV@ILLINOIS.EDU
+
+Department of Electrical and Computer Engineering, University of Illinois at Urbana-Champaign, Urbana, IL 61801 USA
+
+Abstract
+We consider a generalized version of the correlation clustering problem, defined as follows. Given a complete graph G whose edges are labeled with + or -, we wish to partition the graph into clusters while trying to avoid errors: + edges between clusters or - edges within clusters. Classically, one seeks to minimize the total number of such errors. We introduce a new framework that allows the objective to be a more general function of the number of errors at each vertex (for example, we may wish to minimize the number of errors at the worst vertex) and provide a rounding algorithm which converts "fractional clusterings" into discrete clusterings while causing only a constant-factor blowup in the number of errors at each vertex. This rounding algorithm yields constant-factor approximation algorithms for the discrete problem under a wide variety of objective functions.
+1. Introduction
+Correlation clustering is a clustering model first introduced by Bansal, Blum, and Chawla (Bansal et al., 2002; 2004). The basic form of the model is as follows. We are given a collection of objects and, for some pairs of objects, we are given a judgment of whether the objects are similar or dissimilar. This information is represented as a labeled graph, with edges labeled + or - according to whether the endpoints are similar or dissimilar. Our goal is to cluster the graph so that + edges tend to be within clusters and - edges tend to go across clusters. The number of clusters is not specified in advance; determining the optimal number of clusters is instead part of the optimization problem.
+Given a solution clustering, an error is a + edge whose endpoints lie in different clusters or a - edge whose end-
+Proceedings of the 33 rd International Conference on Machine Learning, New York, NY, USA, 2016. JMLR: W&CP volume 48. Copyright 2016 by the author(s).
+
+points lie in the same cluster. In the original formulation of the correlation clustering, the goal is to minimize the total number of errors; this formulation of the optimization problem is called MINDISAGREE. Finding an exact optimal solution is NP-hard even when the input graph is complete (Bansal et al., 2002; 2004). Furthermore, if the input graph is allowed to be arbitrary, the best known approximation ratio is O(log n), obtained by (Charikar et al., 2003; 2005; Demaine et al., 2006). Assuming the Unique Games Conjecture of Khot (Khot, 2002), no constant-factor approximation for MINDISAGREE on arbitrary graphs is possible; this follows from the results of (Chawla et al., 2006; Steurer & Vishnoi, 2009) concerning the minimum multicut problem and the connection between correlation clustering and minimum multicut described in (Charikar et al., 2003; 2005; Demaine et al., 2006).
+Since theoretical barriers appear to preclude constantfactor approximations on arbitrary graphs, much research has focused on special graph classes such as complete graphs and complete bipartite graphs, which are the graph classes we consider here. Ailon, Charikar, and Newman (Ailon et al., 2005; 2008) gave a very simple randomized 3-approximation algorithm for MINDISAGREE on complete graphs. This algorithm was derandomized by van Zuylen and Williamson (van Zuylen & Williamson, 2009), and a parallel version of the algorithm was studied by Pan, Papailiopoulos, Recht, Ramchandran, and Jordan (Pan et al., 2015). More recently, a 2.06-approximation algorithm was announced by Chawla, Makarychev, Schramm and Yaroslavtsev (Chawla et al., 2014). Similar results have been obtained for complete bipartite graphs. The first constant approximation algorithm for correlation clustering on complete bipartite graphs was described by Amit (Amit, 2004), who gave an 11-approximation algorithm. This ratio was improved by Ailon, Avigdor-Elgrabli, Liberty and van Zuylen (Ailon et al., 2012), who obtained a 4-approximation algorithm. Chawla, Makarychev, Schramm and Yaroslavtsev (Chawla et al., 2014) announced a 3-approximation algorithm for correlation clustering on complete k-partite graphs, for arbitrary k, which includes the complete bipartite case. Bipartite clustering has also been studied, outside the
+
+Correlation Clustering and Biclustering with Locally Bounded Errors
+
+correlation-clustering context, by Lim, Chen, and Xu (Lim et al., 2015).
+We depart from the classical correlation-clustering literature by considering a broader class of objective functions which also cater to the need of many community-detection applications in machine learning, social sciences, recommender systems and bioinformatics (Cheng & Church, 2000; Symeonidis et al., 2007; Kriegel et al., 2009). The technical details of this class of functions can be found in Section 2. As a representative example of this class, we introduce minimax correlation clustering.
+In minimax clustering, rather than seeking to minimize the total number of errors, we instead seek to minimize the number of errors at the worst-off vertex in the clustering. Put more formally, if for a given clustering each vertex v has yv incident edges that are errors, then we wish to find a clustering that minimizes maxv yv.
+Minimax clustering, like classical correlation clustering, is NP-hard on complete graphs, as we prove in the extended version of this paper (Puleo & Milenkovic, 2016). To design approximation algorithms for minimax clustering, it is necessary to bound the growth of errors locally at each vertex when we round from a fractional clustering to a discrete clustering; this introduces new difficulties in the design and analysis of our rounding algorithm. These new technical difficulties cause the algorithm of (Ailon et al., 2005; 2008) to fail in the minimax context, and there is no obvious way to adapt that algorithm to this new context; this phenomenon is explored further in the extended version of this paper (Puleo & Milenkovic, 2016).
+Minimax correlation clustering on graphs is relevant in detecting communities, such as gene, social network, or voter communities, in which no antagonists are allowed. Here, an antagonist refers to an entity that has properties inconsistent with a large number of members of the community. Alternatively, one may view the minimax constraint as enabling individual vertex quality control within the clusters, which is relevant in biclustering applications such as collaborative filtering for recommender systems, where minimum quality recommendations have to be ensured for each user in a given category. As an illustrative example, one may view a complete bipartite graph as a preference model in which nodes on the left represent viewers and nodes on the right represent movies. A positive edge between a user and a movie indicates that the viewer likes the movie, while a negative edge indicates that they do not like or have not seen the movie. We may be interested in finding communities of viewers for the purpose of providing them with joint recommendations. Using a minimax objective function here allows us to provide a uniform quality of recommendations, as we seek to minimize the number of errors for the user who suffers the most errors.
+
+A minimax objective function for a graph partitioning problem different from correlation clustering was previously studied by (Bansal et al., 2011). In that paper, the problem under consideration was to split a graph into k roughlyequal-sized parts, minimizing the total number of edges leaving any part. Thus, the minimum in (Bansal et al., 2011) is being taken over the parts of the solution, rather than minimizing over vertices as we do here.
+Another idea slightly similar to minimax clustering has previously appeared in the literature on fixed-parameter tractability of the CLUSTER EDITING problem, which is an equivalent formulation of Correlation Clustering. In particular, Komusiewicz and Uhlmann (Komusiewicz & Uhlmann, 2012) proved that the following problem is fixedparameter tractable for the combined parameter (d, t):
+
+(d, t)-Constrained-Cluster Editing Input: A labeled complete graph G, a function  : V (G)  {0, . . . , t}, and nonnegative integers d and k. Question: Does G admit a clustering into at most d clusters with at most k errors such that every vertex v is incident to at most  (v) errors?
+
+(Here, we have translated their original formulation into the language of correlation clustering.) Komusiewicz and Uhlmann also obtained several NP-hardness results related to this formulation of the problem. While their work involves a notion of local errors for correlation clustering, their results are primarily focused on fixed-parameter tractability, rather than approximation algorithms, and are therefore largely orthogonal to the results of this paper.
+The contributions of this paper are organized as follows. In Section 2, we introduce and formally express our framework for the generalized version of correlation clustering, which includes both classical clustering and minimax clustering as special cases. In Section 3, we give a rounding algorithm which allows the development of constantfactor approximation algorithms for the generalized clustering problem. In Section 4, we give a version of this rounding algorithm for complete bipartite graphs.
+
+2. Framework and Formal Definitions
+
+In this section, we formally set up the framework we will use for our broad class of correlation-clustering objective functions.
+
+Definition 1. Let G be an edge-labeled graph. A discrete
+
+clustering (or just a clustering) of G is a partition of V (G).
+
+A fractional clustering of G is a vector x indexed by
+
+V (G) 2
+
+such that xuv  [0, 1] for all uv 
+
+V (G) 2
+
+and such that
+
+xvz  xvw + xwz for all distinct v, w, z  V (G).
+
+Correlation Clustering and Biclustering with Locally Bounded Errors
+
+If x is a fractional clustering, we can view xuv as a "distance" from u to v; the constraints xvz  xvw + xwz are therefore referred to as triangle inequality constraints. We also adopt the convention that xuu = 0 for all u.
+In the special case where all coordinates of x are 0 or 1, the triangle inequality constraints guarantee that the relation defined by u  v iff xuv = 0 is an equivalence relation. Such a vector x can therefore naturally be viewed as a discrete clustering, where the clusters are the equivalence classes under . By viewing a discrete clustering as a fractional clustering with integer coordinates, we see that fractional clusterings are a continuous relaxation of discrete clusterings, which justifies the name. This gives a natural notion of the total weight of errors at a given vertex.
+Definition 2. Let G be an edge-labeled complete graph, and let x be a fractional clustering of G. The error vector of x with respect to G, written err(x), is a real vector indexed by V (G) whose coordinates are defined by
+
+err(x)v =
+
+xvw +
+
+(1 - xvw).
+
+wN +(v)
+
+wN -(v)
+
+If C is a clustering of G and xC is the natural associated fractional clustering, we define err(C) as err(xC).
+
+We are now prepared to formally state the optimization problem we wish to solve. Let Rn0 denote the set of vectors in Rn with all coordinates nonnegative. Our problem is parameterized by a function f : Rn0  R.
+
+f -Correlation Clustering Input: A labeled graph G. Output: A clustering C of G. Objective: Minimize f (err(C)).
+
+In order to approximate f -Correlation Clustering, we introduce a relaxed version of the problem.
+
+Fractional f -Correlation Clustering Input: A labeled graph G. Output: A fractional clustering x of G. Objective: Minimize f (err(x)).
+
+If f is convex on Rn0, then using standard techniques from convex optimization (Boyd & Vandenberghe, 2004), the Fractional f -Correlation Clustering problem can be approximately solved in polynomial time, as the composite function f err is convex and the constraints defining a fractional clustering are linear inequalities in the variables xe. When G is a complete graph, we then employ a rounding algorithm based on the algorithm of Charikar, Guruswami, and Wirth (Charikar et al., 2003; 2005) to transform the
+
+fractional clustering into a discrete clustering. Under rather modest conditions on f , we are able to obtain a constantfactor bound on the error growth, that is, we can produce a clustering C such that f (err(C))  cf (err(x)), where c is a constant not depending on f or x. In particular, we require the following assumptions on f .
+Assumption A. We assume that f : Rn0  R has the following properties.
+
+(1) f (cy)  cf (y) for all c  0 and all y  Rn, and
+(2) If y, z  Rn0 are vectors with yi  zi for all i, then f (y)  f (z).
+
+Under Assumption A, the claim that f (err(C))  cf (err(x)) follows if we can show that err(C)v  c err(x)v for every vertex v  V (G). This is the property we prove for our rounding algorithms.
+
+We will slightly abuse terminology by referring to the constant c as an approximation ratio for the rounding algorithm; this notation is motivated by the fact that when f is linear, the Fractional f -Correlation Clustering problem can be solved exactly in polynomial time, and applying a rounding algorithm with constant c to the fractional solution yields a c-approximation algorithm to the (discrete) f -Correlation Clustering problem. In contrast, when f is nonlinear, we may only be able to obtain a (1 + )approximation for the Fractional f -Correlation Clustering problem, in which case applying the rounding algorithm yields a c(1 + )-approximation algorithm for the discrete problem.
+
+A natural class of convex objective functions obeying Assumption A is the class of p norms. For all p  1, the p-norm on Rn is defined by
+
+p(x) =
+
+n
+|xi|p
+i=1
+
+1/p
+.
+
+As p grows larger, the p-norm puts more emphasis on the
+coordinates with larger absolute value. This justifies that definition of the -norm as
+
+(x) = max{x1, . . . , xn}.
+
+Classical correlation clustering is the case of f -Correlation
+
+Clustering where f (x)
+
+=
+
+1 n
+
+1(x),
+
+while
+
+minimax
+
+cor-
+
+relation clustering is the case of f -Correlation Clustering
+
+where f (x) = (x).
+
+Our emphasis on convex f is due to the fact that convex programming techniques allow the Fractional f Correlation Clustering problem to be approximately solved in polynomial time when f is convex. However, the correctness of our rounding algorithm does not depend on the
+
+Correlation Clustering and Biclustering with Locally Bounded Errors
+
+convexity of f , only on the properties listed in Assumption A. If f is nonconvex and obeys Assumption A, and we produce a "good" fractional clustering x by some means, then our algorithm still produces a discrete clustering C with f (err(C))  cf (err(x)).
+3. A Rounding Algorithm for Complete Graphs
+We now describe a rounding algorithm to transform an arbitrary fractional clustering x of a labeled complete graph G into a clustering C such that err(C)v  c err(x)v for all v  V (G).
+Our rounding algorithm is based on the algorithm of Charikar, Guruswami, and Wirth (Charikar et al., 2003; 2005) and is shown in Algorithm 1. The main difference between Algorithm 1 and the algorithm of (Charikar et al., 2003; 2005) is the new strategy of choosing a pivot vertex that maximizes |Tu|; in (Charikar et al., 2003; 2005), the pivot vertex is chosen arbitrarily. Furthermore, the algorithm of (Charikar et al., 2003; 2005) always uses  = 1/2 as a cutoff for forming "candidate clusters", while we express  as a parameter which we later choose in order to optimize the approximation ratio.
+Under the classical objective function, an optimal fractional clustering is the solution to a linear program, which motivates the following notation for the more general case.
+Definition 3. If uv is an edge of a labeled graph G, we define the LP-cost of uv relative to a fractional clustering x to be xuv if uv  E+, and 1 - xuv if uv  E-. Likewise, the cluster-cost of an edge uv is 1 if uv is an error in the clustering produced by Algorithm 1, and 0 otherwise.
+Our general strategy for obtaining the constant-factor error bound for Algorithm 1 is similar to that of (Charikar et al., 2003; 2005). Each time a cluster is output, we pay for the cluster-cost of the errors incurred by "charging" the cost of these errors to the LP-costs of the fractional clustering. The main difference between our proof and the proof of (Charikar et al., 2003; 2005) is that we must pay for errors locally: for each vertex v, we must pay for all clustering errors incident to v by charging to the LP cost incident to v. In particular, every clustering error must now be paid for at each of its endpoints, while in (Charikar et al., 2003; 2005), it was enough to pay for each clustering error at one of its endpoints. For edges which cross between a cluster and its complement, this requires a different analysis at each endpoint, a difficulty which was not present in (Charikar et al., 2003; 2005). Our proof emphasizes the solutions to these new technical problems; the parts of the proof that are technically nontrivial but follow earlier work are omitted due to space constraints but can be found in the extended version of this paper (Puleo & Milenkovic, 2016).
+
+Observation 4. Let x be a fractional clustering of a graph G, and let w, z  V (G). For any vertex u, we have xwz  xuz - xuw and 1 - xwz  1 - xuz - xuw.
+Theorem 5. Let G be a labeled complete graph, let  and  be parameters with 0 <  <  < 1/2, and let x be any fractional clustering of G. If C is the clustering produced by Algorithm 1 with the given input, then for all v  V (G) we have err(C)v  c err(x)v, where c is a constant depending only on  and .
+Proof. Let k1, k2, k3 be constants to be determined, with 1/2 < k1 < 1 and 0 < 2k2  k3 < 1/2. Also assume that k1 >  and that k2  1 - 2.
+To prove the approximation ratio, we consider the clustercosts incurred as each cluster is output, splitting into cases according to the type of cluster. In our analysis, as the algorithm runs, we will mark certain vertices as "safe", representing the fact that some possible future clustering costs have been paid for in advance. Initially, no vertex is marked as safe.
+Case 1: A Type 1 cluster is output. Let X = S  N +(u), with S as in Algorithm 1. The new cluster-cost incurred at u is |X|, and for each v  X, a new cluster-cost of 1 is incurred at v.
+First we pay for the new cluster cost incurred at u. For each edge uv with v  T , we have xuv   and so 1 - xuv  1 -   xuv. Thus, the total LP cost of edges uv with v  T is at least vT xuv, which is at least  |T | /2 since {u} is output as a Type 1 cluster. Thus, charging each edge uv with v  T a total of 2/ times its LP-cost pays for the cluster-cost of any positive edges from u to T . On the other hand, if uv is a positive edge with v  S - T , then since v / T , we have xuv  . Hence, the LP-cost of uv is at least , and charging 1/ times the LP-cost of uv pays for the cluster-cost of this edge.
+Now let v  X; we must pay for the new cluster cost at v. If xuv  k2, then the edge uv already incurs LP cost at least k2, so the new cost at v is only 1/(k2) times the LP-cost of the edge uv. So assume xuv < k2. In this case, we say that u is a bad pivot for v.
+First suppose that v is not safe (as is initially the case). We will make a single charge to the edges incident to v that is large enough to pay for both the edge uv and for all possible future bad pivots, and then we will mark v as safe to indicate that we have done this. The basic idea is that if v has many possible bad pivots, then since xuv is "small", all of these possible bad pivots are also close to u, thus included in Tu. Since wTu xuw   |Tu| /2, there is a large set B  Tu of vertices that are "moderately far" from u, and therefore moderately far from v. The number of these vertices grows with the number of bad pivots, so
+
+Correlation Clustering and Biclustering with Locally Bounded Errors
+Algorithm 1 Round fractional clustering x to obtain a discrete clustering, using threshold parameters ,  with 0 <  <  < 1/2.
+Let S = V (G). while S =  do
+For each u  S, let Tu = {w  S - {u} : xuw  } and let Tu = {w  S - {u} : xuw  }. Choose a pivot vertex u  S that maximizes |Tu|. Let T = Tu. if wT xuw   |T | /2 then
+Output the cluster {u}. {Type 1 cluster} Let S = S - {u}. else Output the cluster {u}  T . {Type 2 cluster} Let S = S - ({u}  T ). end if end while
+
+charging all the edges vz for z  B is sufficient to pay for all bad pivots.
+We now make this argument rigorous. Let Pv be the set of potential bad pivots for v, defined by
+Pv = {p  S : xvp < k2}.
+Note that u  Pv. Since k2 < 1/4, we have xup  xuv + xvp < /2 for all p  Pv; hence Pv  T . Define the vertex set B by
+B = {z  T : xuz > k3}.
+Since xuz   for all z  T , we see that
+xuz  k3 |T - B| +  |B| .
+zT
+On the other hand, since {u} is output as a Type 1 cluster, we have
+xuz   |T | /2.
+zT
+Combining these inequalities and rearranging, we obtain |B|  (1 - 2k3) |T - B|. For each vertex z  B, we have xvz  xuz - xuv  (k3 - k2); in particular, since k3  2k2, we have xvz  k2, so that z / Pv. Hence |T - B|  |Pv|, and we have |B|  (1 - 2k3) |Pv|.
+On the other hand, for z  B we also have 1 - xvz  1 - xuv -xuz  1-(1+k2). It follows that each edge vz for z  B has LP-cost at least min((k3 -k2), 1-(1+k2)), independent of whether vz is positive or negative. It is easy to check that since  < 1/2 and k3 < 1, this minimum is always achieved by (k3 - k2). Therefore, we can pay for the (possible) Type-1-cluster cost of all edges vp for p  Pv by charging each edge vz with z  B a total of
+1 (1 - 2k3)(k3 - k2)
+
+times its LP-cost. We make all these charges when the cluster {u} is created and put them in a "bank account" to pay for later Type-1-cluster costs for v. Then we mark v as safe. The total charge in the bank account is at least |Pv|, which is enough to pay for all bad pivots for v.
+We have just described the case where u is a bad pivot and v is not safe. On the other hand, if u is a bad pivot and v is safe, then v already has a bank account large enough to pay for all its bad pivots, and we simply charge 1 to the account to pay for the edge uv.
+
+Case 2: A Type 2 cluster {u}  T is output. The negative
+
+edges within {u}T are easy to pay for: if vw if a negative
+
+edge inside {u}  T , then we have 1 - xvw  1 - xuv -
+
+xuw  1 - 2, so we can pay for each of these edges by
+
+charging
+
+a
+
+factor
+
+of
+
+1 1-2
+
+times
+
+its
+
+LP-cost.
+
+Thus, we consider edges joining {u}T with S-({u}T ).
+
+We call these edges cross-edges for their endpoints. A
+
+standard argument (see the extended version of this paper (Puleo & Milenkovic, 2016)) shows that for z  S - ({u}  T ), the total cluster-cost of the cross-edges for z is at most max{1/(1 - 2), 2/} times the LP-cost of those edges, so the vertices outside {u}  T can be dealt with
+
+easily.
+
+However, we also must bound the cluster-cost at vertices inside {u}  T . This is where we use the maximality of |Tu|.
+Let w  {u}  T . First consider the positive cross-edges wz such that xwz  . Any such edge has cluster-cost 1 and already has LP-cost at least , so charging 1/ times the LP-cost to such an edge pays for its cluster cost. Now let X = {z  S - ({u}  T ) : xwz < }; we still must pay for the edges wz with z  X.
+
+If xuw  k1, which includes the case u = w, then for all
+
+Correlation Clustering and Biclustering with Locally Bounded Errors
+
+z  X, we have xwz  xuz -xuw  -k1 = (1-k1). Hence, for any positive edge wz with z  X, the LP-cost of wz is at least (1 - k1), and so the cluster cost of the edge wz is at most 1/((1 - k1)) times the LP cost. Charging this factor to each cross-edge pays for the cluster-cost of each cross-edge.
+Now suppose xuw > k1. Since k1 > , this implies w / Tu. In this case, it is possible that w may have many positive neighbors z  X for which xwz is quite small, so we cannot necessarily pay for the cluster-cost of the edges joining w and X by using their LP-cost. Instead, we charge their cluster-cost to the LP-cost of edges within T .
+Observe that X  Tw , and hence |Tw |  |X|. By the maximality of |Tu|, this implies that |Tu|  |X|. Now for any v  Tu, we have the following bounds:
+
+xwv  xuw - xuv  k1 - , 1 - xwv  1 - xuw - xuv  1 -  - .
+
+Since  < 1/2 and k1  1, we have k1   < 1 - , so these lower bounds imply that each edge wv with v  Tu has LP-cost at least k1 - , independent of whether wv is
+a positive or negative edge. Thus, the total LP cost of edges joining w to Tu is at least (k1 - ) |Tu|.
+
+Since the total cluster-cost of edges joining w and X is at
+
+most |X| and since |Tu|  |X|, we can pay for these edges
+
+by
+
+charging
+
+each
+
+edge
+
+wv
+
+with
+
+v
+
+
+
+Tu
+
+a
+
+factor
+
+of
+
+1 k1 -
+
+times its LP-cost.
+
+Case 2: v was clustered before w. In this case, v may have made the following charges:
+
+·
+
+A charge of
+
+1 (1-2k3 )(k3 -k2 )
+
+times the LP-cost, to pay
+
+for a "bank account" for v,
+
+·
+
+A charge of at most
+
+2 
+
+times the LP-cost, to pay for all
+
+cross-edges if v was output as a Type 1 cluster,
+
+· A charge of at most max
+
+1 (1-k1
+
+)
+
+,
+
+1 
+
+times the LP-
+
+cost, to pay for vw if v was output in a Type 2 cluster.
+
+Note
+
+that
+
+k1
+
+>
+
+1/2
+
+implies
+
+that
+
+1 (1-k1 )
+
+
+
+2 
+
+,
+
+so
+
+we
+
+may
+
+disregard the case where v is output as a Type 1 cluster.
+
+Thus, in this case the total cost charged to vw by v is at
+
+most c2 times the LP-cost of vw, where
+
+1 11
+
+c2 = (1 - 2k3)(k3 - k2) + max
+
+, (1 - k1) 
+
+.
+
+Case 3: w was clustered before v. In this case, v may have made the following charges:
+
+·
+
+A
+
+charge
+
+of
+
+at
+
+most
+
+1 (1-2k3 )(k3 -k2 )
+
+times
+
+the
+
+LP-
+
+cost, to pay for a "bank account" for v,
+
+·
+
+A charge of at most
+
+1 k2 
+
+times the LP-cost, to pay for
+
+the cluster-cost of vw if vw is a positive edge and w
+
+was output as a Type 1 cluster,
+
+Having paid for all cluster-costs, we now look at the total charge accrued at each vertex. Fix any vertex v and an edge vw incident to v. We bound the total amount charged to vw by v in terms of the LP-cost of vw. There are three distinct possibilities for the edge vw: either vw ended inside a cluster, or v was clustered before w, or w was clustered before v.
+Case 1: vw ended within a cluster. In this case, v may have made the following charges:
+
+·
+
+A charge of
+
+1 (1-2k3 )(k3 -k2 )
+
+times the LP-cost, to pay
+
+for a "bank account" for v,
+
+·
+
+A
+
+charge
+
+of
+
+1 1-2
+
+times
+
+the
+
+LP-cost,
+
+to
+
+pay
+
+for
+
+vw
+
+itself if vw is a negative edge,
+
+·
+
+A charge of
+
+1 k1 -
+
+times the LP-cost, to pay for posi-
+
+tive edges leaving the v-cluster.
+
+· A charge of at most
+12 max 1 - 2 , 
+times the LP-cost, to pay for vw if w was output in a Type 2 cluster.
+
+Clearly vw cannot receive both the second and third types
+
+of charge.
+
+Furthermore, since k2
+
+
+
+1/4,
+
+we have
+
+1 k2 
+
+
+
+2 
+
+.
+
+Since
+
+k2
+
+
+
+1
+
+-
+
+2,
+
+we
+
+see
+
+that
+
+1 k2 
+
+is
+
+the
+
+largest
+
+charge
+
+that vw could receive from either the second or third type
+
+of charge. Thus, in this case the total cost charged to vw by
+
+v is at most c3 times the LP-cost, where
+
+11 c3 = (1 - 2k3)(k3 - k2) + k2.
+
+Thus, in this case the total cost charged to vw by v is at most c1 times the LP-cost of vw, where
+
+1 11
+
+c1
+
+=
+
+(1
+
+-
+
+2k3)(k3
+
+-
+
+k2)
+
++
+
+1
+
+-
+
+2
+
++
+
+k1
+
+-
+
+. 
+
+Thus, the approximation ratio of the algorithm is at most max{c1, c2, c3}. We wish to choose the various parameters to make this ratio as small as possible, subject to the various assumptions on the parameters required for the correctness of the proof. It seems difficult to obtain an exact
+
+Correlation Clustering and Biclustering with Locally Bounded Errors
+
+solution to this optimization problem. Solving the problem numerically, we obtained the following values for the parameters:
+ = 0.465744  = 0.0887449
+k1 = 0.767566 k2 = 0.117219 k3 = 0.308433.
+These parameters yield an approximation ratio of roughly 48.
+4. A Rounding Algorithm for One-Sided Biclustering
+In this section, we consider a version of the f -Correlation Clustering problem on complete bipartite graphs. Let G be a complete bipartite graph with edges labeled + and -, and let V1 and V2 be its partite sets. We will obtain a rounding algorithm that transforms any fractional clustering x into a discrete clustering C such that err(C)v  c err(x)v for all v  V1. Our algorithm is shown in Algorithm 2.
+Our algorithm does not guarantee any upper bound on err(C)v for v  V2: as the algorithm treats the sides V1 and V2 asymmetrically, it is difficult to control the per-vertex error at V2. Nevertheless, an error guarantee for the vertices in V1 suffices for some applications. Our approach is motivated by applications in recommender systems, where vertices in V1 correspond to users, while vertices in V2 correspond to objects to be ranked. In this context, quality of service conditions only need to be imposed for users, and not for objects.
+Theorem 6. Let G be a labeled complete bipartite graph with partite sets V1 and V2, let ,  be parameters as described in Algorithm 2, and let x be any fractional clustering of G. If C is the clustering produced by Algorithm 2 with the given input, then for all v  V1 we have err(C)v  c err(x)v, where c is a constant depending only on  and .
+We note that the proof of Theorem 6 is actually simpler than the proof of Theorem 5, because the focus on errors only at V1 eliminates the need for the "bad pivots" argument used in Theorem 6. This also leads to a smaller value of c in Theorem 6 than we were able to obtain in Theorem 5.
+Proof. As before, we make charges to pay for the new cluster costs at each vertex of V1 as each cluster is output, splitting into cases according to the type of cluster. Let k1 be a constant to be determined, with k1 > .
+Case 1: A Type 1 cluster {u} is output. In this case, the only cluster costs incurred are the positive edges incident to u, all of which have their other endpoint in V2. The averaging argument used in Case 1 of Section 3 shows that
+
+charging every edge incident to u a factor of 2/ times its LP cost pays for the cluster cost of all such edges.
+
+Case 2: A Type 2 cluster {u}  T is output. Negative edges
+within the cluster are easy to pay for: if w1w2 is a negative edge within the cluster, with wi  Vi, then we have
+
+1 - xw1w2  1 - xuw1 - xuw2  1 - 2,
+
+so we can pay for the cluster-cost of such an edge by charging it a factor of 1/(1 - 2) times its LP-cost.
+
+We still must pay for positive edges joining the cluster with the rest of S; we call such edges cross-edges. Each such edge must be paid for at its endpoint in V1.
+If z  V1 is a vertex outside the cluster, then a standard argument (see the extended version of this paper (Puleo & Milenkovic, 2016)) shows that the cross-edges for z can be paid for by charging each such edge a factor of max{1/(1- 2), 2/)} times its LP cost.
+
+Now let w  V1 be a vertex inside the cluster. We must pay for the cross-edges incident to w using the LP-cost of
+the edges incident to w. First consider the positive edges from w to vertices z outside the cluster such that xwz  . Any such edge has cluster-cost 1 and LP-cost at least ,
+so charging each such edge a factor of 1/ times its LPcost pays for its cluster cost. Let X = {z  (S  V2) - T : xwz < }; we must pay for the edges wz with z  X. Note that xuz >  for all z  X, since z  X implies z / T .
+
+If xuw  k1, then for all z  X, we have
+
+xwz  xuz - xuw  (1 - k1).
+
+Hence, for any positive cross-edge wz with z  X, the LP-
+
+cost of wz is at least (1 - k1), and so we can pay for the
+
+cluster-cost
+
+of
+
+wz
+
+by
+
+charging
+
+wz
+
+a
+
+factor
+
+of
+
+1 (1-k1 )
+
+times
+
+its LP-cost.
+
+Now suppose xuw > k1. As before, we pay for the cross-
+edges by charging the edges inside the cluster. Observe that |Tw |  |X|. Since u was chosen to maximize |Tu|, this implies that |Tu|  |X|. For any v  Tu, we have
+
+xwv  xuw - xuv  k1 - .
+
+On the other hand, for any v  Tu we also have
+
+1 - xwv  1 - xuw - xuv  1 -  -    - .
+
+Since k1  1, it follows that the edge wv has LP-cost at least k1 -  independent of whether wv is positive or negative. Thus, the total LP cost of edges joining w to Tu is at least (k1 - ) |Tu|.
+Since the total cluster-cost of the cross- edges joining w and X is at most |X| and since |Tu|  |X|, we can pay for
+
+Correlation Clustering and Biclustering with Locally Bounded Errors
+Algorithm 2 Round fractional clustering to obtain a discrete clustering, using threshold parameters ,  with  < 1/2 and  < .
+Let S = V (G). while V1  S =  do
+For each u  V1  S, let Tu = {w  S - {u} : xuw  } and let Tu = {w  V2  S : xuw  }. Choose a pivot vertex u  V1  S that maximizes |Tu|. Let T = Tu. if wV2T xuw   |V2  T | /2 then
+Output the singleton cluster {u}. {Type 1 cluster} Let S = S - {u}. else Output the cluster {u}  T . {Type 2 cluster} Let S = S - ({u}  T ). end if end while Output each remaining vertex of V2  S as a singleton cluster.
+
+the cross-edges by charging each edge wv with v  Tu a
+
+factor
+
+of
+
+1 k1 -
+
+times
+
+its
+
+LP-cost.
+
+Having paid for all cluster-costs, we now look at the total charge accrued at each vertex. Fix a vertex v  V1 and an edge vw incident to v. We bound the total amount charged to vw by v in terms of the LP-cost of vw. There are three distinct possibilities for the edge vw: either vw ended inside a cluster, or v was clustered before w, or w was clustered before v.
+
+Case 1: vw ended within a cluster. In this case, v may have made the following charges:
+
+·
+
+A charge of at most
+
+1 1-2
+
+times the LP cost, to pay for
+
+vw itself if vw is a negative edge,
+
+·
+
+A charge of
+
+1 k1 -
+
+times the LP-cost, to pay for posi-
+
+tive edges leaving the v-cluster.
+
+Thus, in this case the total cost charged to vw by v is at most c1 times the LP-cost of vw, where
+
+11
+
+c1
+
+=
+
+1
+
+-
+
+2
+
++
+
+k1
+
+-
+
+. 
+
+Case 2: v was clustered before w. In this case, v may have made the following charges:
+
+· A charge of 2/ times the LP cost, to pay for vw if v was output as a singleton,
+
+·
+
+A
+
+charge
+
+of
+
+max{
+
+1 (1-k1
+
+)
+
+,
+
+1 
+
+}
+
+times
+
+the
+
+LP
+
+cost,
+
+to
+
+pay for vw if v was output in a nonsingleton cluster,
+
+Since v makes at most one of the charges above, the total cost charged to vw by v is at most c2 times the LP-cost of
+
+vw, where
+
+1 12
+
+c2 = max
+
+(1 - k1) ,
+
+, 
+
+
+
+.
+
+Case 3: w was clustered before v. In this case, v may have made the following charges:
+
+·
+
+A
+
+charge
+
+of
+
+at
+
+most
+
+max{
+
+1 1-2
+
+,
+
+2 
+
+}
+
+times
+
+the
+
+LP
+
+cost,
+
+to pay for cross-edges at v if w is output in a nonsin-
+
+gleton cluster.
+
+Thus, in this case the total cost charged to vw by v is at most c3 times the LP-cost of vw, where
+
+12
+
+c3 = max
+
+, 1 - 2 
+
+.
+
+The approximation ratio is max{c1, c2, c3}. Numerically, we obtain an approximation ratio of at most 10 by taking the following parameter values:
+
+ = 0.377  = 0.102 k1 = 0.730
+
+Acknowledgments
+The authors thank Dimitris Papailiopoulos for helpful discussions. The authors also acknowledge funding from the NSF grants IOS 1339388 and CCF 1527636, 1526875, 1117980. Research of the first author was supported by the IC Postdoctoral Program.
+
+References
+Ailon, Nir, Charikar, Moses, and Newman, Alantha. Aggregating inconsistent information: ranking and clustering. In Proceedings of the thirty-seventh annual ACM
+
+Correlation Clustering and Biclustering with Locally Bounded Errors
+
+symposium on Theory of computing, pp. 684­693. ACM, Cheng, Yizong and Church, George M. Biclustering of
+
+2005.
+
+expression data. In ISMB, volume 8, pp. 93­103, 2000.
+
+Ailon, Nir, Charikar, Moses, and Newman, Alantha. Aggregating inconsistent information: ranking and clustering. Journal of the ACM (JACM), 55(5):23, 2008.
+Ailon, Nir, Avigdor-Elgrabli, Noa, Liberty, Edo, and Van Zuylen, Anke. Improved approximation algorithms for bipartite correlation clustering. SIAM Journal on Computing, 41(5):1110­1121, 2012.
+Amit, Noga. The bicluster graph editing problem. Master's thesis, Tel Aviv University, 2004.
+Bansal, Nikhil, Blum, Avrim, and Chawla, Shuchi. Correlation clustering. In Proceedings of the 43rd Symposium on Foundations of Computer Science, FOCS '02, pp. 238­, Washington, DC, USA, 2002. IEEE Computer Society. ISBN 0-7695-1822-2.
+Bansal, Nikhil, Blum, Avrim, and Chawla, Shuchi. Correlation clustering. Mach. Learn., 56(1-3): 89­113, June 2004. ISSN 0885-6125. doi: 10.1023/B:MACH.0000033116.57574.95.
+Bansal, Nikhil, Feige, Uriel, Krauthgamer, Robert, Makarychev, Konstantin, Nagarajan, Viswanath, Naor, Joseph, and Schwartz, Roy. Min-max graph partitioning and small set expansion. In 2011 IEEE 52nd Annual Symposium on Foundations of Computer Science-- FOCS 2011, pp. 17­26. IEEE Computer Soc., Los Alamitos, CA, 2011. doi: 10.1109/FOCS.2011.79. URL http://dx.doi.org/10.1109/FOCS.2011.79.
+Boyd, Stephen and Vandenberghe, Lieven. Convex optimization. Cambridge University Press, 2004.
+Charikar, Moses, Guruswami, Venkatesan, and Wirth, Anthony. Clustering with qualitative information. In Proceedings of the 44th Annual IEEE Symposium on Foundations of Computer Science, FOCS '03, pp. 524­, Washington, DC, USA, 2003. IEEE Computer Society. ISBN 0-7695-2040-5.
+Charikar, Moses, Guruswami, Venkatesan, and Wirth, Anthony. Clustering with qualitative information. J. Comput. Syst. Sci., 71(3):360­383, October 2005. ISSN 0022-0000. doi: 10.1016/j.jcss.2004.10.012.
+Chawla, Shuchi, Krauthgamer, Robert, Kumar, Ravi, Rabani, Yuval, and Sivakumar, D. On the hardness of approximating multicut and sparsest-cut. Computational Complexity, 15(2):94­114, 2006.
+Chawla, Shuchi, Makarychev, Konstantin, Schramm, Tselil, and Yaroslavtsev, Grigory. Near optimal lp rounding algorithm for correlation clustering on complete and complete k-partite graphs, 2014.
+
+Demaine, Erik D, Emanuel, Dotan, Fiat, Amos, and Immorlica, Nicole. Correlation clustering in general weighted graphs. Theoretical Computer Science, 361(2): 172­187, 2006.
+Khot, Subhash. On the power of unique 2-prover 1-round games. In Proceedings of the thiry-fourth annual ACM symposium on Theory of computing, pp. 767­775. ACM, 2002.
+Komusiewicz, Christian and Uhlmann, Johannes. Cluster editing with locally bounded modifications. Discrete Appl. Math., 160(15):2259­2270, 2012. ISSN 0166218X. doi: 10.1016/j.dam.2012.05.019.
+Kriegel, Hans-Peter, Kro¨ger, Peer, and Zimek, Arthur. Clustering high-dimensional data: A survey on subspace clustering, pattern-based clustering, and correlation clustering. ACM Transactions on Knowledge Discovery from Data (TKDD), 3(1):1, 2009.
+Lim, Shiau Hong, Chen, Yudong, and Xu, Huan. A convex optimization framework for bi-clustering. In Proceedings of The 32nd International Conference on Machine Learning, pp. 1679­1688, 2015.
+Pan, Xinghao, Papailiopoulos, Dimitris, Oymak, Samet, Recht, Benjamin, Ramchandran, Kannan, and Jordan, Michael I. Parallel correlation clustering on big graphs. arXiv preprint arXiv:1507.05086, 2015.
+Puleo, Gregory J. and Milenkovic, Olgica. Correlation clustering and biclustering with locally bounded errors. arXiv preprint arXiv:1506.08189, 2016.
+Steurer, D. and Vishnoi, N. Connections between unique games and multcut. Technical Report TR09-125, Electronic Colloquium on Computational Complexity, 2009. Available at http://eccc.hpi-web.de/report/2009/125.
+Symeonidis, Panagiotis, Nanopoulos, Alexandros, Papadopoulos, Apostolos, and Manolopoulos, Yannis. Nearest-biclusters collaborative filtering with constant values. In Advances in web mining and web usage analysis, pp. 36­55. Springer, 2007.
+van Zuylen, Anke and Williamson, David P. Deterministic pivoting algorithms for constrained ranking and clustering problems. Math. Oper. Res., 34(3):594­620, 2009. ISSN 0364-765X. doi: 10.1287/moor.1090.0385.
+
+

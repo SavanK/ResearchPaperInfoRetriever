@@ -1,0 +1,22 @@
+Model, Execute, and Deploy: Answering the Hard Questions in End-User Programming
+(Showcase)
+
+Shan Shan Huang
+LogicBlox, USA
+ssh@logicblox.com
+
+ABSTRACT
+End-user programming, a frequently recurring dream, has thus far eluded large-scale, complex applications. Very real, hard questions stand in the way of its realization. How can its languages and tools support: (1) The development of applications with large data sets and sophisticated computation? (2) The co-development by end-users and professional developers when the complexity of an application demands it? (3) Beyond development, the maintenance, distribution, monitoring, and integration with other applications and services? We discuss our approach to these questions, as implemented in the LogicBlox Modeler. We discuss its use in developing applications for governments, major financial institutions, and large global retailers. We highlight the essential synergies between Programming Languages, Software Engineering, and Database research to achieve self-service at scale, and present open questions to which we look to the FSE community for inspirations and solutions.
+CCS Concepts
+· Software and its engineeringModel-driven software engineering · Software and its engineeringAbstraction, modeling and modularity · Software and its
+
+engineeringConstraint and logic languages · Software and its engineeringVery high level languages · Information systemsRelational database model · Information systemsData warehouses · Information systemsData analytics · Information systemsOnline analytical processing
+Keywords
+End-user programming; Declarative programming; Hybrid transactional analytical data processing; Live programming
+BIOGRAPHY
+Shan Shan Huang leads a team of engineers at LogicBlox in pursuit of their shared mission: transforming software development from black art to an accessible form of expression for anyone capable of analytical thought. With her colleagues, she is developing a unified programming environment that is at once a database and a language runtime, with a declarative programming model and spreadsheet-like programmability. Shan Shan has published in areas spanning across programming languages, software engineering, and databases. She maintains her academic ties through research collaborations, services on conference program committees, and speakership at conferences. Shan Shan received her Ph.D. in Computer Science from Georgia Tech and her B.S in Electrical Engineering and Computer Science from MIT.
+
+Permission to make digital or hard copies of part or all of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. Copyrights for third-party components of this work must be honored. For all other uses, contact the Owner/Author. Copyright is held by the owner/author(s). FSE'16, November 13­18, 2016, Seattle, WA, USA ACM. 978-1-4503-4218-6/16/11...$15.00 http://dx.doi.org/10.1145/2950290.2994158
+24
+
+

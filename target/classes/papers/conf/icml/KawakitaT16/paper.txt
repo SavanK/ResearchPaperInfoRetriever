@@ -1,0 +1,1728 @@
+Barron and Cover's Theory in Supervised Learning and its Application to Lasso
+
+Masanori Kawakita Jun'ichi Takeuchi
+
+KAWAKITA@INF.KYUSHU-U.AC.JP TAK@INF.KYUSHU-U.AC.JP
+
+Kyushu University, 744 Motooka, Nishi-Ku, Fukuoka city, Fukuoka 819-0395, JAPAN
+
+Abstract
+We study Barron and Cover's theory (BC theory) in supervised learning. The original BC theory can be applied to supervised learning only approximately and limitedly. Though Barron & Luo (2008) and Chatterjee & Barron (2014a) succeeded in removing the approximation, their idea cannot be essentially applied to supervised learning in general. By solving this issue, we propose an extension of BC theory to supervised learning. The extended theory has several advantages inherited from the original BC theory. First, it holds for finite sample number n. Second, it requires remarkably few assumptions. Third, it gives a justification of the MDL principle in supervised learning. We also derive new risk and regret bounds of lasso with random design as its application. The derived risk bound hold for any finite n without boundedness of features in contrast to past work. Behavior of the regret bound is investigated by numerical simulations. We believe that this is the first extension of BC theory to general supervised learning without approximation.
+1. Introduction
+There have been various techniques to evaluate performance of machine learning methods theoretically. For an example, lasso (Tibshirani, 1996) has been analyzed by nonparametric statistics, empirical process, statistical physics and so on. Most of them require various assumptions like asymptotic assumption (sample number n and/or feature number p go to infinity), boundedness of features or moment conditions. Some of them are much restrictive for practical use. In this paper, we try to develop an-
+Proceedings of the 33 rd International Conference on Machine Learning, New York, NY, USA, 2016. JMLR: W&CP volume 48. Copyright 2016 by the author(s).
+
+other way for performance evaluation with as few assumptions as possible. As an important candidate for this purpose, we focus on Barron and Cover's theory (BC theory) (Barron & Cover, 1991), which is one of the most famous results for the minimum description length (MDL) principle. The MDL principle (Rissanen, 1978; Barron et al., 1998; Gru¨nwald, 2007; Takeuchi, 2014) claims that the shortest description of a given set of data leads to the best hypotheses about the data. A famous model selection criterion based on the MDL principle was proposed by Rissanen (1978). This criterion corresponds to a codelength of a twostage code in which one encodes a statistical model to encode data and then the data are encoded with the model. In this case, an MDL estimator is defined as the minimizer of the total codelength of this two-stage code. BC theory guarantees that a risk based on the Re´nyi divergence (Re´nyi, 1961) is tightly bounded above by redundancy of the twostage code. This result gives a mathematical justification of the MDL principle. Furthermore, BC theory holds for finite n without any complicated technical conditions. However, BC theory has been applied to supervised learning only approximately or limitedly. The original BC theory seems to be widely recognized that it is applicable to both unsupervised and supervised learning. Though it is not false, BC theory actually cannot be applied to supervised learning without a certain condition (2) defined in Section 3. This condition is critical in a sense that a lack of (2) breaks a key technique of BC theory. (Yamanishi, 1992) is the only example of application of BC theory to supervised learning to our knowledge. His work assumed a specific setting, where (2) can be satisfied. However, the risk bound may not be sufficiently tight due to imposing (2) forcedly, which will be explained in Section 3. Another well-recognized disadvantage is the necessity of quantization of parameter space. Barron & Luo (2008) and Chatterjee & Barron (2014b) proposed a way to avoid the quantization and derived a risk bound of lasso. However, their idea cannot be applied to supervised learning in general. This difficulty stems from the above condition (2). It is thus essentially difficult to solve. Actually, their risk bound of lasso was derived with fixed design only (i.e., essentially unsupervised
+
+Barron and Cover's Theory in Supervised Learning and its Application to Lasso
+
+setting). The fixed design, however, is not satisfactory to evaluate generalization error of supervised learning. In this paper, we propose an extension of BC theory to supervised learning without quantization in random design case. The derived risk bound inherits most of advantages of the original BC theory. Furthermore, we can use data-dependent penalties. The main term of the risk bound has again a form of redundancy of two-stage code. Thus, our extension also gives a mathematical justification of the MDL principle in supervised learning. We also derive new risk and regret bounds of lasso with random design as its application under normality of features. This requires much more effort than that for the fixed design case. The derived bounds hold even in case n  p without boundedness of features. To our knowledge, no theory has such advantages in the past. This paper is organized as follows. Section 2 introduces an MDL estimator in supervised learning. We review BC theory in Section 3. We extend BC theory to supervised learning and derive new risk and regret bounds of lasso in Section 4. The performance of the regret bound will be investigated by numerical simulations in Section 5.
+
+2. MDL Estimator in Supervised Learning
+
+Suppose that training data (xn, yn) := {(xi, yi)  X × Y |i = 1, 2, · · · , n} are subject to p¯(xn, yn) = q(xn)p(yn|xn), where X is a domain of feature vec-
+tor x and Y could be  (regression) or a finite set (clas-
+
+sification). Here, the training data are not necessarily in-
+
+dependent and identically distributed (i.i.d.) but can be a
+
+stochastic process in general. A goal of supervised learn-
+
+ing is to estimate p(yn|xn). We use a parametric model p(yn|xn) with a parameter   . The parameter space
+
+ is a certain continuous space. To define an MDL esti-
+
+mator, we need to encode the model p(yn|xn) (or equiva-
+
+lently the parameter). Since the continuous parameter can-
+
+not be encoded, we need to quantize the parameter space
+
+ as (xn). Then, let L~(~|xn) be a model description
+
+length on
+~(xn )
+
+it. Note that L~ exp(-L~(~|xn))
+
+must  1.
+
+satisfy Kraft's inequality An MDL estimator is de-
+
+fined by the minimizer of sum of a data description length
+
+(minus log-likelihood) and the model description length:
+
+¨(xn,
+
+yn)
+
+:=
+
+arg
+
+min
+~(xn )
+
+{
+
+-
+
+log
+
+p~(yn|xn)
+
++
+
+L~(~|xn
+
+} ),
+
+where  > 1. Define the minimum description length attained by the two-stage code as L~2-p(yn|xn) := - log p¨(yn|xn)+L~(¨|xn). Because L~2-p also satisfies Kraft's inequality in terms of yn, it is interpreted as a code-
+length of the two-stage code. Therefore, p~2-p(yn|xn) := exp(-L~2-p(yn|xn)) is a conditional sub-probability dis-
+tribution corresponding to the two-stage code.
+
+3. Barron and Cover's Theory
+
+We briefly review BC theory and its recent progress in view of supervised learning though they discussed basically unsupervised learning (or supervised learning with fixed design). In BC theory, the Re´nyi divergence between p(yn|xn) and r(yn|xn) with order   (0, 1)
+
+dn (p,
+
+r)
+
+:=
+
+-1 1-
+
+log
+
+( Eq (xn )p(y n |xn )
+
+r(yn|xn) )1- p(yn|xn)
+
+(1)
+
+is used as a loss function. Let us introduce a condition that both (xn) and L~(~|xn) are independent of xn, i.e.,
+
+(xn) = , L~(~|xn) = L~(~).
+
+(2)
+
+We emphasize that the original BC theory cannot be applied to supervised learning unless the condition (2) is satisfied. Under the condition (2), BC theory gives the following two theorems for supervised learning.
+Theorem 1. Let  > 1. Assume that L~ satisfies Kraft's inequality and that the condition (2) holds. For any   (0, 1 - -1],
+
+Ep¯ (xn ,yn ) dn (p ,
+
+p¨)
+
+
+
+Ep¯ (xn ,y n )
+
+log
+
+p(yn|xn) p~2-p(yn|xn
+
+)
+
+.
+
+Theorem 2. Let  > 1. Assume that L~ satisfies Kraft's
+inequality and that the condition (2) holds. For any   (0, 1 - -1],
+
+( Pr
+
+dn
+
+(p,
+
+p¨)
+
+n
+
+-
+
+1 n
+
+log
+
+p(yn|xn) p~2-p(yn|xn)
+
+
+
+) 
+
+
+
+e- n/ .
+
+Recall that the quantized space and the model description length can depend on xn in their definitions. If we make them independent of xn for the condition (2), we must make them uniform against xn (i.e., its worst value), which makes the total codelength longer. This is just a reason why we think the PAC bound by Yamanishi (1992) may not be sufficiently tight. Hence, data-dependent model description lengths is more desirable in view of the MDL principle. In addition, the restriction by (2) excludes a practically important case `lasso with column normalization' (explained later) from the scope of application. However, it is essentially difficult to remove this restriction as described in Section 1. Another issue is quantization. The quantization for the encoding is natural in view of the MDL principle. Our target, however, is an application to machine learning. A trivial example of such an application is a penalized maximum likelihood estimator (PMLE)
+^(xn, yn) := arg min { - log p(yn|xn) + L(|xn)},
+
+p2-p(yn|xn) := p^(yn|xn) · exp(-L(^|xn)),
+
+Barron and Cover's Theory in Supervised Learning and its Application to Lasso
+
+where L :  × X n  [0, ] is a certain penalty. PMLE is a wide class of estimators including lasso. If we can accept ¨ as an approximation of ^, we have a risk bound obtained by BC theory. However, the quantization is unnatural in view of machine learning. Barron et al. (2008) proposed an important notion `risk validity' to remove this drawback.
+Definition 3. Let  > 1. For fixed xn, we say that a penalty function L(|xn) is risk valid if there exist a quantized space (xn)   and a model description length L~(~|xn) satisfying Kraft's inequality such that
+
+yn  Y
+
+n,
+
+{
+
+max
+
+
+dn (p ,
+
+p |xn ) - log
+
+p(yn|xn) p (yn |xn )
+
+} -L(|xn)
+
+{
+
+ max
+~(xn )
+
+dn(p, p~|xn)-log
+
+p(yn p~(yn
+
+|xn |xn
+
+) )
+
+-
+
+L~(~|xn
+
+} ),
+
+(3)
+
+where
+
+dn (p,
+
+r|xn)
+
+:=
+
+-1 1-
+
+log
+
+( Ep(yn |xn )
+
+q(yn|xn) p(yn|xn)
+
+)1- .
+
+Here, d(p, r|xn) is the Re´nyi divergence with fixed xn (fixed design). They proved that ^ has similar bounds to
+Theorems 1 and 2 for any risk valid penalty in case of fixed
+design. Their way is excellent because it requires no addi-
+tional condition except the risk validity. However, the risk evaluation with fixed design Ep(yn|xn)[dn(p, p^|xn)] is unsatisfactory for supervised learning to assess the gener-
+alization error. We need to evaluate the risk with random design Ep¯ [dn(p, p^)]. However, it is essentially difficult to apply their idea to random design case. We explain this
+by using lasso as an example. If we extend the above risk validity to random design straightforwardly, (xn) and L~(~|xn) must be independent of xn due to the condition
+(2). In addition, (3) is replaced with
+
+xn, yn  X }
+-L~(~) 
+
+nm×axY{dn,nm(~pax, {pd)n-(plo ,gppp~)((-yynnl||oxxgnnpp)) ~-((yyLnn(||xx|nnx))n )}.
+
+Note that the above inequality must hold for all xn  X n in addition to all yn  Y n. Furthermore, dn(p, p|xn) is replaced with dn(p, p). We can rewrite the above inequality equivalently as
+
+{
+
+xn  X n, yn  Y n,   ,
+
+min
+~
+
+dn(p, p)
+
+-dn (p ,
+
+p~)+log
+
+p (y n |xn ) p~(yn|xn)
+
+} +L~(~)
+
+
+
+L(|xn).
+
+(4)
+
+Let us write the inside part of min of the left side of (4) as H(, ~, xn, yn). To derive a risk valid L(|xn), we need find an upper bound on min~ H(, ~, xn, yn). However, it is difficult to obtain the explicit form of the ~ minimiz-
+ing H. Chatterjee & Barron (2014b) proposed a remedy
+
+for fixed design. We can use it in random design case too
+as follows. Instead of minimization, their idea is to take ~ close to . This seems to be meaningful in the following sense. If we quantize  finely, ¨ is expected to behave similarly to ^. If ~  , then H(, ~, xn, yn)  L~(), which implies that L~() is risk valid and gives a risk bound similar to ¨. Note that, however, we cannot make ~ =  exactly because ~  . Chatterjee and Barron randomized ~ on (xn) around  and took the expectation in terms of ~. This is justified because min~ H  E~[H]. By tuning the randomization carefully, they succeeded in removing the dependency of E~[H(, ~, xn, yn)] on yn. Since this technique can be applied to random design case similarly, we can write E~[H(, ~, xn, yn)] as H(, xn). By this fact, any risk valid penalties derived in this way should depend on xn. If not, L() must bound maxxn H(, xn),
+which makes L much larger. This is unfavorable in view of MDL. In particular, H(, xn) includes an unbounded term
+in terms of xn in case of lasso, which stems from the like-
+lihood ratio term in (4). Hence, risk valid penalties derived
+in this way must depend on xn. Though the 1 norm used in lasso does not depend on xn, the following weighted 1
+norm
+
+p w,1 := wj|j|, where wj :=
+j=1
+
+1 n
+
+n
+
+x2ij
+
+i=1
+
+plays an important role. The lasso with this penalty is
+equivalent to the usual lasso with column normalization
+such that each column of design matrix has the same norm.
+The column normalization is theoretically and practically
+important. Hence, we try to find a risk valid penalty of the form L1(|xn) = µ1w,1 + µ2. Indeed, there seems to be no other useful penalty dependent on xn for lasso.
+However, there are severe difficulties. The main difficulty is caused by (2). Suppose now that ~ is eqeual to  almost ideally. This implies that H(, ~, xn, yn)  L~(). On the other hand, for each fixed , w,1 can be arbitrarily small by making xn small accordingly. Hence,
+µ1w,1 + µ2 is almost equal to µ2. This implies that µ2 must bound max L~(), which is infinity in general. If L~ can depend on xn, we could resolve this problem. However, L~ must be independent of xn. This issue seems not
+to be limited to lasso. Another major issue is evaluation of the above H(, xn) is quite difficult in random design case since dn(p, p) is generally more complicated than dn(p, p|xn). Hence, their technique seems to be useless in the random design case. We propose a remedy to solve
+these issues in a lump.
+
+4. Main Results
+We propose an extension of BC theory to supervised learning and derive new bounds for lasso.
+
+Barron and Cover's Theory in Supervised Learning and its Application to Lasso
+
+4.1. Extension of BC Theory to Supervised Learning
+
+There are several possible approaches to extend BC theory.
+Despite of our efforts, we can hardly derive a meaningful
+tight bound for lasso by most of them except the following
+way. Our key idea is to modify the risk validity by introduc-
+ing a `typical set'. Let Sx be a certain set of stochastic processes x1, x2, · · · and Pxn be the set of their marginal distributions of x1, x2, · · · , xn. We assume that we can define a typical set An for each q  Pxn, i.e., Pr(xn  An )  1 as n  . This is possible if q is stationary and ergodic for example. For short, Pr(xn  An ) is written as Pn hereafter. We modify the risk validity as follows.
+
+Definition 4. Let  > 1 and   (0, 1 - -1]. We say
+that L(|xn) is -risk valid for (, , Pxn, An ) if, for any q  Pxn, there exist a quantized subset (q)   and a model description length L~(|q) satisfying Kraft's inequality such that (q) and L~(|q) satisfy (2) and
+
+xn,
+
+yn
+
+ An ×Y
+
+n,
+
+{
+
+max
+~(q )
+
+dn (p ,
+
+p~)
+
+-
+
+log
+
+p(yn|xn) p~(yn|xn)
+
+}{
+
+-L~(~|q)
+
+ max
+
+
+dn (p ,
+
+p ) - log
+
+p(yn|xn) p (y n |xn )
+
+} -L(|xn) .
+
+A difference from (4) is the restriction of the range of xn onto the typical set. Therefore, we can possibly avoid the problem described in the previous section. Using the -risk validity, we can prove the following two main theorems.
+Theorem 5 (risk bound). Define En as a conditional expectation in terms of p¯(xn, yn) given that xn  An . Let  > 1,   (0, 1) and   (0, 1 - -1]. If L(|xn) is -risk valid for (, , Pxn, An ),
+
+En dn (p ,
+
+p^)
+
+
+
+En
+
+log
+
+p(yn|xn) p2-p(yn|xn)
+
++
+
+
+
+log
+
+1 Pn .
+
+(5)
+
+Theorem 6 (regret bound). Let  > 1,   (0, 1) and   (0, 1 - -1]. If L(|xn) is -risk valid for (, , Pxn, An ),
+
+( Pr
+
+dn
+
+(p,
+
+p^)
+
+n
+
+-
+
+1 n
+
+log
+
+p(yn|xn) p2-p(yn|xn)
+
+>
+
+) 
+
+ 1 - Pn + exp(- n/).
+
+(6)
+
+We describe the proof of Theorem 5 in Appendix A and the proof of Theorem 6 in a supplementary material due to the page restriction. In contrast to the usual BC theory, there is an additional term  log(1/Pn) in the risk bound. Due to the property of the typical set, this term decreases to zero as n  . Hence, the first term is the main term, which has a form of redundancy of a two-stage code like the quantized case. Hence, this theorem gives a justification of the MDL principle in supervised learning. Note that, however, an additional condition on L is required to interpret the first
+
+term of (5) as a redundancy exactly. A sufficient condition for it is called `codelength validity' (Chatterjee & Barron, 2014b). The risk validity does not imply the codelength validity and vice versa in general. Due to the space limitations, we omit more details of the codelength validity.
+We note that the conditional expectation in the risk bound (5) is seemingly hard to be replaced with the usual unconditional expectation. The main difficulty arises from the unboundedness of the loss function: the loss function dn(p, p^) can be arbitrarily large according to the choice of xn in general. Our remedy is a typical set. Because xn lies out of An with small probability, the conditional expectation is likely to capture the expectation of almost all cases. In spite of this fact, if one wants to remove the unnatural conditional expectation, Theorem 6 offers a more satisfactory bound. We should remark that the effectiveness of this approach in real situations depends on whether we can show the risk validity of the target penalty and derive a sufficiently small bound for 1 - Pn. Actually, much effort is required to realize them for lasso.
+
+4.2. Risk Bound of Lasso in Random Design
+
+In this section, we derive new risk and regret bounds by Theorems 5 and 6. Assume that training data {(xi, yi)  (p × )|i = 1, 2, · · · , n} obey a usual regression model Y = X + E , where Y := (y1, y2, · · · , yn)T , E is a noise vector subject to N (; 0, 2In),  is a true parameter and X = [xij]. Here, xij is the jth element of xi and N (·; m, ) is a Gaussian distribution with a mean vector m and a covariance matrix . The dimension p of  can be greater than n. Under the normality of xn, we can derive a
+risk valid weighted 1 penalty by choosing an appropriate typical set.
+Lemma 1. For any   (0, 1), define
+
+Pxn A(n)
+
+:= :=
+
+{q(xn {
+xn
+
+)= j,
+
+ni=1 1-
+
+N(x(1i/; 0n,))|ni=N1oxn-2ijSingu1la+r jj
+
+}, } ,
+
+where jj denotes the jth diagonal element
+
+of .
+
+Assume a linear regression setting:
+
+p(yn|xn) = ni=1N (yi|xTi , 2) and p(yn|xn) = ni=1N (yi|xTi , 2) with  = p. Let  > 1 and   (0, 1 - -1]. The penalty L1(|xn) = µ1w,1 +µ2
+
+is -risk valid for (, , Pxn, An ) if
+
+
+
+µ1 
+
+n log 22
+
+4p
+
+·
+
+
+
++4 (1
+
+1- - )
+
+2 ,
+
+µ2   log 2.
+
+(7)
+
+We describe its proof in Appendix B. The derivation is much more complicated and requires more techniques compared to fixed design case in (Chatterjee & Barron,
+
+Barron and Cover's Theory in Supervised Learning and its Application to Lasso
+
+lower bound of P(n) - exp(- n(1 - ))
+0.0 0.2 0.4 0.6 0.8 1.0
+
+2014b). This is because the Re´nyi divergence is a usual
+
+mean square error in the fixed design case, while it is not
+
+in the random design case in general. Remarkably, the risk
+
+valid penalty in the above theorem also satisfies the code-
+
+length validity. This indicates that the main term of the risk
+
+bound can always be interpreted as redundancy of a prefix
+
+code. Next, we evaluate the convergence rate of Pn.
+
+Lemma 2 (Exponential Bound of Typical Set). Suppose
+
+that xi  N (0, ) independently. For any   (0, 1),
+
+Pn 1
+
+ -
+
+( 1-2
+2p exp
+
+exp
+
+( -
+
+n
+
+(
+
+-
+
+log(1
+
++
+
+))p ))
+
+2
+
+( -
+
+n
+
+(-log(1
+
++
+
+) ))
+
+
+
+1
+
+-2p
+
+exp
+
+( -
+
+n2
+
+(8) )
+.
+
+27
+
+Its proof is described in a supplementary material. For lasso, n  p is often assumed. By Lemma 2, 1 - Pn is bounded above by O(p exp(-n2/7)). Hence, - log Pn in (5) and 1 - Pn in (10) can be negligibly small even if n  p. In this sense, the exponential bound is critical for
+lasso. From Lemmas 1 and 2, we obtain the following the-
+orem.
+
+Theorem 7. Assume the same setting as Lemma 1. If L1(|xn) = µ1w,1 + µ2 satisfies (7), the lasso estimator
+
+^ :=
+
+argmin
+
+
+1 2n2
+
+Y
+
+- X22 + µ1w,1
+
+(9)
+
+has a risk bound
+
+En[d(p,
+
+p^)]
+
+
+
+[
+
+En
+
+inf
+
+
+{
+
+( y
+
+-
+
+X22 - y 2n2
+
+-
+
+X
+
+22)
+
+}] +µ1w,1+µ2 -
+
+p
+
+log
+
+( 1
+
+-
+
+2exp
+
+( -
+
+n 2
+
+n
+
+(
+
+-
+
+log(1
+
++
+
+)) ))
+
+.
+
+and a regret bound
+
+d({p, p^) 
+
+}
+
+inf
+
+
+y
+
+- X22 -y 2n2
+
+-
+
+X22 +µ1w,1+µ2
+
++  (10)
+
+with probability at least
+
+( (n
+
+))p
+
+1-2 exp - (-log(1 + )) -exp(- n/). (11)
+
+2
+
+Here, d(p, r) denotes d1(p, r). Since p¯(xn, yn) is i.i.d. in this setting, we presented the risk bound as a single-sample version by dividing the both sides by n. Compared to the risk bound in the fixed design case, a coefficient of the weighted 1 norm is basically larger. Chatterjee & Barron (2014b) showed that, if µ1  2n log 4p/2 and µ2   log 2, then the weighted 1 normis risk valid. Ignoring , the minimum µ1 in (7) is (1/2) ( + 4)/(1 - ) times that for the fixed design case. Hence, the coefficient is always larger than or equal to compared to the fixed design case but its extent is not so large unless  is close to 1.
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+Figure 1. Plot of (11) against   (0, 1) when n = 200, p = 1000 and  = 0.03. The dotted vertical line indicates  = 0.5.
+
+5. Numerical Simulations
+
+We investigate the behavior of the regret bound (10). Here,
+
+µ1 and µ2 are set to their smallest values in (7) and  = 1 - -1. As described before, the Re´nyi divergence is no
+
+longer a mean square error (MSE) in random design case.
+
+The Re´nyi divergence approaches to KL-divergence when
+
+  1 which is MSE in this case. If we take  close to
+
+1, however, the risk valid penalty function L (and also the
+
+regret bound) tends to diverge unless n is accordingly large
+
+enough. That is, we can obtain only the approximate eval-
+
+uation on the MSE. The precision of that approximation
+
+varies according to the sample size n. We do not employ
+
+the MSE here but another important case  = 0.5, that is,
+
+Bhattacharyya divergence. Bhattacharyya divergence is an
+
+upper bound of two times the squared Hellinger distance
+
+ (
+
+ )2
+
+d2H (p, p) = p(y|x)- p(y|x) q(x)p(y|x)dxdy,
+
+which is often used to performance evaluation. This can be
+proved by the fact that d(p, p)  D1-2(p, p) for any  and   (0, 1), where D(p, q) is -divergence
+
+D
+
+(p,
+
+r)
+
+:=
+
+1
+
+4 -
+
+ 2
+
+( 1
+
+-
+
+(
+
+r(y|x) p(y|x)
+
+)
+
+)1+ 2 q
+
+(x)p(y|x)dxdy
+
+(Cichocki & Amari, 2010) and D0 is just four times
+the squared Hellinger distance. Thus, we can bound 2d2H (p, p^) through Bhattacharyya divergence (d0.5). We set n = 200, p = 1000 and  = Ip to mimic a typical situation of sparse learning. The lasso estimator is calculated
+by a proximal gradient method. To make the regret bound
+tight, we take  = 0.03 that is close to zero compared to
+the main term (regret). For this  , Fig. 1 shows the plot
+
+Barron and Cover's Theory in Supervised Learning and its Application to Lasso
+
+loss
+0.0 0.2 0.4 0.6 0.8 1.0
+loss
+0.0 0.1 0.2 0.3 0.4
+
+d0.5 2dH2 regret bound
+0 20 40 60 80 100
+trial
+Figure 2. Plot of d0.5 (Re´nyi div.), 2d2H (-div.) and the regret bound with  = 0.03 in case SN ratio=1.5.
+
+d0.5 2dH2 regret bound
+0 20 40 60 80 100
+trial
+Figure 3. Plot of d0.5 (Re´nyi div.), 2d2H (-div.) and the regret bound with  = 0.03 in case SN ratio=0.5.
+
+of (11) against . We should choose the smallest as long as
+the regret bound holds with large probability. Our choice is
+ = 0.5 at which the value of (11) is 0.81. We show the re-
+sults of two cases in Figs. 2 and 3. These plots express the value of d0.5, 2d2H and the regret bound that were obtained in a hundred of repetitions with different SN ratios (SNR) Ep [(xT )2]/2 (that is, different 2). From these figures and other experiments, we observed that 2d2H almost always equaled d0.5 (they are completely overlapped). As the SN ratio got larger, then the regret bound became looser (for example, about six times larger than 2d2H when SNR is 10). One of the reasons is that the risk validity condi-
+tion is too strict to bound the loss function when SNR is
+high. Hence, a possible way to improve the risk bound is
+to restrict the parameter space  used in -risk validity to a range of ^, which is expected to be considerably narrower
+than  due to high SNR. In contrast, the regret bound is
+tight when SNR is 0.5 in Fig. 3. Though the regret bound
+is probabilistic, the regret bound dominated the Re´nyi di-
+vergence over all trials.
+
+A. Proof of Theorem 5
+
+Proof.
+
+Define F(xn, yn)
+
+:=
+
+dn (p ,
+
+p )
+
+-
+
+log
+
+.p (y n |xn )
+p (yn|xn)
+
+By the risk validity, we obtain
+
+[ En
+
+exp
+
+(1 
+
+{
+
+max
+
+
+F(xn, yn)
+
+-
+
+})] L(|xn)
+
+
+
+[ En
+
+exp
+
+(1 
+
+max
+~
+
+{ F~(xn,
+
+yn)
+
+-
+
+})] L~(~|q)
+
+
+
+
+
+[ En
+
+exp
+
+(
+
+1 
+
+( F~(xn,
+
+yn)
+
+-
+
+))] L~(~|q) .
+
+(12)
+
+~(q )
+
+The following fact is a key technique:
+
+[ En exp
+
+(
+
+1 
+
+F~(xn,
+
+)] yn)
+
+=
+
+( 1
+exp 
+
+dn (p ,
+
+) p )
+
+En
+
+[(
+
+p~(y
+
+n
+
+|xn
+
+)
+
+)
+
+1 
+
+p(yn|xn)
+
+]
+
+
+
+1 Pn
+
+( 1
+exp 
+
+dn
+
+(p
+
+,
+
+p
+
+) )
+
+E
+
+[(
+
+p~(yn p(yn
+
+|xn |xn
+
+) )
+
+)
+
+1 
+
+]
+
+( )(
+
+)
+
+=
+
+1 Pn
+
+exp
+
+1 
+
+dn
+
+(p,
+
+p
+
+)
+
+exp
+
+-
+
+1 
+
+dn1-
+
+-1
+
+(p
+
+,
+
+p
+
+)
+
+( )(
+
+)
+
+1  Pn exp
+
+1 
+
+dn
+
+(p,
+
+p
+
+)
+
+exp
+
+-
+
+1 
+
+dn
+
+(p,
+
+p
+
+)
+
+1 = Pn .
+
+The first inequality holds because Ep¯(xn,yn) [A]  PnEn [A] for any nonnegative random variable A. The second inequality holds because dn(p, p) is monotoni-
+
+cally increasing with respect to . Thus, the right side of
+
+(12) is bounded by 1/Pn. By Jensen's inequality,
+
+1 Pn
+
+ 
+
+[(
+
+En exp
+
+1 
+
+max
+
+
+{F (xn ,
+
+yn)
+
+-
+
+L(|xn)})] (13)
+
+exp
+
+( En
+
+[ 1 
+
+max
+
+
+{F (xn ,
+
+yn)
+
+-
+
+L(|xn)}])
+
+
+
+exp
+
+( En
+
+[ 1 
+
+( F^(xn,
+
+yn)
+
+-
+
+)]) L(^|xn)
+
+.
+
+Thus, we have
+
+-
+
+log
+
+Pn
+
+
+
+[ En dn(p,
+
+p^)-log
+
+p(yn|xn) p^(yn|xn)
+
+] -L(^|xn) .
+
+Rearranging terms of this inequality, we have the statement.
+
+Barron and Cover's Theory in Supervised Learning and its Application to Lasso
+
+B. Proof of Lemma 1
+Proof. For convenience, we define H(, ~, xn, yn) as
+
+dn (p ,
+
+p )
+
+-
+
+dn(p, p~) + log
+
+p (yn |xn ) p~(yn|xn)
+
++
+
+L~(~|q)
+
+.
+
+loss variation part
+
+codelength validity part
+
+We need to find a weighted 1 penalty function L(|xn) that bounds min~(q) H(, ~, xn, yn) from above for any (, xn, yn)  (p × An × n). To bound min~ H(, ~, xn, yn), we borrow a nice randomization
+
+technique introduced in (Chatterjee & Barron, 2014b)
+
+with some modifications. Let (w1, w2, · · · , wp)T , where wj =
+
+us define jj and
+
+w W
+
+:= :=
+
+diag(w1, · · · , wp). We quantize  as (q) := {(W )-1z|z  Z p}, where  > 0 is a quantization
+
+width and Z is a set of all integers. Though  de-
+
+pends on the data in (Chatterjee & Barron, 2014b), we
+
+must remove that dependency to satisfy -risk validity. A problem is that the minimization of H(, ~, xn, yn)
+
+seems to be difficult to evaluate. A key idea here is to bound not min~ H(, ~, xn, yn) directly but its expectation E~[H(, ~, xn, yn)] with respect to a dexterously randomized ~ because the expectation is larger than the minimum. For each given , ~ is randomized as
+
+ 
+
+ wj
+
+mj
+
+
+
+~j = 
+
+ wj
+
+mj
+
+
+
+ wj
+
+mj
+
+with prob. mj - mj
+
+with prob. mj - mj
+
+, (14)
+
+with prob. 1 - (mj - mj)
+
+where mj := wjj/ and each component of ~ is statisti-
+
+cally independent of each other. Its important properties are
+
+E~[~]
+
+=
+
+
+
+and
+
+E[(~j
+
+-
+
+j )(~j
+
+-
+
+j )]
+
+
+
+I (j
+
+=
+
+j
+
+
+
+)
+
+ wj
+
+|j |.
+
+Using these, we bound E~[H(, ~, xn, yn)] as follows. The loss variation part in H(, ~, xn, yn) is the main concern
+
+because it is more complicated than that of fixed design
+
+case. Let us consider the following Taylor expansion
+
+dn (p ,
+
+p )
+
+-
+
+dn (p ,
+
+p~)
+
+=
+
+-
+
+( dn(p, 
+
+p )
+
+)T
+
+(~
+
+-
+
+)
+
+-
+
+1 2
+
+Tr
+
+(
+
+
+
+2
+
+dn(p, p T
+
+)
+
+(~
+
+-
+
+)(~
+
+-
+
+)T
+
+)
+
+,
+
+(15)
+
+where  is a vector between  and ~. The first term in the right side of (15) vanishes after taking expectation w.r.t. ~ because E~[~ - ] = 0. To bound the second term by the weighted 1 norm of , we have to bound this term above by a multiple of Tr((~ - )(~ - )T ). Nevertheless, it
+is not an easy task because the dependency of the Hessian of dn on ~ is complicated. Here, Lemma 3 in Appendix C plays a key role. By this lemma and Cauchy-Schwartz
+
+inequality, we obtain
+
+Tr
+
+( -
+
+
+
+2
+
+dn(p, p T
+
+)
+
+(~
+
+-
+
+)(~
+
+-
+
+)T
+
+)
+
+
+= =
+
+n 42
+n 42 n 42
+
+T(r(¯(1/)(2T(~1-1/¯/22¯()22~(¯22-¯=)22T)4)n12/22T)r4n((~2 -(~¯-)22()~(~1-¯/-2(22)~)T-T))). 22
+
+See Lemma 3 for unknown symbols. Thus, the expectation of the loss variation part with respect to ~ is bounded as
+
+E~ [dn(p, p)
+
+-
+
+dn (p
+
+,
+
+] p~)
+
+
+
+n 82 w,1.
+
+(16)
+
+The codelength validity part in H(, ~, xn, yn) have the
+
+same form as that for the fixed design case in its appear-
+
+ance. However, we need to evaluate it again in our setting because both  and L~ are changed. The likelihood ratio term in H(, ~, xn, yn) is calculated as
+
+1 22
+
+( 2(y
+
+-
+
+X )T
+
+X (
+
+-
+
+~)+Tr(X T
+
+X (~
+
+-
+
+)(~
+
+-
+
+)T
+
+)) .
+
+Taking expectation with respect to ~, we have
+
+E~
+
+[ log
+
+p (y n |xn ) p~(yn|xn)
+
+]
+
+=
+
+n 22
+
+[( E~ Tr W
+
+2(~
+
+-
+
+)(~
+
+-
+
+)T
+
+)]
+
+
+
+n 22
+
+p
+j=1
+
+wj2 wj
+
+|j |,
+
+where W := diag(w1, w2, · · · , wp). We define a code-
+length function C(z) := z1 log 4p + log 2 for any z  Z p. Note that C(z) satisfies Kraft's inequality. Let us de-
+
+fine a penalty function on (q) as
+
+()
+
+L~(~|q) := C
+
+1 W ~ 
+
+= (1/)W ~1 log 4p + log 2.
+
+Note that L~ satisfies Kraft's inequality and does not depend on xn. By taking expectation w.r.t. ~, we have
+
+[] E~ L~(~|q)
+
+=
+
+log 4p 
+
+w
+
+,1
+
++
+
+log 2.
+
+Thus, the codelength validity part is bounded above by
+
+n 22
+
+p
+j=1
+
+wj2 wj
+
+|j |
+
++
+
+
+
+log 
+
+4p w,1
+
++
+
+
+
+log
+
+2
+
+Combining with (16), E~[H(, ~, xn, yn)] is bounded above by
+
+n n 82 w,1+ 22
+
+p
+j=1
+
+wj2 wj
+
+ |j |+
+
+log 
+
+4p w,1+
+
+log
+
+2.
+
+Barron and Cover's Theory in Supervised Learning and its Application to Lasso
+
+Since xn  An , we can bound this by the data-dependent weighted 1 norm w,1 as
+
+E~[H(, ~, xn, yn)]
+
+
+
+n 82
+
+w,1 1-
+
+ n 1
+
++
+
+
+
+p
+
++ 22
+
+( ( j=1
+
+n = 22
+
+ 4 1-
+
+wj2 wj
+
+|j
+
+|
+
+ +1 
+
++ +
+
+ log 4p w,1 +  log 2  1-
+
+))
+
+ + log 4p  1-
+
+w,1+ log
+
+2.
+
+Because this holds for any  > 0, we can minimize the upper bound with respect to , which completes the proof.
+
+C. Upper Bound of Negative Hessian
+
+Lemma 3. Let ¯ :=  -  and ¯ := 1/2¯. For any , ,
+
+-
+
+
+
+2
+
+d(p, p T
+
+)
+
+
+
+ 42
+
+( 1/2¯(¯)T 1/2 )
+
+¯22
+
+,
+
+(17)
+
+where A  B implies that B - A is positive semi-definite.
+
+Proof. The Re´nyi divergence and its derivatives are well interpreted through a distribution
+
+p¯ (x, y) := q(x)p(y|x)p(y|x)1-/Z,
+
+where Z is a normalization an explicit form of q(x) =
+
+cop¯ns(taxn,ty. )Hdeyrea,nwd ethsehoHwesosnialny
+
+of d(p, p) without proof due to the page limit:
+
+q(x)  :=
+
+= N (x(; 0,  ), 1/2 Ip - (¯22)
+
+(
+
+¯ ¯2
+
+)
+
+(
+
+¯ ¯2
+
+)T
+
+)
+
+1/2
+
+,
+
+2d(p, p) T
+
+=
+
+ 2
+
+
+
+-
+
+2(1 - 4
+
+) Varq(x)
+
+(xxT ¯) ,
+
+2 t
+
+where
+
+c
+
+:=
+
+(1 - ) ,
+
+(t)
+
+:=
+
+. c+t
+
+Here, Ip is an identity matrix of dimension p and Varq(A) := Eq[(A - Eq[A])(A - Eq[A])T ]. Therefore,
+we need to evaluate
+Varq (xxT ¯) = Eq [(xxT ¯)(xxT ¯)T ] - ( ¯)( ¯)T . The (j1, j2) element of Eq [xxT ¯¯T xxT ] is calculated as
+
+Eq
+
+[(xxT
+
+¯¯T
+
+xxT
+
+)] j1j2 =
+
+p
+
+¯j3 ¯j4 Eq
+
+[xj1 xj2 xj3 xj4 ]
+
+,
+
+j3 ,j4 =1
+
+where xj denotes the jth element of x only here. We rewrite  as S to reduce notation complexity hereafter. By the formula of moments of Gaussian distribution,
+
+Eq [xj1 xj2 xj3 xj4 ] = Sj1j2 Sj3j4 +Sj1j3 Sj2j4 +Sj2j3 Sj1j4 .
+
+Therefore, the above quantity is calculated as
+
+Eq
+
+[(xxT
+
+¯¯T
+
+xxT
+
+)
+j1 j2
+
+]
+
+p = ¯j3 ¯j4 (Sj1j2 Sj3j4 + Sj1j3 Sj2j4 + Sj2j3 Sj1j4 )
+j3 ,j4 =1
+
+= ¯T S¯Sj1j2 + 2(S¯)j1 (S¯)j2 .
+
+Summarizing these as a matrix form, we have Eq [xxT ¯¯T xxT ] = (¯T S¯)S + 2S¯(S¯)T .
+
+As a result, Varq (xxT ¯) is obtained as
+
+Varq (xxT ¯) = S¯¯T S + (¯T S¯)S.
+
+We need to survey how this matrix is bounded above in the sense of positive semi-definite. By noticing that S¯ = (1 - (¯22))1/2¯, the first term is calculated as
+
+S¯¯T
+
+S
+
+=
+
+(1
+
+-
+
+(¯22))2¯22
+
+1/2¯(¯)T ¯22
+
+1/2
+
+.
+
+
+
+Note that (1 t)/2)2 
+
+-c2/((t2))2ct)2=
+
+c2t/(c + t)2 = c2/(2(c/ t = c/4 holds, since (c/ t
+
++ +
+
+t)/2  c. Thus, we have
+
+S¯¯T S
+
+
+
+c 4
+
+1/2¯(¯)T 1/2
+
+¯22
+
+.
+
+As for the second term, we first calculate
+
+¯T S¯ = ¯T (1 - (¯22))1/2¯ = (1 - (¯22))¯22.
+
+Note that (1 - (t))t = ct/(c + t) = c/(c/t + 1)  c holds and that S is positive semi-definite for any , the second term is bounded as
+
+(¯T S¯)S = f2(¯22)S  cS.
+
+Summarizing these, we have
+
+Varq (xxT ¯)
+
+
+
+c 4
+
+1/2¯(¯)T 1/2 ¯22
+
++
+
+cS.
+
+Hence, the negative Hessian of d(p, p) is bounded as
+
+- 2d-(p2(ST, p+1)/c2=¯2-((¯4)c2TS1+1//22¯c)(¯2¯()22TS¯¯1T/2S++c(S¯)T S¯)S)
+
+= 42
+
+¯22
+
+.
+
+Barron and Cover's Theory in Supervised Learning and its Application to Lasso
+
+Acknowledgements
+This work was partially supported by JSPS KAKENHI Grant Numbers (25870503) and the Okawa Foundation for Information and Telecommunications. We also thank Mr. Yushin Toyokihara for his support.
+
+Yamanishi, K. A learning criterion for stochastic rules. Machine Learning, 9(2-3):165­203, 1992.
+
+References
+Barron, A. R. and Cover, T. M. Minimum complexity density estimation. IEEE Transactions on Information Theory, 37(4):1034­1054, 1991.
+Barron, A. R. and Luo, X. MDL procedures with 1 penalty and their statistical risk. In Proceedings of the First Workshop on Information Theoretic Methods in Science and Engineering, Tampere, Finland, August 18-20 2008.
+Barron, A. R., Rissanen, J., and Yu, B. The minimum description length principle in coding and modeling. IEEE Transactions on Information Theory, 44(6):2743­2760, 1998.
+Barron, A. R., Huang, C., Li, J. Q., and Luo, X. MDL, penalized likelihood and statistical risk. In Proceedings of IEEE Information Theory Workshop, Porto, Portugal, May 4-9 2008.
+Chatterjee, S. and Barron, A. R. Information theoretic validity of penalized likelihood. 2014 IEEE International Symposium on Information Theory, pp. 3027­ 3031, 2014a.
+Chatterjee, S. and Barron, A. R. Information theory of penalized likelihoods and its statistical implications. arXiv'1401.6714v2 [math.ST] 27 Apr., 2014b.
+Cichocki, A. and Amari, S. Families of alpha- beta- and gamma- divergences: flexible and robust measures of similarities. Entropy, 12(6):1532­1568, 2010.
+Gru¨nwald, P. D. The Minimum Description Length Principle. MIT Press, 2007.
+Re´nyi, A. On measures of entropy and information. In Proceedings of the Fourth Berkeley Symposium on Mathematical Statistics and Probability, 1:547­561, 1961.
+Rissanen, J. Modeling by shortest data description. Automatica, 14(5):465­471, 1978.
+Takeuchi, J. An introduction to the minimum description length principle. In A Mathematical Approach to Research Problems of Science and Technology, Springer (book chapter), pp. 279­296. Springer, 2014.
+Tibshirani, R. Regression shrinkage and selection via the lasso. Journal of the Royal Statistical Society Series B, 58(1):267­288, 1996.
+
+

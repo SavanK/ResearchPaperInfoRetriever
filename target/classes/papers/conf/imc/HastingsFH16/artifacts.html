@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Find Artifacts - conf/imc/HastingsFH16</title>
+<style type="text/css">
+body {
+	font: normal 11pt Arial, Helvetica, sans-serif;
+}
+
+body.author {
+	background-color: BurlyWood;
+}
+
+body.funding {
+	background-color: LightGreen;
+}
+
+body.artifacts {
+	background-color: orange;
+}
+
+button.matchBootstrap {
+	margin-bottom: 10px;
+	margin-right: 5px;
+	white-space: nowrap;
+}
+
+h1 {
+	text-align: center;
+	margin: 5px;
+}
+
+h2 {
+	text-align: left;
+	margin: 5px;
+}
+
+input[type="radio"].matchBootstrap,
+input[type="checkbox"].matchBootstrap {
+	margin-right: 5px;
+}
+
+input[type="radio"].matchBootstrap,
+input[type="checkbox"].matchBootstrap {
+	margin-bottom: 14px;
+}
+
+input[type="radio"].matchSelect {
+	margin-bottom: 7px;
+}
+
+input[type="radio"].matchText {
+	vertical-align: top;
+}
+
+span.author {
+	font-weight: bold;
+	background-color: yellow;
+}
+
+table {
+	border: none;
+	padding: 0;
+}
+
+table td {
+	vertical-align: top;
+	padding: 0;
+}
+
+table td.info {
+	width: 600px;
+}
+
+table td.diacritics {
+	width: 120px;
+	float: right;
+	text-align: right;
+}
+
+table td.diacriticsBootstrap {
+	width: 140px;
+	float: right;
+	text-align: right;
+}
+
+table td.diacritics button,
+table td.diacriticsBootstrap button {
+	white-space: nowrap;
+}
+
+table td.rowlabel {
+	text-align: right;
+	font-weight: bold;
+	padding-right: 5px;
+}
+
+table.info {
+	width: 600px;
+	padding: 0;
+	margin: 0;
+	border: none;
+}
+
+table.info td {
+	padding: 0;
+}
+
+table.info td.rowlabel input {
+	font-weight: normal;
+}
+
+table.info .bootstrap-select.wide {
+	width: 100% !important;
+}
+
+td.matchBootstrap {
+	padding-top: 6px;
+}
+
+textarea {
+	width: 32em;
+}
+
+.bootstrap-select>.dropdown-toggle {
+	margin-bottom: 5px;
+}
+
+.floater {
+	float: left;
+	padding-right: 20px;
+}
+
+
+.message {
+	color: red;
+}
+
+.pdf {
+	display: none; /* We decided not to server the PDF at all */
+	top: 0px;
+	right: 0px;
+	position: fixed;
+	width: 650px;
+	height: 660px;
+	border: 2px solid black
+}
+
+.pdf object {
+	width: 650px;
+	height: 660px;
+}
+
+.wide {
+	width: 100%;
+}
+
+#keyDest {
+	display: none;
+}
+
+#keySrc {
+	text-decoration: underline;
+	cursor: copy;
+}
+
+.academic {
+}
+
+.nonacademic {
+	color: red;
+}
+</style>
+
+		<script type="text/javascript">
+			function addArtifacts(input) {
+				var id = "artifactsTxt";
+				var element = document.getElementById(id);
+				var sep = element.value != "" ? "\n" : "";
+				
+				element.value += sep + input;
+				return false;
+			}
+		
+			function validateForm(form) {
+				{
+					var panic = document.getElementById("panic").checked;
+					var reason = form["reason"].value;
+					
+					if (panic) {
+						if (reason == "") {
+							alert("You may not panic without entering a reason for doing so.");
+							return false;
+						}
+						else
+							return confirm("In a panic situation, only the reason for the panic is recorded; other information is ignored.  " +
+									"The task will be removed from the queue so that you might possibly continued with other tasks.  " +
+									"Proceed with the panic?");
+					}
+					else
+						if (reason != "") {
+							alert("You must panic if there is reason to do so.  Either check the box or remove the reason.");
+							return false;
+						}
+				}
+				
+				{
+					var artifacts = form["artifacts"].value;
+					var lines = artifacts.split("\n");
+					
+					for (var i = 0; i < lines.length; i++) {
+						var line = lines[i].trim();
+						
+						if (line.length == 0)
+							continue;
+						if (line.indexOf(' ') > 0)
+							if (alert("The artifact \"" + line + "\" contains a space which cannot be part of a URL."))
+								return false;
+						if (",.)-".indexOf(line.charAt(line.length - 1)) >= 0)
+							if (!confirm("The artifact \"" + line + "\" ends in a suspicious punctuation mark.  " +
+									"Are you certain that's correct?"))
+								return false;
+						if (!(line.startsWith("http://") ||
+								line.startsWith("https://") ||
+								line.startsWith("ftp://")))
+							if (!confirm("The artifact \"" + line + "\" does not begin with http://, https://, or ftp://.  " +
+									"A reasonable protocol is highly recommended.  Are you certain that's correct?"))
+								return false;
+					}
+				}
+
+				{
+					var artifacts = form["artifacts"].value;
+					
+					if (artifacts == "" && !confirm("No artifacts are specified.  Are you sure?"))
+						return false;
+				}
+				return true;
+			}
+			
+			function isValid(form) {
+				var panic = document.getElementById("panic").checked;
+				var reason = form["reason"].value;
+				
+				if (panic && reason == "")
+					return false;
+				if (!panic && reason != "")
+					return false;
+				return true;
+			}
+			
+			function updateSubmit() {
+				var form = document.forms["form"];
+				var valid = isValid(form);
+				
+				document.getElementById("submit").disabled = !valid;
+			}
+			
+			function onPanicChanged(panic) {
+				updateSubmit();
+			}
+			
+			function onReasonChanged(reason) {
+				updateSubmit();
+			}
+			
+			function onNonacademicChanged(nonacademic) {
+			}
+
+			function onBadgeChanged(badge) {
+			}
+
+			function copyKey(keySrc) {
+				var text = keySrc.innerText;
+				var keyDest = document.getElementById("keyDest");
+				
+				keyDest.style.display = "inherit";
+				keyDest.value = text;
+				keyDest.select();
+				
+				try {
+					var successful = document.execCommand("copy");
+					
+					if (!successful)
+						console.log("Copying text command failed.");
+				}
+				catch (err) {
+					console.log("Oops, unable to copy");
+				}
+				keyDest.style.display = "none";
+			}
+		</script>
+	</head>
+	<body class="artifacts">
+		<h1>Find Artifacts</h1>
+		<!--div class="pdf">
+			<object data="paper.pdf" type="application/pdf">
+				alt : <a href="paper.pdf">paper.pdf</a>
+			</object>
+			<br>
+		</div-->
+		<div class="floater">
+			<h2>Form</h2>
+			<form name="form" method="post" onsubmit="return validateForm(this);">
+				<input type="hidden" name="key" value="conf/imc/HastingsFH16">
+				<input type="hidden" name="type" value="artifacts">
+				<input type="hidden" name="queue" value="${queue?html}">
+				<input type="hidden" name="receipt" value="${receipt?html}">
+				<table>
+					<!--<#if message != "">-->
+						<tr>
+							<td class="message rowlabel">Message:</td>
+							<td class="message info">${message}</td>
+						</tr>
+					<!--</#if>-->
+					<tr>
+						<td class="rowlabel">Title:</td>
+						<td class="info">
+							Weak Keys Remain Widespread in Network Devices.
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">URL:</td>
+						<td class="info">
+							<a href="http://dl.acm.org/citation.cfm?id=2987486" target="_blank">http://dl.acm.org/citation.cfm?id=2987486</a>
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Key:</td>
+						<td class="info">
+							conf/imc/<span id="keySrc" onclick="return copyKey(this);">HastingsFH16</span>
+							<input id="keyDest" type="text">
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Panic:</td>
+						<td>
+							<table class="info">
+								<tr>
+									<td><input type="checkbox" id="panic" name="panic" onchange="onPanicChanged(this);"></td>
+									<td class="wide"><input class="wide" type="text" name="reason" maxlength="63" oninput="onReasonChanged(this);" placeholder="Reason for panic"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Problem:</td>
+						<td>
+							<table class="info">
+								<tr>
+									<td><input class="wide" type="text" name="problem" maxlength="63" size="63" placeholder="Description of the problematic situation"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Nonacademic:</td>
+						<td class="academic">
+							<input type="checkbox" id="nonacademic" name="nonacademic" onchange="onNonacademicChanged(this);">
+							No research could have been involved (such as in a workshop invitation or report).
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Badge:</td>
+						<td>
+							<input type="checkbox" id="badge" name="badge" onchange="onBadgeChanged(this);">
+							This article boasts some kind of seal of approval from an artifact evaluation committee.
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Artifacts:</td>
+						<td>
+							<table class="info">
+								<tr>
+									<td><textarea class="wide" name="artifacts" id="artifactsTxt" maxlength="1023" rows="4" placeholder="Artifact URLs copied from the article or added with the buttons or blank"></textarea></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('http://dx.doi.org/10.1145/2987443.2987486');">Add</button></td>
+					
+						<td class="info">CM. ISBN 978-1-4503-4526-2/16/11. . . $15.00
+DOI: <a href="http://dx.doi.org/10.1145/2987443.2987486" target="_blank">http://dx.doi.org/10.1145/2987443.2987486</a>
+
+Wustrow, and Halderman [21] announced that they </td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://factorable.net');">Add</button></td>
+					
+						<td class="info">ng a binary tree of multi-
+1Available publicly on <a href="https://factorable.net" target="_blank">https://factorable.net</a>.
+
+plications.) Then it uses a remainder tree to c</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://factorable.net/advisories.html');">Add</button></td>
+					
+						<td class="info">ic security advisories for TLS vulnerabilities2.
+2<a href="https://factorable.net/advisories.html" target="_blank">https://factorable.net/advisories.html</a>
+
+55
+
+Hosts Hosts
+
+EFF P&amp;Q Ecosystem Rapid7 Censy</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://kb.juniper.net/InfoCenter/index?page=');">Add</button></td>
+					
+						<td class="info">Heartbleed" issue (CVE-2014-0160)/JSA10623.
+
+61
+
+<a href="https://kb.juniper.net/InfoCenter/index?page=" target="_blank">https://kb.juniper.net/InfoCenter/index?page=</a> content&amp;id=KB29007&amp;pmv=print&amp;actp=LIST, April 201</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://www.usenix.org/');">Add</button></td>
+					
+						<td class="info">apers: Human subjects and ethical considerations. <a href="https://www.usenix.org/" target="_blank">https://www.usenix.org/</a> conference/usenixsecurity16/submitting-papers, 20</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://martinralbrecht.files.wordpress.com/2015/');">Add</button></td>
+					
+						<td class="info">-bit RSA moduli for fun (and a profit of $9,000). <a href="https://martinralbrecht.files.wordpress.com/2015/" target="_blank">https://martinralbrecht.files.wordpress.com/2015/</a> 03/freak-scan1.pdf, 2015.
+[4] Ashish Arora, Ramay</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('http://cr.yp.to/papers.html#smoothparts');">Add</button></td>
+					
+						<td class="info"> Bernstein. How to find smooth parts of integers. <a href="http://cr.yp.to/papers.html#smoothparts" target="_blank">http://cr.yp.to/papers.html#smoothparts</a>.
+[6] Daniel J. Bernstein, Yun-An Chang, Chen-Mou </td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://blog.hboeck.de/archives/872-About-thesupposed-factoring-of-a-4096-bit-RSA-key.html');">Add</button></td>
+					
+						<td class="info">out the supposed factoring of a 4096 bit RSA key. <a href="https://blog.hboeck.de/archives/872-About-thesupposed-factoring-of-a-4096-bit-RSA-key.html" target="_blank">https://blog.hboeck.de/archives/872-About-thesupposed-factoring-of-a-4096-bit-RSA-key.html</a>.
+[8] Kevin Butler, Toni R. Farley, Patrick McDani</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('http://www.forbes.com/sites/amitchowdhry/');">Add</button></td>
+					
+						<td class="info">nfirms existence of the `Error 56' iOS 9.3.2 bug. <a href="http://www.forbes.com/sites/amitchowdhry/" target="_blank">http://www.forbes.com/sites/amitchowdhry/</a> 2016/05/18/apple-ios-9-3-2-bug, 2016. Accessed: 2</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('http://www.crn.com/reviews/componentsperipherals/240154599/review-dell-c3765dnfworkgroup-color-printer.htm');">Add</button></td>
+					
+						<td class="info">a. Review: Dell C3765dnf workgroup color printer. <a href="http://www.crn.com/reviews/componentsperipherals/240154599/review-dell-c3765dnfworkgroup-color-printer.htm" target="_blank">http://www.crn.com/reviews/componentsperipherals/240154599/review-dell-c3765dnfworkgroup-color-printer.htm</a>, 2013.
+[12] D. Dittrich and E. Kenneally. The Men</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://www.eff');">Add</button></td>
+					
+						<td class="info">nd Jesse Burns. An observatory for the SSLiverse. <a href="https://www.eff" target="_blank">https://www.eff</a> .org/files/DefconSSLiverse.pdf , 2010.
+[19] Chris</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://security.googleblog.com/2010/07/');">Add</button></td>
+					
+						<td class="info">ible disclosure: a focus on protecting end users. <a href="https://security.googleblog.com/2010/07/" target="_blank">https://security.googleblog.com/2010/07/</a> rebooting-responsible-disclosure-focus.html, July</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('http://www.businesswire.com/news/home/');">Add</button></td>
+					
+						<td class="info"> Dell to expand imaging and printing marketplace. <a href="http://www.businesswire.com/news/home/" target="_blank">http://www.businesswire.com/news/home/</a> 20040108005690/en/Xerox-Corp.-XeroxInternational-</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('http://eprint.iacr.org/2012/064');">Add</button></td>
+					
+						<td class="info">l Cryptology Conference, CRYPTO '12, August 2012. <a href="http://eprint.iacr.org/2012/064" target="_blank">http://eprint.iacr.org/2012/064</a>.
+[27] Frank Li, Zakir Durumeric, Jakub Czyz, Moha</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://windowsontheory.org/2012/05/17/');">Add</button></td>
+					
+						<td class="info">[29] Ilya Mironov. Factoring RSA moduli. part ii. <a href="https://windowsontheory.org/2012/05/17/" target="_blank">https://windowsontheory.org/2012/05/17/</a> factoring-rsa-moduli-part-ii/, May 2012.
+[30] Rap</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://scans.io/study/sonar.ssl');">Add</button></td>
+					
+						<td class="info">012.
+[30] Rapid7. Project Sonar SSL Certificates. <a href="https://scans.io/study/sonar.ssl" target="_blank">https://scans.io/study/sonar.ssl</a>, April 2016.
+[31] Ronald L Rivest, Adi Shamir, an</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('http://www-03.ibm.com/press/us/en/');">Add</button></td>
+					
+						<td class="info">cloud-based building energy management solutions. <a href="http://www-03.ibm.com/press/us/en/" target="_blank">http://www-03.ibm.com/press/us/en/</a> pressrelease/49159.wss, February 2016.
+[33] Jeffr</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://lkml.org/lkml/2012/7/5/414');">Add</button></td>
+					
+						<td class="info">015. ACM.
+[36] Theodore Ts'o. /dev/random fixups. <a href="https://lkml.org/lkml/2012/7/5/414" target="_blank">https://lkml.org/lkml/2012/7/5/414</a>.
+[37] Theodore Ts'o. random: introduce getrandom(</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://lwn.net/Articles/605828/');">Add</button></td>
+					
+						<td class="info">Ts'o. random: introduce getrandom(2) system call. <a href="https://lwn.net/Articles/605828/" target="_blank">https://lwn.net/Articles/605828/</a>, 2014.
+[38] Luke Valenta, Shaanan Cohney, Alex Li</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://isc.sans.edu/forums/diary/Be+Careful+');">Add</button></td>
+					
+						<td class="info">9] Rob VandenBrink. Be careful what you scan for! <a href="https://isc.sans.edu/forums/diary/Be+Careful+" target="_blank">https://isc.sans.edu/forums/diary/Be+Careful+</a> what+you+Scan+for/18017/.
+[40] Scott Yilek, Eric </td>
+					</tr>
+					<tr><td>&nbsp;</td><td></td></tr>
+					<tr>
+						<td class="rowlabel"><input type="submit" value="Submit" id="submit"></td>
+						<td>&nbsp;</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div class="floater">
+			<h2>Instructions</h2>
+			<ul>
+				<li>Verify by title that you are displaying the correct PDF.</li>
+				<li>If necessary, use the key to find the correct file.</li>
+				<li style="color: red;">
+					Check the article's title (and possibly content) for indication that it
+					deals only with a workshop, for example, and isn't academic research.
+					Tick the nonacademic box in this case.  If the box is already ticked,
+					verify the computer's guess.
+				</li>
+				<li style="color: red;">
+					Check the top right hand corner for a badge and keep an eye
+					out for possible badges elsewhere.  Tick the badge box if found.
+				</li>
+				<li>Look at the end of the paper, footnotes, and acknowledgements for URLs.</li>
+				<li>If need be, query the entire paper for general search terms or specific websites.</li>
+				<li>Paste the URL, along with desription/source if provided.</li>
+			</ul>
+			<div class="floater">
+				<h3>General Search Terms</h3>
+				<ul>
+					<li>artifact<br><br></li>
+
+					<li>code</li>
+					<li>code can be found at</li>
+					<li>source code<br><br></li>
+
+					<li>availability</li>
+					<li>is available</li>
+					<li>made available<br><br></li>
+
+					<li>github</li>
+					<li>bitbucket</li>
+					<li>codeplex</li>
+					<li>git<br><br></li>
+
+					<li>code repository</li>
+					<li>repo<br><br></li>
+
+					<li>download</li>
+					<li>download from<br><br></li>
+
+					<li>our website</li>
+					<li>please visit</li>
+					<li>please see<br><br></li>
+
+					<li>will be released</li>
+				</ul>
+			</div>
+			<div class="floater">
+				<h3>Specific Websites and Address Formats</h3>
+				<ul>
+					<li><a href="https://github.com">github.com</a></li>
+					<li><a href="http://bitbucket.org">bitbucket.org</a></li>
+					<li><a href="https://code.google.com/archive">code.google.com</a></li>
+					<li><a href="http://www.codeplex.com">codeplex.com</a></li>
+					<li><a href="https://sourceforge.net">sourceforge.net</a><br><br></li>
+
+					<li>http: or https:</li>
+					<li>ftp: or ftps:</li>
+					<li>mailto:</li>
+				</ul>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,6 @@
+Benjamin_VanderSloot benvds@umich.edu
+Johanna_Amann johanna@icir.org johanna@icir.org
+Matthew_Bernhard
+Zakir_Durumeric zakir@umich.edu
+Michael_Bailey mdbailey@illinois.edu mdbailey@illinois.edu mjb@eecs.oregonstate.edu bailey@apl.washington.edu baileyma@georgetown.edu
+J._Alex_Halderman jhalderm@eecs.umich.edu jhalderm@umich.edu

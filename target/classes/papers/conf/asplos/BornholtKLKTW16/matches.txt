@@ -1,0 +1,6 @@
+Emina_Torlak:arvind@cs.washington.edu
+Xi_Wang:xi@cs.washington.edu
+Jialin_Li:antoinek@cs.washington.edu
+Arvind_Krishnamurthy:emina@cs.washington.edu
+James_Bornholt:bornholt@cs.washington.edu
+Antoine_Kaufmann:lijl@cs.washington.edu

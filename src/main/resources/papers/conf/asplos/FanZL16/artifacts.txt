@@ -1,0 +1,6 @@
+http://dx.doi.org/10.1145/2872362.2872383
+https://archive.ics
+http://grouplens.org/datasets/
+http://literature.rockwellautomation.com/idc/
+http://www.solidstatecontrolsinc.com/download/
+https://www.kernel.org/doc/Documentation/

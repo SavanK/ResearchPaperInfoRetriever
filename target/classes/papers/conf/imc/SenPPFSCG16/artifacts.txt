@@ -1,0 +1,15 @@
+http://dx.doi.org/10.1145/2987443.2987485
+https://http[s]
+https://http-example
+http://example.com/test
+https://info.internet.org/en/
+http://www.internetlivestats.com/
+http://databank.worldbank.org/data/
+https://en.wikipedia.org/wiki/Digital_divide
+https://www.planet-lab.org/
+https://www.measurementlab.net/
+http://www.theverge.com/2016/2/8/10913398/
+http://www.trai.gov.in/WriteReadData/WhatsNew/
+https://developers.facebook.com/docs/internet-org/
+https://developers
+https://play.google.com/store/apps/details?id=org

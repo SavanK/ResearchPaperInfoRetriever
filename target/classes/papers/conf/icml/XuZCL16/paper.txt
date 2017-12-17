@@ -1,0 +1,1214 @@
+Matrix Eigen-decomposition via Doubly Stochastic Riemannian Optimization
+
+Zhiqiang Xu Peilin Zhao Jianneng Cao Xiaoli Li
+Institute for Infocomm Research, A*STAR, Singapore
+
+XUZQ@I2R.A-STAR.EDU.SG ZHAOP@I2R.A-STAR.EDU.SG CAOJN@I2R.A-STAR.EDU.SG
+XLLI@I2R.A-STAR.EDU.SG
+
+Abstract
+Matrix eigen-decomposition is a classic and long-standing problem that plays a fundamental role in scientific computing and machine learning. Despite some existing algorithms for this inherently non-convex problem, the study remains inadequate for the need of large data nowadays. To address this gap, we propose a Doubly Stochastic Riemannian Gradient EIGenSolver, DSRG-EIGS, where the double stochasticity comes from the generalization of the stochastic Euclidean gradient ascent and the stochastic Euclidean coordinate ascent to Riemannian manifolds. As a result, it induces a greatly reduced complexity per iteration, enables the algorithm to completely avoid the matrix inversion, and consequently makes it well-suited to large-scale applications. We theoretically analyze its convergence properties and empirically validate it on real-world datasets. Encouraging experimental results demonstrate its advantages over the deterministic counterpart.
+1. Introduction
+Matrix eigen-decomposition, aiming at a group of top eigenvectors of a given matrix (Golub & Van Loan, 1996), has found widespread applications in many areas of scientific and engineering computing, e.g., numerical computation (Press et al., 2007) and structure analysis (Torbjorn Ringertz, 1997)). Particularly, it plays a fundamental role in many machine learning tasks, such as spectral clustering (Ng et al., 2002), dimensionality reduction (Jolliffe, 2002), and kernel approximation (Drineas & Mahoney, 2005), etc. Despite the great importance of this problem, existing solutions, i.e., eigen-
+Proceedings of the 33 rd International Conference on Machine Learning, New York, NY, USA, 2016. JMLR: W&CP volume 48. Copyright 2016 by the author(s).
+
+solvers, have been relatively lacking. Among them, the power method (Golub & Van Loan, 1996) and the (block) Lanczos algorithm (Parlett, 1998) belong to well-known eigensolvers, while randomized SVD (Halko et al., 2011) and online learning of eigenvectors (Garber et al., 2015) are recently proposed. In addition, matrix eigendecompostion can be formulated as a quadratically constrained quadratic program, and thus can be addressed from the optimization perspective, for example, the trace penalty minimization (Wen et al., 2013). Notably, its non-convex constraint set constitutes a Riemannian manifold, or more precisely, Stiefel manifold, which turns it into a Riemannian optimization problem that can be tackled by the methods of optimization on manifolds (Edelman et al., 1999; Absil et al., 2008; Wen & Yin, 2013). However, most of existing eigensolvers belong to batch learning, i.e., using the entire dataset at each update step, and thus are not suitable to large-scale matrices, especially those unable to completely fit into memory. To address this issue, we usually could resort to stochastic optimization, which enables the algorithm to work through access to only a subset of the data each time. And stochastic algorithms often converge faster than their batch counterparts even if no memory issue arises.
+To overcome the limitations of existing batch learning eigensolvers, we propose a doubly stochastic Riemannian gradient method to obtain the DSRG-EIGS algorithm, a new eigensolver. The method simultaneously generalizes the stochastic gradient ascent (SGA) and the stochastic coordinate ascent (SCA) (Nesterov, 2012) from the Euclidean space to the Riemannian space, and arrives at a combination of their Riemannian counterparts: stochastic Riemannian gradient ascent (SRGA) and stochastic Riemannian coordinate ascent (SRCA). Specifically, SRGA works by sampling data sub-matrices, while SRCA proceeds by sampling column blocks of Riemannian gradient coordinates in our problem. Both methods keep iterates remaining on the manifold and stochastic Riemannian gradients staying in the tangent space during iterations. They greatly reduce the complexity per iteration of the algorithm, especially for
+
+Matrix Eigen-decomposition via Doubly Stochastic Riemannian Optimization
+
+dense matrices. Meanwhile, the algorithm becomes able to completely avoid the matrix inversion required in its deterministic version, and thus can work effectively in the case of desiring a large number of eigenvectors. Furthermore, we provide a progressive analysis on the theoretical convergence properties of DSRG-EIGS, which shows the convergence of the algorithm to global solutions at a sub-linear rate in expectation and that the algorithm is able to take advantage of importance sampling (Zhao & Zhang, 2014) to improve the convergence rate.
+The rest of the paper is organized as follows. In Section 2, we review some basics of matrix eigen-decomposition and Riemannian optimization. We present our doubly stochastic Riemannian gradient eigensolver, abbreviated as DSRG-EIGS in Section 3, followed by the progressive theoretical analysis in Section 4. Experimental results are shown in Section 5. Section 6 discusses related work. Finally, Section 7 concludes the paper.
+
+2. Preliminaries
+2.1. Matrix Eigen-decomposition
+The eigen-decomposition of a symmetric1 matrix A  Rn×n says that A = UUT where U = [u1, · · · , un] (uj represents the jth column of U) is an orthogonal matrix, i.e., UU = UU = I (I represents the identity matrix of appropriate size),  = diag(1, · · · , n) is a diagonal matrix, and uj is called the eigenvector corresponding to the eigenvalue j, i.e., Auj = juj. For the convenience in the sequel, we assume that 1  · · ·  n and define V [u1, · · · , uq] and V [uq+1, · · · , un],  diag(1, · · · , q) and  diag(q+1, · · · , n), where q is the number of top eigenvectors to be sought.
+From the point of view of optimization, in practice, matrix eigen-decomposition can be defined by the following nonconvex quadratically constrained quadratic program:
+
+max (1/2)tr(XAX),
+XRn×q :XX=I
+
+(1)
+
+where q < n and tr(·) represents the trace of a square ma-
+
+trix, that
+
+i.e., sum of its diagonal X = V maximizes the
+
+entries. It can trace value at
+
+(b1e/e2a)silyqiv=e1rifiie. d
+
+2.2. Riemannian Gradient
+Given a Riemannian manifold (Lee, 2012) M, its tangent space at a point X  M, denoted as TXM, is a Euclidean space that locally linearizes M around X. Analogous to the Euclidean case, one iterate of the first-order optimiza-
+1The given matrix A is assumed to be symmetric throughout the paper, i.e., AT = A.
+
+tion on M takes the form (Absil et al., 2008):
+
+X(t+1) = RX(t) (tX(t) ),
+
+(2)
+
+where X(t)  TX(t) M (namely, X(t) is a tangent vector of M at X(t)) represents the search direction, t is the step size, and RX(t) (·) represents the retraction at X(t) which maps a tangent vector   TX(t) M to a point on M.
+Tangent vectors serving as search directions are generally gradient-related. The gradient of a function f (X) defined on M, denoted as Gradf (X), depends on the Riemannian metric, which is a family of smoothly varying inner products on tangent spaces, i.e., , X, where ,   TXM for any X  M. The Riemannian gradient Gradf (X)  TXM is the unique tangent vector that satisfies
+
+Gradf (X), X = Df (X)[],
+
+(3)
+
+for any   TXM, where Df (X)[] represents the directional derivative of f (X) in the tangent direction .
+
+2.2.1. EIGS VIA RIEMANNIAN GRADIENT
+The constraint set in problem (1) constitutes a Stiefel manifold, i.e., St(n, q) = {X  Rn×q : XX = I}, which turns the problem into a Riemannian one:
+
+max f (X),
+XSt(n,q)
+
+where f (X) (1/2)tr(XAX). Under the canonical
+
+metric
+
+, X
+
+=
+
+tr((I -
+
+1 2
+
+XX
+
+))
+
+and by (3),
+
+the
+
+Riemannian gradient of f (X) is
+
+Gradf (X) = (I - XX)AX.
+
+Furthermore, we use the Cayley transformation based retraction (Wen & Yin, 2013):
+
+RX()
+
+=
+
+(I
+
+-
+
+1 S())-1(I 2
+
++
+
+1 S())X,
+2
+
+(4)
+
+for any   TXSt(n, q), where S() = (PX)X -
+
+X(PX)
+
+and
+
+PX
+
+=
+
+I
+
+-
+
+1 2
+
+XX
+
+.
+
+Given a line search method for determining the step size such as Amijo-Wolf conditions (Nocedal & Wright, 2006) or non-monotone line search (Wen & Yin, 2013), we can arrive at the Riemannian Gradient EIGenSolver (RGEIGS)
+
+X(t+1) = RX(t) (tGradf (X(t))).
+
+3. Doubly Stochastic Riemannian Gradient
+In this section, we propose a doubly stochastic Riemannian gradient eigensolver, denoted as DSRG-EIGS, which generalizes Euclidean SGA and SCA to Stiefel manifolds and
+
+Matrix Eigen-decomposition via Doubly Stochastic Riemannian Optimization
+
+meanwhile extends RG-EIGS to the doubly stochastic optimization setting.
+One update of the stochastic Riemannian gradient ascent takes the form (Bonnabel, 2013):
+X(t+1) = RX(t) (tG(yt, X(t))),
+where t > 0, yt is an observation of the random variable y that follows some distribution and satisfies E[f (y, X)] = f (X), and G(y, X)  TXSt(n, p) is a stochastic Riemannian gradient such that E[G(y, X)] = Gradf (X).
+
+3.1. Sampling over Data
+
+We first consider the stochastic Riemannian gradient based on sampling over data. The given matrix A  Rn×n can be
+
+written as a matrix summation. Although this summation
+
+could be made quite general, in our case, it's based on the
+
+following partitioning of A into a block matrix of size nr × nc for simplicity:
+
+
+
+A11 · · · A1nc
+
+nr nc
+
+A =  ··· ··· ···  =
+
+Ekl  A,
+
+Anr1 · · · Anrnc
+
+k=1 l=1
+
+where Ekl  {0, 1}n×n represents the element indicator of Akl in A. Define
+
+f (s, X) p-s 1tr(X(Es  A)X)
+
+and G(s, X) p-s 1(I - XX)(Es  A)X,
+where s is a random variable taking on pair values from {(k, l) : k = 1, · · · , nr, l = 1,· · · , nc}, with respective probabilities ps > 0 subject to s ps = 1. It holds that E[f (s, X)] = f (X) and E[G(s, X)] = Gradf (X).
+
+We then get the stochastic Riemannian gradient G(s, X) by sampling over data, which greatly reduces the complexity per iteration for data scanning, from that of a full scan, O(n2q) for dense matrices, to that of a partial scan. However, the complexity per iteration for updating variable X remains the same as that with the batch version RG-EIGS, i.e., O(nq2) + O(q3). Hence, when q is large, it's still computationally cumbersome.
+
+3.2. Sampling over Riemannian Gradient Coordinates
+To further reduce the complexity per iteration, we now consider the stochastic Riemannian gradient based on sampling over Riemannian gradient coordinates {[Gradf (X)]ij : i = 1, · · · , n, j = 1, · · · , q}. This is exactly the idea of stochastic coordinate ascent (Nesterov, 2012). However, SCA is intended to solve unconstrained or separately constrained convex problems, and thus not suitable for ours, an inherently non-convex problem. In fact,
+
+the variable space St(n, q) (i.e., Stiefel manifold) and the gradient space TXSt(n, q) (i.e., Euclidean space) are not the same one. Hence, the direct application of this method to our problem may be not well-defined, because a partial update of coordinates could make either X(t) drift off the manifold, i.e., X(t)  St(n, q), or X(t) step out of the tangent space, i.e., X(t)  TX(t) St(n, q).
+To tackle this issue, we propose to sample intrinsic coordinates of Riemannian gradients in the tangent space. Note that the tangent space of Stiefel manifold (Absil et al., 2008) at X can be explicitly represented as
+
+TXSt(n, q) = {X + XK :  = -  Rq×q, K  R(n-q)×q},
+
+where X  Rn×(n-q) represents the orthonormal complement of X in Rn×n such that (X X) is othogonal.
+
+By this representation, we can identify the intrinsic coor-
+
+dinates of a tangent vector X with corresponding  and
+
+K. We can also find the dimensionality of St(n, q) is
+
+1 2
+
+q(q
+
+-
+
+1)
+
++
+
+(n
+
+-
+
+q)q.
+
+Recall that our Riemannian gradient is Gradf (X) = (I - XX)AX, which can be rewritten as Gradf (X) = XXAX. Hence, its intrinsic coordinates are  = 0 and K = XAX. We only need to sample coordinates from K. To gain advantages as with SCA, we sample columns
+of K, which is equivalent to sample columns of X. To this
+end, assume X is partitioned into a block matrix of size 1 × qc (i.e., column block matrix):
+qc X = (X·1, X·2, · · · , X·qc ) = E·m  X,
+m=1
+
+where E·m  {0, 1}n×q similarly represents the element indicator of X·m in X. Define
+
+f (r, X) p-r 1tr(XA(E·r  X))
+
+and G(r, X) p-r 1(I - XX)A(E·r  X),
+where r is a random variable taking on values 1, · · · , qc, with respective probabilities pr > 0 subject to r pr = 1. It holds that E[f (r, X)] = f (X) and E[G(r, X)] =
+Gradf (X). As we will see shortly, only one column block
+of X needs be updated at each step.
+
+We now get the stochastic Riemannian gradient G(r, X) by sampling over Riemannian intrinsic coordinates. It keeps X and G(r, X) staying on the manifold and in the tangent space, respectively, and meanwhile the update step works like a Euclidean SCA step.
+
+3.3. Doubly Stochastic Riemannian Gradient (DSRG)
+By sampling over both data and intrisic Riemannian gradient coordinates, we arrive at our doubly stochastic Rieman-
+
+Matrix Eigen-decomposition via Doubly Stochastic Riemannian Optimization
+
+nian gradient G(s, r, X)  TXSt(n, q): G(s, r, X) = ps-1p-r 1(I - XX)(Es  A)(E·r  X).
+
+It's easy to see that it is an unbiased estimate of the true Riemannian gradient, i.e., E[G(s, r, X)] = Gradf (X). We then arrive at our DSRG ascent method:
+
+X(t+1) = RX(t) (tG(st, rt, X(t))).
+
+(5)
+
+To simplify the above update, first let g G(s, r, X), U~
+
+(g, X) and V~ (X, -g). Since g  TXSt(n, q), we have
+
+gX
+
+=
+
+0,
+
+which
+
+implies
+
+that
+
+PX(g)
+
+=
+
+(I -
+
+1 2
+
+XX)g
+
+=
+
+g
+
+and thus S(g) = U~ V~ . We then can write
+
+RX(g)
+
+=
+
+(I
+
+-
+
+ S(g))-1(I
+
++
+
+ S(g))X
+
+22
+
+= X + U~ (I -  V~ U~ )-1V~ X,
+
+2
+
+by the Sherman-Morrison-Woodbury formula (Press et al.,
+
+2007). Note that
+
+()
+
+V~ X =
+
+I 0
+
+(
+
+and V~ U~ =
+
+0 -gg
+
+)
+
+I 0
+
+.
+
+Accordingly,
+
+(
+
+(I -  V~ U~ )-1 = 2
+
+W
+
+-
+
+ 2
+
+g
+
+
+
+gW
+
+ 2
+
+W
+
+)
+
+W
+
+where
+
+W
+
+=
+
+(I
+
++
+
+2 4
+
+gg)-1.
+
+We
+
+then
+
+get
+
+RX(g)
+
+=
+
+X + (I -  Xg)gW 2
+
+= -X + (g + 2X)W.
+
+(6)
+
+To see the properties of this method, let's focus on W. Note that
+
+gg = diag(0, · · · , 0, C, 0, · · · , 0),
+
+where C = ps-2p-r 2D is the rth diagonal block of gg, and
+
+D = X·r(Es  A)(I - XX)(Es  A)X·r = (AklXlr)(AklXlr)
+- (Xk·AklXlr)(Xk·AklXlr),
+
+supposing s = (k, l) (note that subscripts k, l, r are all block indices). Therefore, we get
+
+W = diag(I, · · · , I, B-1, I, · · · , I),
+
+where B
+
+=
+
+I
+
++
+
+2 4
+
+C.
+
+We now can see that in (5) only
+
+the rth column block of X needs be updated, while the left
+
+ones remain unchanged:
+
+
+
+X·m
+
+  
+
+(p-s 1p-r 1(H - XXk·)AklXlm +2X·m)B-1 - X·m,
+X·m,
+
+m=r m = r
+
+where H = (0, · · · , 0, I, 0, · · · , 0) with I being the kth column block.
+Our DSRG-EIGS algorithm is summarized in Algorithm 1, which enjoys the advantages over RG-EIGS from the double stochasticity: 1) it achieves a greatly reduced complexity per iteration, O(nq), especially when A is dense or q is large; 2) only a size-controlled small matrix B needs be inverted; 3) there is no need of matrix inversion when qc = q, i.e., single column sampling over X.
+
+Algorithm 1 DSRG-EIGS
+
+Input: A, T ,  > 0,  > 0
+
+Output: X(T )
+
+1:
+
+Initialize X(0) and ps
+
+=
+
+As F s~ As~F
+
+for any s  S
+
+=
+
+{(k, l) : k = 1, · · · , nr, l = 1, · · · , nc}.
+
+2: for t = 1, 2, · · · , T do
+
+3: Sample st = (kt, lt) from S according to {ps}.
+
+4: Sample rt from {1, 2, · · · , qc} uniformly.
+
+5:
+
+Set t
+
+=
+
+ 1+t
+
+.
+
+6: Update X(·rtt+1) = -X(·rtt) + (tqcp-st1(H(t) - X(t)X(ktt)· )Aktlt X(lttr)t + 2X(·rtt))(B(t))-1
+
+and X(·rt+1) = X(·rt) for r = rt, where B(t) and H(t)
+
+are as defined in Section 3.3.
+
+7: end for
+
+4. Theoretical Analysis
+We analyze convergence properties of Algorithm 1 in this section.
+
+4.1. Local Convergence
+
+We note the following facts. Stiefel manifold is smooth,
+
+connected and compact, with a positive global injectiv-
+
+ity radius (Lee, 2012; Bonnabel, 2013). In addition, the
+
+function f (X) to be maximized in our problem is three
+
+times continuously differentiable, the retraction (4) is twice
+
+continuously differentiable, and the stochastic Riemannian
+
+gradient (5) is unbiased, and bounded since both A and X
+
+are bounded. According to (Bonnabel, 2013), we have
+
+
+
+Thteort2e<m
+
+4.1. If , then
+
+step sizes satisfy for Algorithm 1, f
+
+t t (X(t))
+
+=  and converges al-
+
+most surely and Gradf (X(t)) converges to 0 almost surely,
+
+as t  .
+
+Note that only convergence to a local solution is guaranteed by Theorem 4.1.
+
+4.2. Global Convergence
+In fact, Theorem 4.1 can be strengthened to achieve a global convergence for our problem. Specifically, we in-
+
+Matrix Eigen-decomposition via Doubly Stochastic Riemannian Optimization
+
+vestigate the squared cosine value of the principal angle between2 Xt and the ground truth V, which is defined as
+
+cos2Xt, V
+
+min(Xt VVXt)
+
+=
+
+min
+y=0
+
+V
+
+Xty
+
+22
+
+/y22.
+
+Note that if cos2Xt, V = 1, then Xt = V up to a q × q orthogonal matrix, that is, our goal is achieved. Actually
+
+we have the following strengthened theorem:
+
+Theorem 4.2. Define t = 1 - E[cos2Xt, V]. Assume
+
+that A has a positive eigen-gap, i.e.,  = q - q+1 > 0,
+
+t
+
+=
+
+c t
+
+with c
+
+>
+
+2 
+
+,
+
+and
+
+cos2Xs,
+
+V
+
+
+
+1 2
+
+with s
+
+
+
+0.
+
+Then
+
+we
+
+have
+
+t
+
+=
+
+O(
+
+1 t
+
+)
+
+for
+
+t
+
+
+
+s.
+
+Theorem 4.2 shows that our DSRG-EIGS algorithm con-
+
+verges to a global solution at a sub-linear rate in expec-
+
+tation. We note that the requirement on the initialization
+
+X0, which makes cos2Xs, V
+
+
+
+1 2
+
+at certain iteration
+
+s  0, is theoretically non-trivial. However, empirically a
+
+random initialization works well as we will observe in our
+
+experiments. Hence, Theorem 4.2 amounts to the conver-
+
+gence analysis at a later stage of the algorithm starting from
+
+t0 = s instead of t0 = 0.
+
+Similar to (Balsubramani et al., 2013), we have the following theorem which shows the concrete convergence rate of our algorithm. Before that, we define some stochastic quantities:
+
+At p-st1(Est  A), Yt p-rt1(E·rt  Xt), and Zt Z~ t(Z~ t Z~ t)-1/2, where Z~ t = Xt + tAtYt.
+
+Theorem 4.3. Under the conditions of Theorem 4.2, as-
+sume that a = c , b = E[At22]E[Yt22] with  > 9, and t > s  1. Then it holds that
+
+t+1
+
+
+
+s( t
+
+s +
+
+)a 1
+
++
+
+4b a-
+
+(1 1
+
++
+
+s
+
+1 +
+
+)a-1 1
+
+t
+
+1 +
+
+. 1
+
+To prove Theorem 4.2-4.3, we need some lemmas.
+
+Lemma 4.4.
+
+Assume cos2Xt, V
+
+
+
+1 2
+
+and
+
+let
+
+t
+
+=
+
+E[At22]E[Yt22]. Then
+
+1 - E[cos2Zt, V]  (1 - t )(1 - E[cos2Xt, V]) + 5tt2 + O(t3).
+
+Lemma 4.5.
+
+cos2Xt+1, V  cos2Zt, V - 4t2At22Yt22 ± O(t3).
+
+Lemma 4.6. Assume the constant  > 9. Then
+
+t+1  (1 - t )t + tt2.
+2For notational convenience, we place iteration indices about t as subscripts hereafter.
+
+All the proofs are given in the supplementary. We notice that Theorem 4.3 and Lemma 4.6 provide a convenient form that enables us to leverage sampling distributions for improving the convergence rate.
+
+4.3. Accelerated Global Convergence
+Since the inequalities in Theorem 4.3 and Lemma 4.6 hold for general sampling distributions, we are able to improve the convergence rate by optimizing sampling distributions over data or gradient coordinates, i.e., importance sampling (Zhao & Zhang, 2014).
+We only need to minimize t w.r.t. two sampling distributions, {ps} and {pr}, which is equivalent to two independent problems:
+
+min E[At22] and min E[Yt22].
+
+s ps=1
+
+r pr =1
+
+Let h({ps}, ) be the Lagrange function for the first constrained optimization problem. Then
+
+ h({ps}, ) = E[At22] + ( ps - 1)
+ s = p-kl1Akl22 + ( pkl - 1),
+k,l k,l
+
+h pkl
+
+=
+
+-
+
+Akl22 p2kl
+
++ ,
+
+2h p2kl
+
+=
+
+2
+
+Akl22 p3kl
+
+> 0.
+
+Setting
+
+h  pkl
+
+lution pkl =
+
+= 0, followed by normalization, yields the soAkl2/ k,l Akl2. However, the spectral
+
+norm of a matrix is not quite easy to compute. We can re-
+
+lax3 using an easy-to-compute upper bound of the spectral
+
+norm:
+
+min s
+
+ps =1
+
+E[At22]
+
+
+
+min s
+
+ps =1
+
+E[At2F
+
+],
+
+and pkl
+
+work on the latter = AklF / k,l
+
+problem. AklF .
+
+Likewise, we can find that This says that the blocks
+
+with a larger norm value should be sampled with a higher
+
+probability, which is quite a useful property for sparse ma-
+
+trix eigen-decomposition in that it can avoid frequent use
+
+of less informative blocks especially those zero or nearly
+
+zero blocks.
+
+On the other hand, it holds that pr
+
+=
+
+X·r 2 r X·r 2
+
+similarly.
+
+Since X·r2 = 1 always, we get pr = qc-1, which says
+
+that the optimal sampling over gradient coordinates turns
+
+out to be a uniform sampling. Two optimal sampling dis-
+
+tributions are used in Algorithm 1.
+
+5. Experimental Results
+In this section, we empirically validate the effectiveness of our proposed doubly stochastic Riemannian gradient
+3We acutally can use a tighter upper bound on spectral norm: A2  A1A.
+
+Matrix Eigen-decomposition via Doubly Stochastic Riemannian Optimization
+
+method for matrix eigen-decomposition, DSRG-EIGS, by comparing it with its deterministic counterpart, RG-EIGS (Wen & Yin, 2013), and using Matlab's EIGS function for benchmarking. Both DSRG-EIGS and RG-EIGS were implemented in Matlab on a machine with Windows OS, 8G of RAM.
+
+Table 1. Sparse Matrices.
+
+dataset
+
+n nnz(A) mr mc
+
+hangGlider 10,260 92,703 10 1
+
+indef
+
+64,810 565,996 50 1
+
+IBMNA
+
+169,422 1,279,274 150 1
+
+5.1. Experimental Setting
+
+We detail the experimental settings in this subsection, including the RG-EIGS implementation, initialization of X at t = 0, step size t, and quality measures for performance evaluation.
+
+We adopt the original author's implementation for the RG-
+
+EIGS4. It uses the non-monotone line search with the well-
+
+known Barzilai-Borwein step size, which significantly re-
+
+duces the iteration number, and performs well in practice.
+
+Both RG-EIGS and DSRG-EIGS are fed with the same
+
+initial value of X, where each entry is sampled from the
+
+standard normal distribution N (0, 1) and then they all as a
+
+whole are orthogonalized. We set t for DSRG-EIGS to
+
+take
+
+the
+
+form
+
+of
+
+t
+
+=
+
+ 1+t
+
+,
+
+where
+
+
+
+is
+
+fixed
+
+to
+
+2
+
+through-
+
+out the experiments and  will be tuned.
+
+The performance of different algorithms is evaluated using
+
+three quality measures: feasibilities Xt Xt - IF , ob-
+
+jective
+
+function
+
+values
+
+1 2
+
+tr(Xt AXt)
+
+and
+
+squared
+
+cosine
+
+values of the principal angle between each iterate Xt and
+
+the ground truth V, i.e., cos2Xt, V. Lower values of
+
+feasibility are better, while large values of objective func-
+
+tion and squared cosine are better. The output by EIGS
+
+is taken as the ground truth. We report the convergence
+
+curves of these measures, where the empirical convergence
+
+rate of each algorithm in terms of objective function values
+
+or squared cosine values can be observed.
+
+5.2. Performance on Sparse Matrices
+We first examine the performance of the algorithms on sparse matrices, which are downloaded from the university of Florida sparse matrix collection5. Their statistics are given in Table 1. Each of them is uniformly partitioned into a block matrix of size mr × mc given in Table 1. We use q = 100 and uniformly partition X into a block matrix of size 1 × qc with qc = q/2.
+The convergence curves of three quality measures for RGEIGS and DSRG-EIGS on sparse matrices are shown in Figure 1, with one row of plots for each matrix and one column of plots for each measure. Each point on the convergence curve for RG-EIGS corresponds to one batch step6, while it spans a fixed number of stochastic steps for
+4optman.blogs.rice.edu/ 5www.cise.ufl.edu/research/sparse/matrices/ 6The decrease steps in Figure 1(b) are caused by the non-
+
+dataset
+
+Table 2. Dense Matrices.
+
+n
+
+nnz(A)
+
+mr mc
+
+citeseer 3,312 10,969,344 10 10
+
+usps 9,298 86,452,804 20 20
+
+pubmed 19,717 388,760,089 40 40
+
+news20 19,928 397,125,184 40 40
+
+a8a 32,561 1,060,218,721 40 40
+
+DSRG-EIGS. We tested four different step sizes for DSRGEIGS on each dataset. In each plot, the output of matlab's EIGS function, as a reference, is shown as a single point represented by a red pentagram. These performance results show that DSRG-EIGS consistently and significantly outperforms RG-EIGS in term of each quality measure. Specifically, DSRG-EIGS converges faster than RG-EIGS in terms of objective function values as shown in the middle column of plots, which clearly demonstrates the effectiveness and superiority of our algorithm to its deterministic version. Similar conclusions can be drawn for the right column of plots in terms of squared cosine values.
+Moreover, we observe that the feasibility of RG-EIGS deteriorates in a manner similar to step functions. This is because that RG-EIGS relies heavily on the ShermanMorrison-Woodbury formula which suffers from the numerical instability, and that the caused error will accumulate with iterations. In contrast, our DSRG-EIGS achieves a better feasibility especially on the first two sparse matrices, indicating that this issue is mitigated.
+5.3. Performance on Dense Matrices
+We now report the performance of the algorithms on dense matrices, which are RBF kernels generated using feature datasets: citeseer and pubmed7, usps, news20 and a8a8. The statistics of resultant dense matrices are shown in Table 2, including their block sizes of uniform partitioning. We use q = 10 here. X is uniformly partitioned into qc = q/2 column blocks as well.
+Figure 2 shows the convergence curves of different measures on two dense matrices (results on left dense matrices are placed in the supplementary). As we can see,
+monotone step size used in the implementation of RG-EIGS. 7linqs.cs.umd.edu/projects/projects/lbc 8www.csie.ntu.edu.tw/~cjlin/libsvmtools
+
+|| XTX - I ||F
+
+|| XTX - I || F
+
+Matrix Eigen-decomposition via Doubly Stochastic Riemannian Optimization
+
+10-12 10-13
+
+hangGlider p=100
+EIGS RG-EIGS DSRG-EIGS  = 0.4 DSRG-EIGS  = 0.6 DSRG-EIGS  = 0.8 DSRG-EIGS  = 1.0
+
+105 104 103 102
+
+hangGlider p=100
+EIGS RG-EIGS DSRG-EIGS  = 0.4 DSRG-EIGS  = 0.6 DSRG-EIGS  = 0.8 DSRG-EIGS  = 1.0
+
+cos(X,V)
+
+1.2 1 0.8 0.6 0.4 0.2
+
+hangGlider p=100
+EIGS RG-EIGS DSRG-EIGS  = 0.4 DSRG-EIGS  = 0.6 DSRG-EIGS  = 0.8 DSRG-EIGS  = 1.0
+
+f(X) f(X)
+
+10-14 0 0.5 1 1.5 2 2.5 3 Time (sec.)
+(a) hangGlider - feasbility
+
+101 0 3.5 0 0.5 1 1.5 2 2.5 3 3.5 0 0.5 1 1.5 2 2.5 3
+
+Time (sec.)
+
+Time (sec.)
+
+(b) hangGlider - objective function
+
+(c) hangGlider - cosine value
+
+10-5 10-6 10-7 10-8 10-9 10-10 10-11 10-12 10-13 10-14
+0
+
+indef p=100
+EIGS RG-EIGS DSRG-EIGS  = 2.0e-06 DSRG-EIGS  = 4.0e-06 DSRG-EIGS  = 6.0e-06 DSRG-EIGS  = 8.0e-06
+
+109 108 107 106
+
+indef p=100
+EIGS RG-EIGS SRGD-EIGS  = 2.0e-06 SRGD-EIGS  = 4.0e-06 SRGD-EIGS  = 6.0e-06 SRGD-EIGS  = 8.0e-06
+
+5 10 15 20 Time (sec.)
+(d) indef - feasbility
+
+105 25 0
+
+5 10 15 20 Time (sec.)
+
+(e) indef - objective function
+
+1.2
+
+1
+
+0.8
+
+cos(X,V)
+
+0.6
+
+0.4
+
+0.2
+
+25
+
+0 0
+
+indef p=100
+EIGS RG-EIGS DSRG-EIGS  = 2.0e-06 DSRG-EIGS  = 4.0e-06 DSRG-EIGS  = 6.0e-06 DSRG-EIGS  = 8.0e-06
+5 10 15 20 Time (sec.)
+(f) indef - cosine value
+
+10-10
+
+IBMNA p=100
+
+IBMNA p=100 105
+
+IBMNA p=100 1.2
+
+10-11 10-12 10-13
+
+EIGS RG-EIGS DSRG-EIGS  = 2.0 DSRG-EIGS  = 3.0 DSRG-EIGS  = 4.0 DSRG-EIGS  = 5.0
+
+f(X)
+
+104 103 102
+
+EIGS RG-EIGS DSRG-EIGS  = 2.0 DSRG-EIGS  = 3.0 DSRG-EIGS  = 4.0 DSRG-EIGS  = 5.0
+
+cos(X,V)
+
+1 0.8 0.6 0.4 0.2
+
+EIGS RG-EIGS DSRG-EIGS  = 2.0 DSRG-EIGS  = 3.0 DSRG-EIGS  = 4.0 DSRG-EIGS  = 5.0
+
+10-14 0
+
+50 100 150 200 Time (sec.)
+
+(g) IBMNA - feasbility
+
+101 250 0
+
+50 100 150 200 Time (sec.)
+
+(h) IBMNA - objective function
+
+0 250 0
+
+50 100 150 200 Time (sec.)
+(i) IBMNA - cosine value
+
+3.5 25 250
+
+Figure 1. Performance on sparse matrices.
+
+|| XTX - I || F
+
+the performance of DSRG-EIGS is similar to the case of sparse matrices, compared to RG-EIGS. Especially on the a8a dataset, RG-EIGS fails to run due to running out of memory, while our DSRG-EIGS can still work (where the ground truth results were computed on a machine with the same CPU but a larger RAM). Therefore, the effectiveness and superiority of our algorithm are validated on dense matrices as well.
+The experimental studies on both sparse and dense matrices demonstrate that the proposed algorithm is broadly effective and can be superior to its deterministic version. The advantages could be more pronounced in some cases. If the memory can not hold an input matrix, for example, a full matrix of size 32000 × 32000 like a8a, RGEIGS clearly fails to run. In some real applications of matrix eigen-decomposition, when suboptimal solutions suffice to achieve satisfactory results in terms of third-party or
+
+domain-specific quality measures, such as modularity for spectral clustering, DSRG-EIGS would be a better choice than RG-EIGS.
+6. Related Work
+Typical existing approaches to matrix eigen-decomposition include the power method, the Lanczos algorithms, and Riemannian methods. The power method (Golub & Van Loan, 1996), finding the leading eigenpair (i.e., eigenvalue with the largest absolute value), starts from some initial vector, and then repeatedly alternates matrix-vector multiplication and vector normalization. Although it can be used on large sparse matrices, it may be slow and even diverge. Instead of disregarding the information in previous iterations as in power method, the Lanczos algorithm (Cullum & Willoughby, 2002) utilizes
+
+|| XTX - I || F
+
+Matrix Eigen-decomposition via Doubly Stochastic Riemannian Optimization
+
+f(X) f(X)
+
+10-7 10-8 10-9 10-10 10-11 10-12 10-13 10-14 10-15
+0
+
+news20 p=10
+EIGS RG-EIGS DSRG-EIGS  = 8.0 DSRG-EIGS  = 9.0 DSRG-EIGS  = 10.0 DSRG-EIGS  = 11.0
+
+news20 p=10 104
+
+1.2
+
+1
+
+103
+
+0.8
+
+EIGS
+
+cos(X,V)
+
+RG-EIGS
+
+102
+
+DSRG-EIGS  = 8.0 DSRG-EIGS  = 9.0
+
+0.6
+
+DSRG-EIGS  = 10.0
+
+DSRG-EIGS  = 11.0
+
+0.4
+
+101 0.2
+
+100
+
+5 10 15 20 25 30 35 40 45
+
+0
+
+Time (sec.)
+
+0 5 10 15 20 25 30 35 40 45 0
+Time (sec.)
+
+(a) news20 - feasbility
+
+(b) news20 - objective function
+
+news20 p=10
+
+EIGS RG-EIGS DSRG-EIGS  = 8.0 DSRG-EIGS  = 9.0 DSRG-EIGS  = 10.0 DSRG-EIGS  = 11.0
+
+5 10 15 20 25 30 35 Time (sec.)
+(c) news20 - cosine value
+
+40
+
+45
+
+10-13.3 10-13.4 10-13.5 10-13.6
+
+a8a p=10
+
+DSRG-EIGS  = 1.0e+00
+
+105
+
+104
+
+103
+
+a8a p=10
+
+DSRG-EIGS  = 1.0e+00
+
+1.2 1
+0.8 0.6
+
+a8a p=10
+
+DSRG-EIGS  = 1.0e+00
+
+cos(X,V)
+
+10-13.7 10-13.8 10-13.9
+
+102
+
+0.4 0.2
+
+101 0 20 40 60 80 100 120 140 160 180 200 0 20 40 60 80 100 120 140 160 180 200
+
+Time (sec.)
+
+Time (sec.)
+
+(d) a8a - feasbility
+
+(e) a8a - objective function
+
+0 0 20 40 60 80 100 120 140 160 180 200 Time (sec.)
+(f) a8a - cosine value
+
+Figure 2. Performance on dense matrices.
+
+|| XTX - I ||F
+
+it to iteratively construct a basis of the Krylov subspace for eigen-decomposition. Riemannian methods address the problem from the Riemannian optimization perspective, such as optimization on Stiefel or Grassmann manifolds (Torbjorn Ringertz, 1997; Absil et al., 2008). One recently proposed method, Randomized SVD (Halko et al., 2011), finds the truncated SVD by random projections. All these methods perform the batch learning, while our focus in this paper is on stochastic algorithms. Another recent method, called MSEIGS (Si et al., 2014), tries to utilize graph cluster structure to speedup eigen-decomposition, while we consider more general matrices. The work most related to ours include online learning of eigenvectors (Garber et al., 2015), which only targets the leading eigenvector, i.e., q = 1, and coordinate descent on orthogonal matrices (Shalit & Chechik, 2014), which is a special case of Stiefel manifolds. (Garber et al., 2015) is based on the power method, and provides the regret analysis without empirical validation. We address the problem from a stochastic Riemannian optimization perspective. Stochastic coordinate descent is realized through Givens rotations with only local convergence guaranteed in (Shalit & Chechik, 2014), while we work on general Stiefel manifolds with global convergence guaranteed. On the other hand, doubly stochastic gradient has been used for scaling up kernel (Dai et al., 2014) and nonlinear component analysis (Xie et al., 2015), which rely on the primal feature data in vectors as with other PCA algorithms (Mitliagkas et al., 2013; Boutsidis et al., 2015), instead of relational data
+
+in square matrices as we target. In addition, importance sampling (Zhao & Zhang, 2014) has been considered for convex problems, while we extend its use on a non-convex problem in this paper.
+7. Conclusion
+We proposed the doubly stochastic Riemannian gradient ascent algorithm for matrix eigen-decomposition (DSRGEIGS), i.e., a new eigensolver, which generalized the Euclidean stochastic gradient ascent and the Euclidean stochastic coordinate ascent to the Riemannian setting, or more precisely, Stiefel manifolds. The algorithm enjoys the advantages from both sides to achieve a greatly reduced complexity per iteration and be able to avoid the matrix inversion. We conducted a progressive convergence analysis, which shows that DSRG-EIGS converges to a global solution at a sub-linear rate in expectation, and that the convergence rate can be improved by leveraging sampling distributions. The effectiveness and superiority are verified on both sparse and dense matrices. For future work, we may address the limitations of DSRG-EIGS, including the non-trivial initialization and dependence on a positive eigen-gap. We may also conduct more empirical investigations on the algorithm.
+
+Matrix Eigen-decomposition via Doubly Stochastic Riemannian Optimization
+
+Acknowledgments
+We would like to thank Dr. Yiping Ke for reading the draft and offering useful suggestions, and anonymous reviewers for their valuable comments, which significantly improve the quality of the paper in different ways.
+References
+Absil, P-A, Mahony, Robert, and Sepulchre, Rodolphe. Optimization algorithms on matrix manifolds. Princeton University Press, 2008.
+Balsubramani, Akshay, Dasgupta, Sanjoy, and Freund, Yoav. The fast convergence of incremental PCA. In Advances in Neural Information Processing Systems 26, December 5-8, 2013, Lake Tahoe, Nevada, United States., pp. 3174­3182, 2013.
+Bonnabel, Silvere. Stochastic gradient descent on riemannian manifolds. IEEE Trans. Automat. Contr., 58(9): 2217­2229, 2013. doi: 10.1109/TAC.2013.2254619.
+Boutsidis, Christos, Garber, Dan, Karnin, Zohar Shay, and Liberty, Edo. Online principal components analysis. In Proceedings of the Twenty-Sixth Annual ACM-SIAM Symposium on Discrete Algorithms, SODA 2015, San Diego, CA, USA, January 4-6, 2015, pp. 887­901, 2015.
+Cullum, Jane K. and Willoughby, Ralph A. Lanczos Algorithms for Large Symmetric Eigenvalue Computations, Vol. 1. Society for Industrial and Applied Mathematics, Philadelphia, PA, USA, 2002. ISBN 0898715237.
+Dai, Bo, Xie, Bo, He, Niao, Liang, Yingyu, Raj, Anant, Balcan, Maria-Florina, and Song, Le. Scalable kernel methods via doubly stochastic gradients. In Advances in Neural Information Processing Systems 27, December 8-13 2014, Montreal, Quebec, Canada, pp. 3041­3049, 2014.
+Drineas, Petros and Mahoney, Michael W. On the nystro¨m method for approximating a gram matrix for improved kernel-based learning. J. Mach. Learn. Res., 6:2153­ 2175, December 2005. ISSN 1532-4435.
+Edelman, Alan, Arias, Toma´s A., and Smith, Steven T. The geometry of algorithms with orthogonality constraints. SIAM J. Matrix Anal. Appl., 20(2):303­353, April 1999. ISSN 0895-4798. doi: 10.1137/S0895479895290954.
+Garber, Dan, Hazan, Elad, and Ma, Tengyu. Online learning of eigenvectors. In Proceedings of the 32nd International Conference on Machine Learning, ICML 2015, Lille, France, 6-11 July 2015, pp. 560­568, 2015.
+Golub, Gene H. and Van Loan, Charles F. Matrix Computations (3rd Ed.). Johns Hopkins University Press, Baltimore, MD, USA, 1996. ISBN 0-8018-5414-8.
+
+Halko, N., Martinsson, P. G., and Tropp, J. A. Finding structure with randomness: Probabilistic algorithms for constructing approximate matrix decompositions. SIAM Rev., 53(2):217­288, May 2011. ISSN 0036-1445. doi: 10.1137/090771806.
+Jolliffe, I. T. Principal component analysis. Hardcover, October 2002.
+Lee, John M. Introduction to smooth manifolds. Springer, 2012.
+Mitliagkas, Ioannis, Caramanis, Constantine, and Jain, Prateek. Memory limited, streaming pca. In Burges, C. J. C., Bottou, L., Welling, M., Ghahramani, Z., and Weinberger, K. Q. (eds.), Advances in Neural Information Processing Systems 26, pp. 2886­2894. Curran Associates, Inc., 2013.
+Nesterov, Yurii. Efficiency of coordinate descent methods on huge-scale optimization problems. SIAM Journal on Optimization, 22(2):341­362, 2012. doi: 10.1137/ 100802001.
+Ng, Andrew Y., Jordan, Michael I., and Weiss, Yair. On spectral clustering: Analysis and an algorithm. In Dietterich, T.G., Becker, S., and Ghahramani, Z. (eds.), Advances in Neural Information Processing Systems 14, pp. 849­856. MIT Press, 2002.
+Nocedal, J. and Wright, S. J. Numerical Optimization. Springer, New York, 2nd edition, 2006.
+Parlett, Beresford N. The Symmetric Eigenvalue Problem. Prentice-Hall, Inc., Upper Saddle River, NJ, USA, 1998. ISBN 0-89871-402-8.
+Press, William H., Teukolsky, Saul A., Vetterling, William T., and Flannery, Brian P. Numerical Recipes 3rd Edition: The Art of Scientific Computing. Cambridge University Press, New York, NY, USA, 3 edition, 2007. ISBN 0521880688, 9780521880688.
+Shalit, Uri and Chechik, Gal. Coordinate-descent for learning orthogonal matrices through givens rotations. In Proceedings of the 31th International Conference on Machine Learning, ICML 2014, Beijing, China, 21-26 June 2014, pp. 548­556, 2014.
+Si, Si, Shin, Donghyuk, Dhillon, Inderjit S, and Parlett, Beresford N. Multi-scale spectral decomposition of massive graphs. In Ghahramani, Z., Welling, M., Cortes, C., Lawrence, N.D., and Weinberger, K.Q. (eds.), Advances in Neural Information Processing Systems 27, pp. 2798­ 2806. Curran Associates, Inc., 2014.
+Torbjorn Ringertz, U. Eigenvalues in optimum structural design. Institute for Mathematics and Its Applications, 92:135, 1997.
+
+Matrix Eigen-decomposition via Doubly Stochastic Riemannian Optimization
+Wen, Zaiwen and Yin, Wotao. A feasible method for optimization with orthogonality constraints. Math. Program., 142(1-2):397­434, 2013. doi: 10.1007/ s10107-012-0584-1.
+Wen, Zaiwen, Yang, Chao, Liu, Xin, and Zhang, Yin. Trace-penalty minimization for large-scale eigenspace computation. Technical report, RICE UNIV HOUSTON TX DEPT OF COMPUTATIONAL AND APPLIED MATHEMATICS, 2013.
+Xie, Bo, Liang, Yingyu, and Song, Le. Scale up nonlinear component analysis with doubly stochastic gradients. CoRR, abs/1504.03655, 2015.
+Zhao, Peilin and Zhang, Tong. Stochastic optimization with importance sampling. CoRR, abs/1401.2753, 2014.
+
+

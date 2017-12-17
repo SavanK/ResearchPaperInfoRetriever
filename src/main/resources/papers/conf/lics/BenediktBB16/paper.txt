@@ -1,0 +1,468 @@
+A Step Up in Expressiveness of Decidable Fixpoint Logics
+
+Michael Benedikt
+University of Oxford
+
+Pierre Bourhis
+CNRS CRIStAL, Universite´ Lille 1, INRIA Lille
+
+Michael Vanden Boom
+University of Oxford
+
+Abstract
+Guardedness restrictions are one of the principal means to obtain decidable logics — operators such as negation are restricted so that the free variables are contained in an atom. While guardedness has been applied fruitfully in the setting of ﬁrst-order logic, the ability to add ﬁxpoints while retaining decidability has been very limited. Here we show that one of the main restrictions imposed in the past can be lifted, getting a richer decidable logic by allowing ﬁxpoints in which the parameters of the ﬁxpoint can be unguarded. Using automata, we show that the resulting logics have a decidable satisﬁability problem, and provide a ﬁne study of the complexity of satisﬁability. We show that similar methods apply to decide questions concerning the elimination of ﬁxpoints within formulas of the logic.
+Categories and Subject Descriptors Theory of computation [Logic]
+1. Introduction
+We are interested in expressive logics for which static analysis problems such as satisﬁability are decidable. One way to achieve decidability is via guardedness restrictions. The Guarded Fragment (GF) [2] is a fragment of ﬁrst-order logic obtained by requiring in existential quantiﬁcation ∃x.φ(x) that φ be of the form R(x)∧φ (x), where R(x) is an atom containing all free variables of φ , and requiring in universal quantiﬁcation that φ be of the form R(x) → φ (x), where R is as above. The Guarded Negation Fragment (GNF) [5] is an even more expressive decidable language, allowing unrestricted existential quantiﬁcation but restricting negation to be of the form R(x) ∧ ¬φ (x), with R as above.
+Of course, there are other paradigms for decidability within ﬁrst-order logic, such as restricting to two variables [27]. A particularly attractive feature of guarded logics is that, unlike with the two variable fragment [20], decidability can be extended to give decidable fragments of least ﬁxpoint logic (LFP). LFP is the natural extension of ﬁrst-order logic with a ﬁxpoint constructor. Given a formula φ(x1 . . . xm, y1 . . . yn) over some signature σ in which an m-ary second-order variable X occurs freely and positively in φ, and given a σ-structure A and some ﬁxed valuation ρ for y, we can deﬁne a new m-ary relation: the relation is deﬁned as the limit of a monotone sequence X0 . . ., starting with X0 = ∅ and then setting
+Permission to make digital or hard copies of part or all of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for proﬁt or commercial advantage and that copies bear this notice and the full citation on the ﬁrst page. Copyrights for components of this work owned by others than ACM must be honored. Abstracting with credit is permitted. To copy otherwise, to republish, to post on servers, or to redistribute to lists, requires prior speciﬁc permission and/or a fee. Request permissions from permissions@acm.org or Publications Dept., ACM, Inc., fax +1 (212) 869-0481. LICS ’16, July 05-08, 2016, New York, NY, USA Copyright c 2016 ACM 978-1-4503-4391-6/16/07. . . $15.00 DOI: http://dx.doi.org/10.1145/2933575.2933592
+
+Xi+1 to be the set of a such that φ holds when extending ρ with the interpretation of X as Xi and x as a. Emphasizing the distinction between x and y, we call x the ﬁxpoint variables and y the parameter variables. Informally, during the ﬁxpoint process, the ﬁxpoint variables change in each iteration, while the parameter variables stay the same. Formulas in LFP can use relations deﬁned using a ﬁxpoint constructor like this, in addition to relations in σ.
+Guarded Fixpoint Logic (denoted GFP or µGF) [19] extends GF with a ﬁxpoint operator while maintaining decidability. The ﬁxpoint constructor is restricted in two ways: the parameter variables y must be empty, and the ﬁxpoint relation itself cannot be used as a guard. Guarded Negation Fixpoint Logic (GNFP) [5] adds ﬁxpoint constructors to GNF with similar restrictions.
+It is known that the second restriction on these ﬁxpoint logics is essential for decidability [19]. But what about the ﬁrst? It certainly seemed important to the proofs of decidability; [21] states
+It should be stressed that the presence of extra ﬁrst-order parameters in ﬁxed-point operations as well as the use of second-order variables and ﬁxed points as guards is disallowed in µGF. These restrictions are essential for keeping the semantics invariant under guarded bisimulation. For instance, with the use of a ﬁrst-order parameter ... one can deﬁne the transitive closure of a binary relation ... However, the transitive closure query is not invariant under guarded bisimulation and it is known that adding transitive closure to GF produces an undecidable logic [17].
+In this paper we show that the parameter restriction can indeed be loosened. We introduce a variation of GNFP, denoted GNFP-UP, where the ﬁxpoint variables of any ﬁxpoint need to be guarded, but the ﬁxpoint can carry additional unguarded parameters. One can write a GNFP-UP formula holding on the transitive closure of a binary relation. But such a formula cannot be used as a guard, and thus assertions that a binary relation is transitive (the key to undecidability in [17]) cannot be expressed. GNFP-UP can express many properties related to transitivity, such as assertions of paths with certain properties (see the discussion of conjunctive regular path queries with inverse in Section 3).
+The decidability of GFP is proven using an elegant high-level argument [18]: one shows that satisﬁable formulas must have treelike models, and thus satisﬁability can be reduced to satisﬁability of a Monadic Second Order Logic sentence over trees, decidable via Rabin’s theorem [25]. A ﬁner argument shows that from a GFP formula φ one can eﬀectively create a tree automaton Aφ which is non-empty exactly when φ is satisﬁable. By analyzing the complexity of this automaton construction, Gra¨del and Walukiewicz derived a 2-ExpTime bound on satisﬁability [19].
+We begin by showing that the high-level argument easily extends to give decidability of GNFP-UP. The ﬁner analysis of the complexity of GNFP-UP satisﬁability requires more work. Because of negation and quantiﬁcation in our logic, one might expect that
+
+the complexity would be a tower of exponentials based on the quantiﬁer alternation. However, we show that the complexity is controlled by the parameter depth of the formula: informally, this is a number that measures the number of times we change parameters while passing from a formula to a subformula. We give elementary bounds for each parameter depth, while proving that the complexity is non-elementary (but still primitive recursive) when the depth is not restricted. Each parameter depth includes formulas of arbitrary quantiﬁer alternation; we avoid unnecessary exponential blowups by identifying pieces of the GNFP-UP formulas that behave like GNFP. We also show that some interesting logics ﬁt within low parameter depth.
+Finally, we describe how our translation to automata can be modiﬁed to show decidability of the boundedness problem, a quantitative analog of satisﬁability that asks if a ﬁxpoint can be replaced by a ﬁxed number of unfoldings. Our solution to the boundedness problem can be applied to decide whether certain GNFP-UPexpressible formulas can be rewritten in ﬁrst-order logic.
+2. Preliminaries
+We consider signatures σ with a ﬁnite set of relations and constants. We write const(σ) for the set of constants in the signature σ.
+Least ﬁxed point logic (LFP) over σ is the extension of ﬁrstorder logic over σ with the following formation rule: if φ(y, z, Y, Z) is a formula in which Y is a free second-order variable of arity |y| that appears only positively, and t is a tuple of variables and constants of length |y|, then [lfpY,y . φ](t) is also a formula. Informally, it asserts that t is in the least ﬁxpoint induced by φ. The parameter variables of this formula are z — the free variables of φ other than y. In this paper, we emphasize the parameters by writing [lfpYz,y . φ], and reserve [lfpY,y . φ] for the case when there are no parameters.
+The semantics are standard: since φ(y, z, Y, Z) is positive in Y, it induces a monotone operator
+U → OAφ,v,V(U) := {u : A, u, v, U, V |= φ(y, z, Y, Z)}
+on every structure A with valuation v for z and V for Z. Hence, this operator has a unique least ﬁxpoint, denoted φ∞(A, v, V), and this can be obtained as the union of its ﬁxpoint approximants φβ(A, v, V) over all ordinals β, where
+φ0(A, v, V) := ∅
+φβ+1(A, v, V) := OAφ,v,V(φβ(A, v, V))
+φβ(A, v, V) := β <β φβ (A, v, V) where β is a limit ordinal.
+The semantics of the least ﬁxpoint formulas is deﬁned such that A, v, V |= [lfpYz,y . φ](t) iﬀ t ∈ φ∞(A, v, V) = β∈Ord φβ(A, v, V).
+Free and bound variables The notion of free vs. bound secondorder variables is standard. In particular, Y is free in φ(y, z, Y, Z) but bound in [lfpYz,y . φ](t). We assume no second-order variable Y is bound by more than one ﬁxpoint operator, so each bound second-order variable Y identiﬁes a unique ﬁxpoint. If Y identiﬁes a ﬁxpoint with parameters z, then params(Y) := z, the parameters associated with the second-order variable Y.
+We use free(φ) to denote the free ﬁrst-order variables in φ. It is deﬁned recursively. For atoms Rt with R ∈ σ and t a tuple consisting of constants and variables, the free ﬁrst-order variables are just the variables in t. For Y t with Y a second-order variable, free(Y t) is the union of the variables in t and params(Y). For boolean connectives, free(φ1 ∧ φ2) = free(φ1 ∨ φ2) = free(φ1) ∪ free(φ2), and free(¬φ) = free(φ). For quantiﬁcation, free(∃x.φ) = free(φ) \ {x}. Finally, for [lfpYz,y . φ](t), the free ﬁrst-order variables consist of the parameter variables z together with the variables in t.
+
+The parameters in φ consists of the union of params(Y) for all second-order variables Y occurring in φ; we let params(φ) denote the subset of these parameters that occur free in φ.
+
+GNFP-UP Guarded negation ﬁxpoint logic with unguarded parameters (GNFP-UP) is the fragment of LFP that allows unguarded parameter variables in ﬁxpoint deﬁnitions, but requires ﬁxpoint variables and negation to be guarded. Formally, a GNFP-UP[σ] formula φ is generated recursively from the following grammar:
+φ ::= R t | Y t | φ ∧ φ | φ ∨ φ | ∃y.φ |
+α ∧ ¬φ where free(φ) ⊆ free(α) | [lfpYz,y . gdd(y) ∧ φ(y, z, Y, Z)](t) for φ positive in Y
+where t is a tuple of variables or constants, Rt and α are atoms using a relation in σ or =, and gdd(y) is deﬁned below.
+
+Guardedness The guardedness predicate gdd(y) asserts y is guarded by an atom in σ or =. It can be understood as an abbreviation for the disjunction of existentially quantiﬁed atoms that use a relation from σ or = and involve all of the variables in y. Because of this, only guarded relations can be deﬁned using ﬁxpoints
+in GNFP-UP: i.e. any tuple of elements in the relation deﬁned by
+the ﬁxpoint formula must already be guarded by an atom in the base signature σ. Note that the relations deﬁned using a ﬁxpoint
+operator cannot be used as guards. The parameters z are not required to be guarded in the ﬁxpoint
+deﬁnition. However, for the purposes of negation, parameters are
+treated like other variables and must be guarded. For example, if α(x) is an atomic formula over σ, and Y identiﬁes a ﬁxpoint with parameters z, then α(x) ∧ ¬Y x is not permitted since Y implicitly uses parameters z and these parameters are not guarded by α (since the free variables in Y x are really x and z).
+A formula φ that includes free ﬁrst-order variables x is xguarded if it is logically equivalent to gdd(x) ∧ φ. If free(φ) = x and φ is x-guarded, then we say it is answer-guarded. Sentences or
+formulas with one free variable are always answer-guarded since we can use a trivial guard like x = x. For readability purposes, we often omit such trivial guards.
+
+Simultaneous ﬁxpoints We will also allow simultaneous ﬁxpoints [lfpYzi,yi .S ](t) where
+
+S
+
+=
+
+YY1j,,...
+
+y1 yj
+
+:= :=
+
+gdd(y1) gdd(y j)
+
+∧ ∧
+
+φ1(y1, z, Y1, . . . , Y φ j(y j, z, Y1, . . . , Y j
+
+j, Z) , Z)
+
+is a system of mutually deﬁned equations Yi, yi := φi such that φi ∈ GNFP-UP, and Y1, . . . , Y j occur only positively in φi. Each φi utilizes the same parameters z, but diﬀerent ﬁxpoint variables yi. Such a system deﬁnes a monotone operation on vectors of relations, and [lfpYzi,yi .S ](t) expresses that t is a tuple in the i-th component of the least ﬁxpoint deﬁned by this operation; Yi is the distinguished goal predicate in [lfpYzi,yi .S ](t). Allowing simultaneous ﬁxpoints does not change the expressivity of the logic, since they can be
+eliminated in favor of traditional ﬁxpoints [3], with a possible
+exponential blow-up in size. However, it is often more convenient
+to work directly with these simultaneous ﬁxpoints (see Example 4).
+
+GNFP-UP vs. GNFP A good example to keep in mind is that GNFP-UP can express the transitive closure of a binary relation R.
+Example 1. Suppose R is a binary relation in σ. Consider the following GNFP-UP[σ]-formula:
+φ(x, z) := [lfpzY,y . R yz ∨ ∃y .(Ryy ∧ Yy )](x) .
+Observe that φ has two free variables, the variable x being tested in the ﬁxpoint and the parameter variable z. The formula φ(x, z)
+
+expresses that there is some R-path from element x to z, i.e. (x, z) is in the transitive closure of R.
+We can express that x participates in an R-cycle by using the formula φ(x, x).
+We cannot express that the structure is strongly R-connected, since this would require unguarded negation, but we can say every pair of guarded elements is R-connected: ¬∃xz.(gdd(x, z) ∧ ¬φ(x, z)) ∈ GNFP-UP.
+The sentence ¬∃xz.(φ(x, z) ∧ ¬Rxz) ∨ (Rxz ∧ ¬φ(x, z)) that says R is transitively closed is not in GNFP-UP, since we cannot use the ﬁxpoint relation deﬁned by φ as a guard for ¬Rxz.
+In LFP, it is always possible to eliminate the use of parameters by increasing the arity of the deﬁned ﬁxpoint predicates and passing the parameters explicitly in the ﬁxpoint. This is not usually possible in our context, because the ﬁxpoint variables are required to be guarded. Indeed, it can be shown that the transitive closure of a binary relation R cannot be expressed in GNFP (the fragment of GNFP-UP in which ﬁxpoints do not use any parameters).
+Proposition 2. GNFP-UP is strictly more expressive than GNFP, even over ﬁnite structures.
+Normal form A conjunctive query (CQ) is ∃y.ψ for ψ a conjunction of atoms. A union of conjunctive queries (UCQ) is a disjunction of CQs. Such queries are expressible in GNF. It is helpful to work with GNFP-UP in a normal form that highlights the fact that GNFP-UP formulas can be built up from UCQ-shaped formulas using guarded negation and guarded ﬁxpoints with parameters.
+Formally, A normal form GNFP-UP[σ] formula φ or ψ is generated recursively from the following grammars:
+φ ::= i ∃yi. j ψi j
+ψ ::= R t | Y t | α ∧ ¬φ where free(φ) ⊆ free(α) |
+[lfpYzm,ym .S ](t)
+where t is a tuple of variables or constants, Rt and α are atoms using a relation in σ or =, and S is a system with equations of the form Y, y := gdd(y) ∧ φ(y, z, Y, Z), as described earlier.
+Any GNFP-UP formula can be converted into normal form in a canonical way. The width of a GNFP-UP formula is the maximum number of free variables used in any subformula after the formula is converted into normal form. We write (GNFP-UP)k[σ] for GNFP-UP formulas of width k.
+Other guarded logics with parameters We could consider variants of other guarded logics with parameters. The unary negation ﬁxpoint logic with unguarded parameters (UNFP-UP) is the fragment of GNFP-UP where only formulas with at most one free variable are negated, and the ﬁxpoint predicates are monadic but may still carry any number of unguarded parameters. The formula φ(x, z) in Example 1 is in UNFP-UP.
+We could also consider GFP-UP, the variant of GFP with parameters in the ﬁxpoints, but where these parameters still need to be guarded if appearing under a quantiﬁcation (this mimics the way we have added parameters to GNFP). The formula φ in Example 1 is not in GFP-UP since the quantiﬁcation in ∃y .(Ryy ∧Yy ) is not correctly guarded: GFP-UP would require something like ∃y .(Gzy ∧ Yy ), which includes a guard that covers not only y but also the parameter z implicit in the ﬁxpoint predicate Y. However, adding parameters to GFP in this way does not increase expressivity:
+Proposition 3. For every answer-guarded GFP-UP formula φ, we can construct in linear time an equivalent GFP formula φ using ﬁxpoint predicates of higher arity.
+This may explain why parameters were not considered further in [19, 21]: when they are introduced to GFP in their full power, it leads to undecidability, and when they are introduced in this
+
+more restrictive way, they do not add any expressive power. This is in contrast to GNFP, where we can add parameters in a way that strictly increases expressivity while still retaining decidability.
+Organization In Section 3, we give some examples illustrating the expressive power of GNFP-UP. We also deﬁne the parameter depth, a key measure of how complicated a GNFP-UP formula is. We then argue in Section 4 that GNFP-UP has tree-like models, which makes satisﬁability and boundedness amenable to tree automata techniques. The main technical work is described in Sections 5 and 6 where we describe the automata tools needed for GNFP-UP. Finally, in Sections 7 and 8, we use this automata machinery to study static analysis problems like satisﬁability and boundedness.
+
+3. Expressivity examples
+
+In this section, we give some examples showing that GNFP-UP subsumes and extends a wide range of logics. This provides evidence of its power, and explains some of the good properties of these previously-studied logics.
+In order to help study the power of GNFP-UP, we ﬁrst deﬁne a way to measure how the parameters are used. Roughly speaking, the parameter depth is the maximum number of nested parameter changes. We deﬁne pdepthz(η) inductively as follows:
+
+pdepthz(R t) = pdepthz(Y t) := 0
+
+pdepthz(α ∧ ¬φ) := pdepthz∩free(φ)(φ)
+
+pdepthz( i ∃xi. j ψi j) := maxi pi s.t.
+
+pi
+
+:=
+
+1 + max j pdepthparams(ψij)(ψi j) max j pdepthz(ψi j)
+
+if ∃ j. params(ψi j) otherwise
+
+z
+
+pdepthz([lfpXz m,xm .S ](t)) :=
+1 + maxφj∈S pdepthparams(φj)(φ j) maxφj∈S pdepthz(φ j)
+
+if ∃ j. params(φ j) otherwise
+
+z .
+
+The parameter depth pdepth(φ) for normal form φ ∈ GNFP-UP is just pdepthfree(φ)(φ). For φ not necessarily in normal form, we deﬁne it to be the pdepth after converting to normal form.
+Observe that a formula that does not use any parameters has pdepth 0. Even a formula that does use parameters can have pdepth 0 if all of its parameters actually come from free variables of the formula. This is because parameters like this can be viewed as constants, since they have a ﬁxed interpretation in any structure. Because of this, if φ ∈ GNFP-UP[σ] with pdepth(φ) = 0 and params(φ) = z, then we can view φ as a GNFP formula without parameters, over the signature σ extended with extra constants z.
+In general, the pdepth increases when we pass through a subformula that introduces more parameters. This can happen when passing through existential quantiﬁcation that introduces a variable that is later used as a parameter (see the third case in the pdepth definition), or it can happen when passing through a ﬁxpoint deﬁnition that introduces a ﬁxpoint variable that is later used as a parameter (see the fourth case).
+Later, we will see that the parameter depth is the major factor impacting the complexity of satisﬁability testing.
+We now give some examples to illustrate the expressivity of GNFP-UP, and this notion of parameter depth. These examples are drawn mostly from query languages used in databases and knowledge representation. Understanding these diﬀerent logics and query languages is not important for understanding the main results about GNFP-UP (e.g., Theorem 20 and Theorem 24). However, for readers familiar with some of these previously-studied logics, they may give some insight into the sort of properties that can be expressed in GNFP-UP. Indeed, it is interesting to note that many
+
+of the previously-studied logics described below are low in this parameter depth hierarchy.
+
+Traditional guarded logics GNFP-UP subsumes all of the previously mentioned guarded logics (and their ﬁxpoint extensions), including GFP sentences, UNFP formulas, and GNFP formulas. Unsurprisingly, these traditional guarded logics without parameters can be expressed as GNFP-UP formulas of pdepth 0.
+
+Navigational queries There are a number of languages for navigational queries in graph databases, where the signature σ consists
+only of binary and unary relations. For these languages, a regular expression E over symbols R, R− coming from binary relations R ∈ σ can be seen as deﬁning a navigation relation that holds for (x, y) exactly when there is some path between x and y matching E.
+A conjunctive 2-way regular path query (C2RPQ) [13] is just a CQ
+over such expressions.
+
+Example 4. Consider some C2RPQ over signature σ. Let Σ :=
+
+{R, R− : R is a binary relation in σ}.
+
+Given a regular expression E over Σ, we can capture the
+
+navigation relation deﬁned by it using a GNFP-UP formula E .
+
+We start with a ﬁnite state automaton A = Σ, Q, q0, ∆, F for
+
+E and write a GNFP-UP[σ] formula with simultaneous ﬁxpoints
+
+E( for
+
+x, y) each
+
+:= [lfpyX0,x . state qi ∈ Q,
+
+S ](x) which has and the equation
+
+a second-order variable for the i-th component Xi
+
+,
+
+Xi xi
+
+in S captures the possible transitions from state qi:
+
+∃z.(χT (xi, z) ∧ X j z) ∨
+
+xi = y ⊥
+
+if i ∈ F if i F
+
+(qi,T,q j)∈∆
+
+where χT (xi, z) is Rxiz if T = R and Rzxi if T = R−. Once we have E in GNFP-UP for each regular expression E
+appearing in the C2RPQ, it is easy to translate into GNFP-UP by replacing each E(x, y) in the C2RPQ by E (x, y). These GNFP-UP formulas have parameter depth 1: the GNFP-UP formula E (x, y) for each regular expression predicate E(x, y) has pdepth 0; when these are substituted in the CQ, the resulting formula has pdepth
+at most 1 since the existential quantiﬁcation may be introducing
+variables that are used as parameters in the inner formulas. GNFP-
+UP can also express unions of C2RPQs.
+
+We can in fact replace regular expressions in C2RPQs by a variant of propositional dynamic logic (PDL). PDL consists of programs (deﬁning binary relations within a labeled graph) and tests (deﬁning unary relations within a graph) deﬁned by mutual recursion. Programs contain all binary relation symbols and are closed under concatenation, union, and Kleene star. Tests contain all unary relation symbols and are closed under boolean operations. Given a test t, we can deﬁne a program t? that returns pairs (x, x) such that x is in the unary relation deﬁned by t, and given a program P we can form a test P , deﬁning a relation consisting of pairs (u, u) such that there exists v with (u, v) in the language described by P. We let CQPDL denote the language of conjunctive queries where binary relations can be PDL programs. Clearly this subsumes C2RPQs, and it also subsumes extensions deﬁned in the description logic literature [9]. If P is restricted to be a traditional regular expression, then the corresponding GNFP-UP formula for P has pdepth at most 1. By writing expressions with more complicated nesting of these tests, however, these formulas can reach higher parameter depth levels.
+
+Fragments of Datalog Datalog is a syntax for expressing the negation-free fragment of least ﬁxpoint logic. It is heavily used to express database queries that involve some form of recursion. We argue that all the previously-deﬁned fragments of Datalog that have decidable static analysis problems are contained in GNFP-UP.
+Formally, a Datalog query is speciﬁed by
+Π = EDBΠ, IDBΠ, RulesΠ, goal
+
+where the extensional predicates EDBΠ and intensional predicates IDBΠ are disjoint sets, RulesΠ consists of formulas of the form R(x1 . . . xn) ← ψ(xy) where R is an IDB predicate and ψ is a conjunction of atoms, and goal is a distinguished member of IDBΠ. Given some structure A we can evaluate goal in the structure obtained from A by ﬁring the rules of Π until a ﬁxpoint has been reached. For a structure A and query Π we let Π(A) be the value of the predicate goal so obtained. A boolean Datalog query is one where the goal predicate is 0-ary, and hence the query deﬁnes a boolean function on input structures.
+Monadic Datalog restricts the IDBs to have arity 1. In this case, it is possible to express the query using a UNFP formula with simultaneous ﬁxpoints without parameters. Frontier-guarded Datalog allows the use of intensional predicates with unrestricted arities, but for each rule R(x1 . . . xn) ← ψ(xy), the variables x1 . . . xn in the head of the rule, must appear in a single EDB atom appearing in the body ψ. This subsumes monadic Datalog, since the single head variable in the monadic Datalog rules can be trivially guarded. Frontier-guarded Datalog can be expressed in GNFP. No parameters are necessary, so the parameter depth is 0.
+The ﬂag and check queries introduced in [12, 26] are based on fragments of Datalog queries that have been shown to have decidable analysis problems.
+One family consists of the monadically deﬁned queries (MQs). These are of the form ∃y.Π where Π is a Monadic Datalog query, the goal predicate is nullary, and the rules use special symbols z. The answers to the query are (projections of) assignments to the special symbols for which the corresponding Monadic Datalog query evaluates to true. The idea is that the special symbols serve as ﬂags for potential answers to the query, and the Datalog query checks if the ﬂags mark actual answers.
+
+Example 5 (based on [12]). The transitive closure of a binary
+relation R can be expressed by the MQ Π with special symbols z1, z2 where Π is
+
+U(y) ← R z1y
+
+U(y) ← U x ∧ R xy
+
+hit() ← Uz2 .
+
+The answer to the query would consist of all pairs (a1, a2) for which the rules imply hit under the standard Datalog semantics, when
+
+interpreting z1 as a1 In UNFP-UP, this
+
+and z2 as a2. is ψ(z1, z2) :=
+
+[lfpzh1it,,z∅2
+
+.S
+
+]()
+
+where
+
+S :=
+
+U, y hit, ∅
+
+:= R z1y ∨ ∃x.(U x ∧ R xy) := Uz2
+
+Notice that the special symbols become parameters. Because hit is a nullary predicate, the ﬁxpoint is nullary too. It expresses the same property as the formula in Example 1, but is written in an alternative way that mimics the MQ. It has parameter depth 0.
+
+We can translate an arbitrary MQ ∃y.Π with special symbols z using a similar method: the monadic Datalog query becomes a simultaneous ﬁxpoint ψ in GNFP-UP, with the special symbols z as parameters, and the special nullary hit predicate as the goal predicate. The MQ itself can then be written in GNFP-UP as ∃y.ψ (z). The resulting formula has pdepth at most 1, since ψ (z) has pdepth 0, and ∃y.ψ (z) may project some of the parameters (the previous example only has pdepth 0 because there is no such projection).
+In [26], they also consider a nested version of these ﬂag and check queries. An m-nested MQ is one where the monadic Datalog query is allowed to use predicates deﬁned by (m − 1)-nested MQs in the rule bodies (but these predicates cannot be used as guards); a 1-nested MQ is just the MQ deﬁned above. In general, we can translate an m-nested MQ query into a GNFP-UP formula of pdepth at most m. [12] deﬁnes other variants of ﬂag and check queries; all of them can be similarly captured in GNFP-UP.
+
+A Datalog query Π1 is contained in a Datalog query Π2 if for all input structures A, Π1(A) ⊆ Π2(A). Similarly given a sentence φ in some logic, we say Datalog query Π1 is contained in Π2 relative to φ if Π1(A) ⊆ Π2(A) for all A satisfying φ. GNFP-UP can express the Datalog queries in the fragments above. Moreover, since it is closed under boolean combinations for sentences, it can also express containment of two boolean queries within each fragment, and containment relative to sentences φ that are expressible in GNFP-UP.
+Transitive closure logic The extension of FO with a transitive closure operator (rather than a full ﬁxpoint operator) was introduced in [23] and has been studied extensively. In a similar vein, we can consider GNF extended with a (guarded) transitive closure operator which we denote GNF(TC). The idea is to add to GNF the following formula building rule: if φ(x, y) ∈ GNF(TC) for m-tuples x and y, then [TCx,y . gdd(x) ∧ φ(x, y)](u, v) is a formula in GNF(TC). The intended meaning is that u and v are guarded (in the original signature) and (u, v) is in the reﬂexive transitive closure of the binary relation on m-tuples deﬁned by gdd(x) ∧ φ(x, y).
+Example 1 is ∃x .(Rxx ∧ [TCy,y . Ryy ](x , z)) (the guardedness predicate is omitted since singletons are trivially guarded). CQPDL, and hence C2RPQs, can also be expressed in GNF(TC).
+It is straightforward to check that every GNF(TC) formula can be translated in polynomial time to an equivalent GNFP-UP formula, and that such formulas can reach arbitrary pdepth levels.
+Why GNFP-UP? The previous examples serve to illustrate the variety of logics that GNFP-UP subsumes. GNFP-UP is useful because it serves as a unifying logic for all of these diﬀerent formalisms that have some recursive nature.
+A major advantage of GNFP-UP over the Datalog-based languages is that the logic has some form of negation. Not only does the presence of negation increase the expressivity of the queries that can be written in this language, but it also means that we can express directly query containment problems in this language, which was not possible in many of these earlier formalisms.
+Despite the increased expressivity, we will show that GNFP-UP still has many useful model theoretic and computational properties, including decidable satisﬁability and boundedness.
+4. Tree-like models and tree encodings
+Although GNFP-UP fails to have the ﬁnite model property (since it embeds the 2-way µ-calculus), it does have the tree-like model property. This says that if there is a model, then there is a model with a tree decomposition of some bounded tree width. A tree decomposition of a structure A is a tree labelled with atomic facts of A such that every atom is present in some label, and for each a ∈ dom(A), the set of nodes (often called bags) that mention a form a connected part of the tree. The decomposition has tree-width w−1 if the number of elements represented in each bag is at most w.
+Proposition 6. Every satisﬁable (GNFP-UP)k[σ] sentence has a model of tree-width at most k + |const(σ)| − 1.
+The proof uses a standard technique, involving an unravelling based on a notion of guarded negation bisimulation.
+The ﬁrst route to deciding satisﬁability relies on the tree-like model property of Proposition 6 along with the fact that GNFPUP can be expressed in a fragment of second-order logic called guarded second-order logic (GSO) in which second-order quantiﬁcation is interpreted only over guarded relations, i.e. relations where every tuple is guarded by some atom in the base signature.
+Proposition 7. Given φ ∈ GNFP-UP[σ], we can construct an equivalent φ ∈ GSO[σ] in linear time.
+Corollary 8. Satisﬁability for GNFP-UP is decidable.
+
+Proof. GNFP-UP embeds in GSO by Proposition 7 and has bounded tree-width by Proposition 6. Using [21], GSO can be translated into an equivalent MSO formula (over encodings of the tree-like models) which is decidable by [25].
+This is the easiest route to showing decidability of GNFP-UP, but it is not good for extracting complexity bounds. We next show how to make direct use of the tree-like model property and a translation taking a formula in the logic to tree automata that represent tree-like models of the formula, to determine more precisely the complexity of satisﬁability and boundedness for GNFP-UP.
+Coding structures Structures of bounded tree-width can be encoded as trees over a ﬁnite alphabet that depends only on the signature and the tree-width. Fix some signature σ and some width k ∈ N. Let Uk be a set of size 2(k + |const(σ)|). We refer to these as “names”, as they name elements coded in a node. The signature σ˜ k for the encodings is deﬁned as follows.
+• For all a ∈ Uk, there is a unary relation Da ∈ σ˜ k which indicates that a is a name for an element in the bag.
+• For every relation R ∈ σ of arity n and every n-tuple a ∈ Ukn, there is a unary relation Ra ∈ σ˜ k, which indicates that R holds for the tuple of elements indexed by a.
+• For every constant z ∈ σ and c ∈ Uk, there are unary relations Vc/z which indicate that z is interpreted by the element named by c in the given bag. Tree decompositions and the corresponding encodings can gen-
+erally have unbounded (possibly inﬁnite) degree. We apply the ﬁrstchild, next-sibling transformation (based on an arbitrary ordering of the children) to the standard encoding, so that we can use binary trees for our encodings. This transformation takes a tree with arbitrary branching degree and constructs a binary tree as follows: it maps the root of the original tree to the root of a new binary tree; then, starting from the root, each node’s leftmost child in the original tree is mapped to its left child in the binary tree, and its next sibling to the right in the original tree is mapped to its right child.
+Hence, for our binary tree encodings, a node u can be identiﬁed by a word in {0, 1}∗, and the biological children of u are the nodes u01∗ (these are the nodes that would have been children of u in the tree decomposition before the ﬁrst-child next-sibling transformation). The biological parent of v is the unique u such that v ∈ u01∗. A biological neighbor is a biological child or biological parent. For these binary tree encodings, we also add to σ˜ k unary predicates Pi for i ∈ {0, 1} which indicate the node is the i-th child of its parent.
+This transformation to a binary tree encoding is essential in certain automaton constructions (e.g. Theorem 13) when the automaton needs to record in its state the direction it came from. From now on, we use σ˜ k-tree to refer to an inﬁnite full binary tree over σ˜ k.
+Decoding structures If a σ˜ k-tree satisﬁes certain consistency properties, then it can be decoded into a σ-structure that has treewidth k + |const(σ)| − 1.
+Let names(v) := {a ∈ Uk : Da v} denote the set of names used for elements in bag v.
+A consistent σ˜ k-tree is a σ˜ k-tree such that every node v satisﬁes • |names(v)| ≤ k + |const(σ)|; • for all Ra ∈ σ˜ k, if Ra v then a ⊆ names(v); • Piv holds iﬀ v is the i-th child of its parent; • for all constants z ∈ σ, there is exactly one node w and one
+c ∈ names(w) such that Vc/z w. Given a consistent tree T , we say nodes u and v are a-connected if there is a sequence of nodes u = w0, w1, . . . , w j = v such that wi+1 is a biological neighbor of wi, and a ∈ names(wi) for all i ∈ {0, . . . , j}. We write [v, a] for the equivalence class of aconnected nodes of v. For a = a1 . . . an, we often abuse notation and write [v, a] for the tuple [v, a1], . . . , [v, an]
+
+The decoding of T is the σ-structure D(T ) with universe {[v, a] : v ∈ dom(T ) and a ∈ names(v)} such that for each constant z, we have zD(T ) := [v, c] for the unique v, c such that Vc/z v holds, and for each relation R, we have RD(T )([v1, a1], . . . , [v j, a j]) iﬀ there is w ∈ dom(T ) such that Raw holds and [w, ai] = [vi, ai] for all i.
+Free variables For formulas with free variables, the trees are extended with additional information about the valuations for these free variables. These trees use an extended signature where for each free ﬁrst-order variable z and each c ∈ Uk, we introduce a predicate Vc/z, and for each second-order variable Z of arity n and each a ∈ Ukn, we introduce a predicate Za. We refer to these as free variable markers or encodings of valuations for free variables.
+We write z→ for the sets of predicates associated with z. For a set of free variables z = {z1 . . . zn}, we write z→ for z1→ ∪ · · · ∪ zn→. We sometimes abuse notation and write z→ for both the predicates and the valuation of those predicates. Similar conventions apply to the free second-order variables.
+Given a σ˜ k-tree T , we write (T , z→, Z→) for a tree over the signature σ˜ k∪z→∪Z→. We abuse the terminology and say (T , z→, Z→) is a consistent σ˜ k-tree if T is a consistent σ˜ k-tree, and for each z ∈ z→, there is exactly one v and one c ∈ names(v) such that Vc/z v holds, and for each Za ∈ Z→, if Zav then a ⊆ names(v).
+5. Automata tools
+We make use of automata running on inﬁnite binary trees. In this section, we brieﬂy recall some deﬁnitions and properties (please consult, e.g., [24, 29] for more information). We will need to use 2-way automata that can move both up and down as they process the tree, so we highlight some less familiar properties about the relationship between 2-way and 1-way versions of these automata.
+Trees The input structures are inﬁnite full binary trees T over a ﬁnite set of propositions Σ. In other words, these are structures over a signature with binary relations for the left and right child relation, and unary relations for the propositions. We also assume there are propositions indicating whether each node is a left child, right child, or the root. We write T (v) for the set of propositions that hold at node v.
+Tree automata An alternating parity tree automaton A is a tuple Σ, Q, q0, δ, Ω where Σ is a ﬁnite set of propositions, Q is a ﬁnite set of states, q0 ∈ Q is the initial state, δ : Q × P(Σ) → B+(Dir × Q) is the transition function with directions Dir ⊆ {l, r, ↑}, and Ω : Q → P is the priority function with a ﬁnite set of priorities P ⊆ N.
+The transition function maps a state and input letter to a positive boolean formula over propositions Dir × Q, denoted B+(Dir × Q). This formula indicates possible next moves for the automaton. We can assume that these formulas are written in disjunctive normal form. Running the automaton A on some input tree T is best thought of in terms of an acceptance game. Positions in the game are of the form (q, v) ∈ Q × dom(T ). In position (q, v), Eve chooses a disjunct θ in δ(q, T (v)). Then Adam chooses a conjunct (d, q ) in θ and the game continues from position (q , v ), where v is the node in direction d from v. In other words, the disjunct θ chosen by Eve speciﬁes the possible copies of the automaton that could be launched by Adam from v or a neighbor of v.
+A play (q0, v0)(q1, v1) . . . in the game is winning for Eve if it satisﬁes the parity condition: the maximum priority occurring inﬁnitely often in Ω(q0)Ω(q1) . . . is even. A strategy for Eve is a function that given the history of the play and the current position in the game, determines Eve’s choice in the game. Note that we allow the automaton to be started from arbitrary positions v0 in the tree, rather than just the root; we will often indicate this by saying that the automaton is launched from v0. We say that A accepts T starting from v0 if Eve has a strategy such that all plays consistent
+
+with the strategy starting from (q0, v0) are winning. L(A) denotes the language of trees accepted by A starting from the root.
+A 1-way alternating automaton is an automaton that uses only directions l and r. A (1-way) nondeterministic automaton is a 1-way alternating automaton such that every transition function formula is of the form i (l, qil) ∧ (r, qir).
+Closure properties We recall some closure properties of these automata (omitting the standard proofs).
+First, the automata that we are using are closed under union and intersection (of their languages).
+Proposition 9. 2-way alternating parity tree automata and 1-way nondeterministic parity tree automata are closed under union and intersection, with only a polynomial blow-up in the number of states and overall size.
+For example, this means that if we are given 2-way alternating parity tree automata A1 and A2, then we can construct in PTime a 2-way alternating parity tree automaton A such that L(A) = L(A1) ∩ L(A2). In automaton constructions, when we say, e.g., “take the intersection of A1 and A2”, we mean take this automaton A such that L(A) = L(A1) ∩ L(A2).
+Another important language operation is projection. Let L be a language of trees over propositions Σ ∪ {P}. The projection of L with respect to P is the language of trees T over Σ such that there is some T ∈ L such that T and T agree on all propositions in Σ. Projection is easy for nondeterministic automata since the valuation for the projected proposition can be guessed by Eve.
+Proposition 10. 1-way nondeterministic parity tree automata are closed under projection, with no change in the number of states and overall size.
+Finally, complementation is easy for alternating automata by taking the dual automaton, obtained by switching conjunctions and disjunctions in the transition function, and incrementing all of the priorities by one.
+Proposition 11. 2-way alternating parity tree automata are closed under complementation, with no change in the number of states and overall size.
+Connections between 2-way and 1-way automata It was shown by Vardi [30] that 2-way alternating parity tree automata can be converted to equivalent 1-way nondeterministic automata, with an exponential blow-up.
+Theorem 12 ([30]). Let A be a 2-way alternating parity tree automaton. We can construct a 1-way nondeterministic parity tree automaton A such that L(A) = L(A ). The number of states of A is exponential in the number of states of A, but the number of priorities of A is linear in the number of priorities of A.
+1-way nondeterministic tree automata can be seen as a special case of 2-way alternating automata, so the previous theorem shows that 1-way nondeterministic and 2-way alternating parity automata are equivalent, in terms of their ability to recognize trees starting from the root.
+We need another conversion from 1-way nondeterministic to 2way alternating automata that we call localization. This is the process by which a 1-way nondeterministic automaton that is running on trees with extra information about some predicate annotated on the tree is converted to an equivalent 2-way alternating automaton that operates on trees without these annotations, but under the assumption that these predicates hold only locally at the position the 2-way automaton is launched from. A similar localization idea is present in prior work (see, e.g., [10, 12]).
+Theorem 13. Let Σ := Σ ∪ {P1, . . . , P j}. Let A be a 1-way nondeterministic parity automaton on Σ -trees. We can construct
+
+a 2-way alternating parity automaton A on Σ-trees such that for all Σ-trees T and v ∈ dom(T ),
+A accepts T from the root iﬀ A accepts T from v,
+where T is the Σ -tree obtained from T by setting PT1 = · · · = PTj = {v}. The number of states of A is linear in the number of states of A , and the overall size is linear in the size of A .
+Proof sketch. A simulates A by guessing in a backwards fashion an initial part of a run of A on the path from v to the root and then processing the rest of the tree in a normal downwards fashion. The subtlety is that the automaton A is reading a tree without valuations for P1, . . . , P j so once the automaton leaves node v, if it were to cross this position again, it would be unable to correctly simulate A . To avoid this, we only send downwards copies of the automaton in directions that are not on the path from the root to v.
+We remark that this construction can be adapted for an alternating parity automaton as input, but A is exponential in the size of the input automaton A , rather than linear.
+Emptiness testing Finally, we make use of the well-known fact that language emptiness of tree automata is decidable.
+Theorem 14 ([16],[30]). For 1-way nondeterministic parity tree automata, emptiness is decidable in time polynomial in the number of states and exponential in the number of priorities. For 2-way alternating parity automata, it is decidable in time exponential in the number of states and priorities.
+6. Automata for GNFP-UP
+In this section, we construct automata for θ in GNFP-UP[σ]. Before we give some details of the construction, it is helpful to consider how automata can be used to analyze ﬁxpoints.
+Using localized automata for ﬁxpoints Testing whether some tuple t is in the least ﬁxpoint [lfpYz,y . φ] in some structure A and for some ﬁxed valuation of the parameters (and any other free variables) can be viewed as a game. Positions in this game consist of the current tuple y being tested in the ﬁxpoint, with the initial position being t. In general, in position y, one round of the game consists of the following:
+• Eve chooses some valuation for Y such that φ(y, Y) holds (if it is not possible, she loses), then
+• Adam chooses tuple y ∈ Y (if it is not possible, he loses), and the game proceeds to the next round in position y .
+Adam wins if the game continues forever. The idea is that if t is really in the least ﬁxpoint, then it must
+be added in some ﬁxpoint approximant. This gives Eve a strategy for choosing Y at each stage in the game, in such a way that after ﬁnitely many challenges by Adam, she should be able to guess the empty valuation.
+When the ﬁxpoint can consist of only guarded tuples, there is a version of this game on a tree encoding T of a structure, that can be implemented using tree automata. We start with an automaton Aφ for the body φ of the ﬁxpoint. In fact, we start with localized versions of this automaton because we need to launch diﬀerent versions based on Adam’s challenges. A local assignment b/y for b = b1 . . . bn ∈ Ukn and y = y1 . . . yn is a mapping such that yi → bi. A node v in T with b ⊆ names(v) and a local assignment b/y, speciﬁes a valuation for y→. We say it is local since the free variable markers for y would all appear locally in v. If we have an automaton A running on trees with free variable markers for y, we say that we localize A to b/y if we apply the localization theorem (Theorem 13) to the predicates Vbi/yi , and then eliminate the dependence on any other Vc/yi for c bi by always
+
+assuming these predicates do not hold. This results in an automaton that simulates A under the assumption that the free variables y correspond to the elements [v, b], but it no longer relies on free variable markers for y. These localized automata are important because they can be launched to test that a tuple of elements that appear together in a node satisfy some property — without having the markers for this tuple explicitly written on the tree.
+We now describe the version of the ﬁxpoint game using localized automata. Initially, Eve navigates to a node in T carrying t, and launches the appropriate localized Aφ from there. In general, the game proceeds as follows:
+• Eve and Adam simulate some localized version of Aφ. During the simulation Eve can guess a valuation for Y (recall that Aφ runs on trees with an annotation describing the valuation for the second-order variable Y, and that information is missing from T ). Because Y can only contain guarded tuples, this amounts to guessing an annotation of the tree with this valuation.
+• When Eve guesses some y ∈ Y, Adam can either continue the simulation, or challenge her on this assertion. A challenge corresponds to launching a new localized copy of Aφ from the node carrying y (again, we know that y must be present locally in a node, since any tuple in the ﬁxpoint must be guarded).
+After each challenge, the game continues as before (with the new copy of Aφ being simulated, Eve guessing a new valuation for Y, etc.). Adam wins if he challenges inﬁnitely often, or if the game stabilizes in some simulation of Aφ where he wins.
+Assuming we have localized automata for φ, we can implement this game using a 2-way alternating parity automaton. We assign a large odd priority (larger than the priorities in Aφ) to the states where Adam challenges, so that he wins if he is able to challenge inﬁnitely many times; the other priorities are just inherited from Aφ. Simultaneous ﬁxpoints can be handled in a similar way.
+In order to analyze the ﬁxpoints like this, our inductive automaton construction must produce 2-way localized automata at each stage — if we did not, then each time we reached a ﬁxpoint and needed localized automata for the body of the ﬁxpoint, we would get an exponential blow-up. For GFP and GNFP, we can deﬁne directly the localized versions of the automata using a state set of size at most singly exponential in the size of the input formula. However, by adding parameters in GNFP-UP, this direct deﬁnition of a localized version becomes more challenging. We are forced to construct non-localized automata at some points — namely, for subformulas that introduce new parameters — and then apply Theorems 12 and 13, resulting in an exponential blow-up. The parameter depth is a measure of how many of these blow-ups occur.
+Construction We now describe more details of the construction of an automaton for normal form θ ∈ GNFP-UP[σ]. First, it is straightforward to construct an automaton that checks consistency:
+Proposition 15. There is a 2-way alternating parity tree automaton C that checks whether or not a σ˜ k-tree (possibly extended with additional free variable markers for z and Z) is consistent. The size of C is at most exponential in (|σ| + |z| + |Z|) · |Uk|k.
+Hence, we can concentrate on deﬁning an automaton for θ that runs on consistent trees and accepts iﬀ the decoding of the consistent input tree actually satisﬁes θ.
+The main theorem states that the size of the automaton for θ is a tower of exponentials whose height depends on the pdepth. Given a function f , we write expnf (m) for a tower of exponentials of height n based on f , i.e. exp0f (m) = m and expnf (m) = 2 f .(expnf−1(m))
+Theorem 16. For normal form θ ∈ (GNFP-UP)k[σ] with pdepth(θ) ≥ 1, we can construct a 2-way alternating parity tree automaton Aθ such that for all consistent σ˜ k-trees T , D(T ) |= θ iﬀ
+
+T ∈ L(Aθ), and the size of Aθ is at most (pdepth(θ)+1)-exponential in |θ|.
+More precisely, there is a polynomial function f independent of θ such that the size is at most exppfdepth(θ)( f (m) · 2 f (klr)) where m = |θ|, l = |const(σ)|, and r = rankCQ(σ) (see deﬁnitions below).
+
+For brevity, in this theorem and in the remainder of the paper, we
+usually give only bounds on the output size, not the running time
+of the algorithms. However the proofs will show that the worst-
+case running time is bounded by a polynomial in the output size, i.e. the running time of Theorem 16 is (pdepth(θ) + 1)-ExpTime. We
+emphasize that this means that for ﬁxed pdepth, the construction
+can be done in elementary time. The main factor aﬀecting the output size is the pdepth, since this
+determines the height of the tower of exponentials. However, for more precise bounds, the other factors aﬀecting the size are the size of the formula θ, the width k, the number of constants in σ, and the CQ-rank (the maximum number of conjuncts ψi in any CQ-shaped subformula ∃x. i ψi for non-empty x).
+The proof of Theorem 16 is by induction on |θ|, and constructs localized 2-way automata for subformulas of θ. For GNFP subformulas, it is known from [8] how to construct 2-way automata:1
+
+Lemma 17 ([8]). Let ψ(y, Z) ∈ GNFPk[σ ] in normal form. Then for every local assignment b/y, we can construct a 2-way alternating parity tree automaton Aψb/y such that for all consistent σ˜ k-trees (T , Z→) and for all nodes w ∈ dom(T ) with b ⊆ names(w),
+D(T ), [w, b], Z |= ψ iﬀ Aψb/y accepts (T , Z→) from w.
+There is a polynomial function f independent of ψ such that the number of states for all such localized automata is at most N := f (m) · 2 f (klr) where m = |ψ|, l = |const(σ )|, and r = rankCQ(ψ). The number of priorities in each automaton is linear in |ψ|. The overall size is at most exponential in |σ | · N.
+
+We use these automata for GNFP as building blocks for our
+GNFP-UP construction. Recall that pdepth 0 formulas can always
+be viewed as GNFP formulas. We can also transform parts of the formula into GNFP formulas over a slightly diﬀerent signature.
+For this purpose, given ψ ∈ (GNFP-UP)k[σ] with params(ψ) ⊆ z, deﬁne the augmented signature σz,ψ to be the signature σ together with additional constants z ∈ z and subformula predicates Fη for subformulas η with params(η) ⊆ z. For such η, the arity of Fη is usually |free(η) \ params(η)|; in the special case that η is a ﬁxpoint
+formula, then the arity of Fη is the arity of this ﬁxpoint predicate. Then we can transform the outer part of a GNFP-UP formula to a
+GNFP formula over this augmented signature. We can only perform
+this transformation on the outer part of the formula that uses the same set of parameters. Consider η ∈ (GNFP-UP)k[σ] with free(η) ⊆ yz and params(η) ⊆ z. We deﬁne transformz(η) ∈ GNFPk[σz,η] inductively as follows:
+
+transformz(R t) := R t transformz(Y t) := Y t
+
+transformz(α ∧ ¬φ) := α ∧ ¬transformz∩free(φ)(φ)
+
+transformz([lfpXz ,x .S ](t)) :=
+F[lfpXz ,x .S ](t) t if there is φ j ∈ S with params(φ j) [lfpX,x .S ](t) o.w.
+
+z
+
+where S is the result of applying transformz to each φ j ∈ S
+
+transformz( i ∃xi. j ψi j) :=
+
+F i ∃xi. j ψij y if there is i, j such that params(ψi j) z i ∃xi. j transformz∩free(ψij)(ψi j) o.w.
+
+1 [8] used a diﬀerent encoding of the tree-like models, but the adaptation to the encoding here requires only minor technical changes.
+
+The GNFP formula obtained using this transformation is “equiv-
+alent” to the GNFP-UP formula, under the assumption that the addi-
+tional predicates in the augmented signature are interpreted in the
+expected way. It does not increase the width, CQ-rank, or the size
+of the formula. If the transformation applied to η only introduces Fη for strict
+subformulas η of η, then we say the transformation is helpful. In
+a helpful transformation, all occurrences of these new predicates Fη appear under a guard of free(η ) \ params(η ). Another way to understand the parameter depth is to say that the parameter depth
+measures the number of unhelpful breakpoints we reach as we try
+to transform the entire formula using this operation.
+The main idea in the construction, described in Lemma 18 be-
+low, is to transform the outer part of the formula into a GNFP for-
+mula. If the transformation is helpful, we can then use the GNFP
+automaton for the outer part of the formula, and plug in inductively
+deﬁned automata checking the subformulas. When this is not possible, we must use diﬀerent techniques which result in an exponential blow-up at these stages.
+Lemma 18. Let φ(y, z, Z) be a subformula of θ ∈ (GNFP-UP)k[σ] with params(φ) ⊆ z. For each local assignment b/y, we can construct a 2-way alternating parity tree automaton Bφb/y such that for all consistent σ˜ k-trees (T , z→, Z→) and for all nodes w ∈ dom(T ) with b ⊆ names(w),
+D(T ), [w, b], z, Z |= φ iﬀ Bφb/y accepts (T , z→, Z→) from w.
+For pdepthz(φ) ≥ 1, there is a polynomial function f independent of φ such that the size of all such localized automata is at most exppfdepthz(φ)( f (mn) · 2 f (klr)) where m = |φ|, n = |σ|, l = |const(σ)|, and r = rankCQ(φ). The number of priorities is linear in |φ|. For pdepthz(φ) = 0, the bounds match Lemma 17.
+Proof sketch. The proof is by induction on |φ|. Assume φ := transformz(φ) is helpful. This always holds for
+the smallest (atomic) formulas, so this covers the base of the induction. We construct Bφb/y to simulate the automaton Aφb/y from Lemma 17, while allowing Eve to guess valuations for the Fη relations from φ . Since φ is helpful, we know that every Fη relation in φ is for some formula η that is strictly smaller than φ, and
+hence the inductive hypothesis ensures there is a corresponding au-
+tomaton for every suitable local assignment. During the simulation of Aφb/y, if Eve asserts Fη(x) a at w for some a ⊆ names(w), then Adam can challenge this by launching the localized automaton for the intersection of Bηa(/xx) and Bgad/dx(x) from w; likewise, if Eve does not assert Fη(x) a at w for some a ⊆ names(w), then Adam can challenge this by launching the localized automaton for the dual of the intersection of Bηa(/xx) and Bgad/dx(x) from w. Correctness follows from Lemma 17, and the fact that the inductive hypothesis ensures the subautomata for Fη in φ are correct. There is no exponential blowup in this case.
+Next, assume that φ := transformz(φ) is unhelpful. There are two possible cases.
+The ﬁrst case is when φ is a UCQ-shaped formula i ∃xi. j ψi j where variables from some xi are used as parameters in j ψi j. To start, we consider each CQ-shaped formula separately, so ﬁx some ∃xi. j ψi j. We use the inductive hypothesis to obtain 2-way alternating automata for each conjunct ψi j, using the empty local assignment. This is possible since the size of these conjuncts must be strictly less than the size of φ. Because we are using the empty local
+assignment, these automata operate on trees with markers for all of the free variables: xi ∪ y ∪ z. Take the intersection of these automata using Proposition 9. Then take the intersection with the automaton
+from Proposition 15 checking consistency. This yields a 2-way alternating automaton corresponding to j ψi j. We then convert this
+
+automaton to a nondeterministic version using Theorem 12 and project away the information about xi using Proposition 10. This yields an equivalent (1-way) nondeterministic parity automaton for the CQ. Next, we localize this automaton to the desired variables y using Theorem 13. Finally, to construct the automaton Bφb/y, we take the union of the individual CQ automata using Proposition 9. The conversion from a 2-way alternating automaton to a nondeterministic automaton is the costly step in this process, resulting in an exponential blow-up. This matches the claimed size bound since pdepth(ψi j) < pdepthz(φ).
+The second case is when φ is a ﬁxpoint formula where ﬁxpoint variables are used as parameters in the body of the ﬁxpoint. Suppose it is of the form [lfpXz ,x . gdd(x) ∧ χ(xz , XZ)](t) where params(χ)∩ x ∅, so params(χ) z; the construction is similar for a simultaneous ﬁxpoint. The formula χ in the body of the ﬁxpoint is strictly smaller, so we can apply the inductive hypothesis to get an automaton for this part. We want this automaton to be localized to x so we can test for tuples in the ﬁxpoint by launching copies of the automaton for some local assignment. However, the inductive hypothesis does not directly yield this, since some variables from x are used as parameters. Hence, we must use the inductive hypothesis to get a 2-way automaton for B∅χ/∅, apply Theorem 12 to get an equivalent 1-way nondeterministic automaton (resulting in an exponential blow-up), and then localize to some a/x using Theorem 13. Once we have these localized automata Bχa/x for the body of the ﬁxpoint, we can construct an automaton that captures the ﬁxpoint game described at the beginning of this section.
+Theorem 16 easily follows from this lemma. Using exactly the same conversion rules from [5], it can be shown that an arbitrary GNFP-UP sentence θ can be converted to an equivalent normal form θ with size exponential in |θ|, but width and CQ-rank linear in |θ|. Hence, we have the following corollary.
+Corollary 19. For θ ∈ GNFP-UP[σ] (not necessarily in normal form), we can construct an automaton Aθ of (pdepth(θ ) + 1)exponential size.
+7. Satisﬁability and containment
+Because of the tree-like model property for GNFP-UP, we can use the automaton construction and ExpTime emptiness testing (Theorem 14) to decide satisﬁability of GNFP-UP.
+Theorem 20. Satisﬁability for θ ∈ GNFP-UP is decidable in (pdepth(θ) + 2)-ExpTime.
+Applications We can apply Theorem 20 to obtain results about the query languages described in Section 3: e.g., containment of mnested MQs is in (m + 2)-ExpTime. This result was known already from [12]. However, an advantage of this GNFP-UP framework is that we can introduce additional features such as relativizing the results to sentences in our logics, without aﬀecting the complexity.
+Corollary 21. Containment of m-nested MQs relative to boolean frontier-guarded Datalog queries (or any boolean queries translatable to GNFP in PTime) is decidable in (m + 2)-ExpTime.
+We can extend our approach to even allow some unguarded logics on the left-hand side of the containment (as is done in [12], which considers only unrelativized containment).
+Corollary 22. Containment of a Datalog query in an m-nested MQ is in (m + 2)-ExpTime, even relative to a boolean frontier-guarded Datalog query or a GNFP sentence.
+We can also derive results about satisﬁability of CQPDL with respect to GNFP sentences. Although CQPDL can reach arbitrary pdepth levels, we can construct an equi-satisﬁable formula of low
+
+pdepth. This yields the following new result, extending results about (nested) C2RPQs from [9].
+Corollary 23. Satisﬁability of CQPDL sentences (or boolean combinations of CQPDL sentences and GNFP sentences) is decidable in 2-ExpTime.
+Lower bounds This connection with ﬂag and check queries also demonstrates that our general (m + 2)-ExpTime bound on satisﬁability for GNFP-UP formulas of pdepth m is optimal, since containment of boolean Datalog queries in m-nested MQs is actually (m + 2)-ExpTime hard [12].
+8. Extending to boundedness
+Thus far, we have concentrated on showing that satisﬁability is decidable for GNFP-UP, using techniques based on automata. In this section, we point out that we can extend this automata machinery to help answer additional questions like boundedness.
+The boundedness problem for a logic L over σ asks:
+Given a formula φ(x, X) ∈ L[σ] positive in some secondorder variable X of arity |x|, is there a natural number n such that for all σ-structures A, φn(A) = φn+1(A)?
+In other words, the boundedness problem asks whether there is a uniform natural number bound on the number of iterations needed to reach the least ﬁxpoint induced by φ(x, X). For formulas φ(x, z, X) with some designated set of parameters z, it is also natural to ask the following variant of the boundedness problem: is there a natural number n such that for all σ-structures A and for all valuations z → c, does φn(A, c) = φn+1(A, c)?
+There is a large body of work studying boundedness for various logics, particularly Datalog queries (see [1, 15, 22]). Boundedness is undecidable when φ is a negation-free ﬁrst-order formula. However, for many guarded logics, boundedness has been shown to be decidable [6, 8, 11] (some of the decidability results rely on unpublished work due to Colcombet, referred to as ILT in [6]).
+Using similar techniques, we can analyze boundedness for GNFP-UP. As was the case for our analysis of satisﬁability, the key is to take advantage of the fact that we can restrict to structures of bounded tree-width, and then use tree automata to help solve the problem. For boundedness a variant of the prior construction (with the same bounds) can generate a special type of tree automaton with counters called a cost automaton (see [8, 14] for more information). This cost automaton deﬁnes a function that maps a consistent tree T to the least n ∈ N ∪ {∞} such that every tuple in φ∞(D(T )) is in φn(D(T )) — there is a single counter that is incremented each time the ﬁxpoint is unfolded. The range of the function deﬁned by this cost automaton is bounded by a natural number across all consistent trees iﬀ φ is bounded.
+In general, it is not known how to decide if the range of the function deﬁned by a cost automaton over inﬁnite trees is bounded. However, for special types of cost automata — like the automata that come from analyzing boundedness for guarded logics — this is known to be decidable [8] (in cases where there is a reliance on cost automaton results that have been claimed before but not published, we mark this with ILT as in [6]).2 Hence, by combining our automaton construction with results from [8] and ILT, we can show:
+Theorem 24. Assuming ILT, the boundedness problem is decidable for x-guarded φ(x, X) ∈ GNFP-UP[σ] in non-elementary time (elementary time for ﬁxed pdepth).
+In the special case of x-guarded φ(x, z, X) ∈ GNF[σ], boundedness is decidable in elementary time (without assuming ILT).
+2 ILT stands for “inﬁnite limitedness theorem”, a statement about cost automata on inﬁnite trees. More details can be found in [8].
+
+FO deﬁnability For certain logics, boundedness coincides with FO deﬁnability; e.g., we have the following corollary of Theorem 24.
+Corollary 25. It is decidable whether [lfpXz ,x .φ] can be written in FO for x-guarded φ(x, z, X) ∈ GNF[σ].
+Furthermore, whenever this holds the ﬁxpoint [lfpXz ,x .φ] can in fact be written in GNF.
+Proof. If φ ∈ GNF is bounded, then the ﬁxpoint is equivalent to the n-th approximant, for some n ∈ N. We can write out the formula φn for this approximant, where φ0 := ⊥, and φn := φ[φn−1(y)/Xy]. This is in GNF, and witnesses the FO deﬁnability of [lfpXz ,x .φ]. The other direction follows from the Barwise-Moschovakis theorem [7].
+A similar result is not known for φ ∈ GNFP-UP[σ], because of the presence of additional ﬁxpoints in φ — the boundedness problem only concerns the elimination of the outermost ﬁxpoint.
+As another application, we can combine automata techniques from this paper with other cost automata results in [8, 10] to prove the following result about negation-free CQPDL and FO deﬁnability.
+Theorem 26. It is decidable whether or not a negation-free CQPDL sentence relative to a GNF sentence can be expressed in FO.
+In particular, we can decide whether a conjunctive regular path query can be expressed in FO, and similarly for their nested and two-way variants (e.g. C2RPQs).
+The ability to reduce C2RPQ querying to ﬁrst-order querying is interesting, since when this occurs we can use standard database techniques to evaluate graph queries with recursion.
+9. Conclusion
+We have explained how ﬁxpoint logics can be increased in expressivity while retaining decidability, by allowing unguarded parameters. We have also undertaken a ﬁne-grained analysis of the complexity of static analysis problems for the resulting logics.
+A limitation of our analysis is that it restricts to reasoning over all structures, both ﬁnite and inﬁnite. In contrast, [4, 28] have shown that unparameterized guarded ﬁxpoint logics have decidable satisﬁability problems over ﬁnite structures. It is not clear if the technique of [4] extends to deal with unguarded parameters.
+The results about testing ﬁrst-order deﬁnability of ﬁxpoint logics and recursive queries (e.g. Theorem 26) do not include complexity bounds. We conjecture that the cost automaton results could be analyzed and reﬁned further (as was done in [8]) to extract at least an elementary bound (and, ideally, a 2-ExpTime bound). For cases without negation, like FO deﬁnability of C2RPQs, it may well be possible to extend the more elementary automata-theoretic approach used to decide boundedness for monadic Datalog [15], avoiding the use of cost automata altogether.
+Acknowledgments
+Benedikt’s work was sponsored by the Engineering and Physical Sciences Research Council of the United Kingdom (EPSRC), grants EP/M005852/1 and EP/L012138/1. Vanden Boom was partially supported by EPSRC grant EP/L012138/1. Bourhis was supported by CPER Nord-Pas de Calais/FEDER DATA Advanced Data Science and Technologies 2015-2020 and the ANR Aggreg Project ANR-14-CE25-0017, INRIA Northern European Associate Team Integrated Linked Data.
+References
+[1] S. Abiteboul. Boundedness is undecidable for datalog programs with a single recursive rule. IPL, 32(6):281–287, 1989.
+
+[2] H. Andre´ka, I. Ne´meti, and J. van Benthem. Modal languages and bounded fragments of predicate logic. JPL, 27(3):217–274, 1998.
+[3] A. Arnold and D. Niwin´ski. Rudiments of mu-calculus. North Holland, 2001.
+[4] V. Ba´ra´ny and M. Bojan´czyk. Finite satisﬁability for guarded ﬁxpoint logic. IPL, 112(10):371–375, 2012.
+[5] V. Ba´ra´ny, B. ten Cate, and L. Segouﬁn. Guarded negation. In ICALP, 2011.
+[6] V. Ba´ra´ny, B. ten Cate, and M. Otto. Queries with guarded negation. PVLDB, 5(11):1328–1339, 2012.
+[7] J. Barwise and Y. N. Moschovakis. Global inductive deﬁnability. JSL, 43(3):521–534, 1978.
+[8] M. Benedikt, B. ten Cate, T. Colcombet, and M. Vanden Boom. The complexity of boundedness for guarded logics. In LICS, 2015.
+[9] M. Bienvenu, D. Calvanese, M. Ortiz, and M. Simkus. Nested regular path queries in description logics. In KR, 2014.
+[10] A. Blumensath, T. Colcombet, D. Kuperberg, P. Parys, and M. Vanden Boom. Two-way cost automata and cost logics over inﬁnite trees. In CSL-LICS, 2014.
+[11] A. Blumensath, M. Otto, and M. Weyer. Decidability results for the boundedness problem. LMCS, 10(3), 2014.
+[12] P. Bourhis, M. Kro¨tzsch, and S. Rudolph. Reasonable highly expressive query languages. In IJCAI, 2015.
+[13] D. Calvanese, G. De Giacomo, M. Lenzerini, and M. Y. Vardi. Containment of conjunctive regular path queries with inverse. In KR, 2000.
+[14] T. Colcombet and C. Lo¨ding. Regular cost functions over ﬁnite trees. In LICS, 2010.
+[15] S. S. Cosmadakis, H. Gaifman, P. C. Kanellakis, and M. Y. Vardi. Decidable optimization problems for database logic programs. In STOC, 1988.
+[16] E. A. Emerson and C. S. Jutla. The complexity of tree automata and logics of programs (extended abstract). In FOCS, 1988.
+[17] E. Gra¨del. On the restraining power of guards. JSL, 64(4):1719–1742, 1999.
+[18] E. Gra¨del. Guarded ﬁxed point logics and the monadic theory of countable trees. TCS, 288(1):129 – 152, 2002.
+[19] E. Gra¨del and I. Walukiewicz. Guarded ﬁxed point logic. In LICS, 1999.
+[20] E. Gra¨del, M. Otto, and E. Rosen. Undecidability results on twovariable logics. In STACS, 1997.
+[21] E. Gra¨del, C. Hirsch, and M. Otto. Back and forth between guarded and modal logics. ACM TOCL, 3(3):418–463, 2002.
+[22] G. G. Hillebrand, P. C. Kanellakis, H. G. Mairson, and M. Y. Vardi. Undecidable boundedness problems for datalog programs. J. Log. Program., 25(2):163–190, 1995.
+[23] N. Immerman. Relational queries computable in polynomial time. Information and Control, 68(1-3):86–104, 1986.
+[24] C. Lo¨ding. Automata on inﬁnite trees. Available at http://www.automata.rwth-aachen.de/ loeding/inf-tree-automata.pdf.
+[25] M. O. Rabin. Decidability of second-order theories and automata on inﬁnite trees. Trans. Amer. Math. Soc., 141:1–35, 1969.
+[26] S. Rudolph and M. Kro¨tzsch. Flag & check: data access with monadically deﬁned queries. In PODS, 2013.
+[27] D. Scott. A decision method for validity of sentences in two variables. JSL, 27(477), 1962.
+[28] L. Segouﬁn and B. ten Cate. Unary negation. LMCS, 9(3), 2013.
+[29] W. Thomas. Languages, Automata, and Logic. In G. Rozenberg and A. Salomaa, editors, Handbook of Formal Languages. 1997.
+[30] M. Y. Vardi. Reasoning about the past with two-way automata. In ICALP, 1998.
+
+

@@ -1,0 +1,674 @@
+Efficient Algorithms for Adversarial Contextual Learning
+
+Vasilis Syrgkanis Microsoft Research, 641 Avenue of the Americas, New York, NY 10011 USA
+Akshay Krishnamurthy Microsoft Research, 641 Avenue of the Americas, New York, NY 10011 USA
+Robert E. Schapire Microsoft Research, 641 Avenue of the Americas, New York, NY 10011 USA
+
+VASY@MICROSOFT.COM AKSHAYKR@CS.CMU.EDU SCHAPIRE@MICROSOFT.COM
+
+Abstract
+We provide the first oracle efficient sublinear regret algorithms for adversarial versions of the contextual bandit problem. In this problem, the learner repeatedly makes an action on the basis of a context and receives reward for the chosen action, with the goal of achieving reward competitive with a large class of policies. We analyze two settings: i) in the transductive setting the learner knows the set of contexts a priori, ii) in the small separator setting, there exists a small set of contexts such that any two policies behave differently on one of the contexts in the set. Our algorithms fall into the Follow-The-Perturbed-Leader family (Kalai & Vempala, 2005) and achieve regret O(T 3/4 K log(N )) in the transductive setting and O(T 2/3d3/4K log(N )) in the separator setting, where T is the number of rounds, K is the number of actions, N is the number of baseline policies, and d is the size of the separator. We actually solve the more general adversarial contextual semi-bandit linear optimization problem, whilst in the full information setting we address the even more general contextual combinatorial optimization. We provide several extensions and implications of our algorithms, such as switching regret and efficient learning with predictable sequences.
+1. Introduction
+We study contextual online learning, a powerful framework that encompasses a wide range of sequential decision mak-
+Proceedings of the 33 rd International Conference on Machine Learning, New York, NY, USA, 2016. JMLR: W&CP volume 48. Copyright 2016 by the author(s).
+
+ing problems. Here, on every round, the learner receives contextual information which can be used as an aid in selecting an action. In the full-information version of the problem, the learner then observes the loss that would have been suffered for each of the possible actions, while in the more challenging bandit version, only the loss that was actually incurred (i.e. for the chosen action) is observed. The goal is to achieve low loss over several rounds. The contextual bandit problem is of particular practical relevance, with applications to personalized recommendations, clinical trials, and targeted advertising.
+Algorithms for contextual learning, such as Hedge (Freund & Schapire, 1997; Cesa-Bianchi et al., 1997) and Exp4 (Auer et al., 1995), are well-known to have remarkable theoretical properties, being effective even in adversarial, non-stochastic environments and capable of performing almost as well as the best among an exponentially large family of policies, or rules for choosing actions. However, the space requirements and running time of these algorithms are generally linear in the number of policies, which is far too expensive for a the many applications that call for an extremely large policy space. In this paper, we address this gap between the statistical and computational complexity of contextual online learning in an adversarial setting.
+As an approach to solving online learning problems, we posit that the corresponding batch version is solvable. In other words, we assume access to a certain optimization oracle for solving a batch-learning problem. Concrete instances of such an oracle include empirical risk minimization procedures for supervised learning, algorithms for the shortest paths problem, and dynamic programming.
+Such an oracle is central to the Follow-the-PerturbedLeader algorithms of Kalai & Vempala (2005), although these algorithms are not generally efficient since they require separately "perturbing" each policy in the entire
+
+Efficient Algorithms for Adversarial Contextual Learning
+
+space. Oracles of this kind have also been used in designing efficient contextual bandit algorithms (Agarwal et al., 2014; Langford & Zhang, 2008; Dud´ik et al., 2011); however, these require a much more benign setting in which contexts and losses are chosen randomly and independently rather than by an adversary.
+In this paper, for a wide range of problems, we present computationally efficient algorithms for contextual online learning in an adversarial setting, assuming oracle access. We give results for both the full-information and bandit settings. To the best of our knowledge, these results are the first of their kind at this level of generality.
+Overview of results. We begin in Section 2 with a new and general Follow-the-Perturbed-Leader algorithm in the style of Kalai & Vempala (2005). This algorithm only accesses the policy class using the optimization oracle.
+We then apply these results in Section 3 to two settings. The first is a transductive setting (Ben-David et al., 1997) in which the learner knows the arriving contexts a priori, or, less stringently, knows only the set, but not necessarily the actual sequence or multiplicity with which each context arrives. In the second, small-separator setting, we assume that the policy space admits the existence of a small set of contexts, called a separator, such that any two policies differ on at least one context from the set. The size of the smallest separator for a particular policy class can be viewed as a new measure of complexity, different from the VC dimension, and potentially of independent interest.
+We analyze our algorithm for a generalized online learning setting called online combinatorial optimization, which includes as special cases transductive contextual experts, online shortest-path routing, online linear optimization (Kalai & Vempala, 2005), and online submodular minimization (Hazan & Kale, 2012).
+In Section 4, we extend our results to the bandit setting, or in fact, to the more general semi-bandit setting, using a technique of Neu & Barto´k (2013). Among our main results, we obtain regret bounds for the adversarial contextual bandit problem of O(T 3/4 K log(N )) in the transductive setting, and O(T 2/3d3/4K log(N )) in the smallseparator setting, where T is the number of time steps, K the number of actions, N the size of the policy space, and d the size of the separator. Being sublinear in T , these bounds imply the learner's performance will eventually be almost as good as the best policy, although they areworse than the generally optimal dependence on T of O( T ), obtained by many of the algorithms mentioned above. On the other hand, these preceding algorithms are computationally intractable when the policy space is gigantic, while ours runs in polynomial time in T, K, d and log(N ), assuming access to an optimization oracle. Improving these bounds with an
+
+efficient algorithm remains an open problem.
+
+In Section 5, we give an efficient algorithm when regret is measured in comparison to a competitor that is allowed to switch from one policy to another a bounded number of times. Here, we show that the optimization oracle can be efficiently implemented given an oracle for the original policy class. Specifically, this leads to a fully efficient algorithm for the online switching shortest path problem in directed acyclic graphs.
+
+Finally, Section 6 shows how "path length" regret bounds
+
+can be derived in the style of Rakhlin & Sridharan
+
+(2013b). Such bounds have various applications, for
+
+instance, in obtaining better bounds for playing repeated
+
+games (Rakhlin & Sridharan, 2013a; Syrgkanis et al.,
+
+2015). Our results easily extend to infinite policy classes
+
+with bounded Natarajan dimension and more gener-
+
+ally to classes with bounded Laplacian complexity:
+
+L() = supx1:T E[sup
+
+T t=1
+
+Lt
+
+((xt
+
+))],
+
+with
+
+Lt
+
+a vector of independent Laplace distributions in each
+
+coordinate.
+
+Other related work. Contextual, transductive online learning using an optimization oracle was previously studied by Kakade & Kalai (2005), whose work was later extended and improved by Cesa-Bianchi & Shamir (2011) using a generalization of a technique from Cesa-Bianchi et al. (1997). However, these results are for binary classification or other convex losses defined on onedimensional predictions and outcomes; as such, they are special cases of the much more general setting we consider here.
+Awerbuch & Kleinberg (2008) present an efficient algorithm for the online shortest paths problem. This can be viewed as solving an adversarial bandit problem with a very particular optimization oracle over an exponentially large but highly structured space of "policies" corresponding to paths in a graph. However, their setting is clearly far more restrictive and structured than ours is.
+Concurrently with our work, Rakhlin & Sridharan (2016) also obtain sublinear regret guarantees for an oracle-based adversarial contextual bandit algorithm, albeit non-combinatorial. Their algorithm achieves O(T 3/4 K(log(N ))1/4) in two settings: a hybrid stochastic-adversarial setting, where the contexts are drawn i.i.d. from a distribution that the learner knows how to sample from, and a fully transductive setting, where the contexts and their multiplicities are known a priori. Their algorithm is of the random playout (Cesa-Bianchi & Shamir, 2011) style and is based on a minimax analysis.
+
+Efficient Algorithms for Adversarial Contextual Learning
+
+2. Online Learning with Oracles
+
+We start by analyzing the family of Follow-the-PerturbedLeader algorithms in a very general online learning setting. Parts of this generic formulation follow the recent formulation of Daskalakis & Syrgkanis (2015), but we present a more refined analysis which is essential for our contextual learning result in the next sections. The main theorem of this section is essentially a generalization of Theorem 1.1 of Kalai & Vempala (2005).
+
+Consider an online learning problem where at each timestep an adversary picks an outcome yt  Y and the algorithm picks a policy t   from some policy space .1 The algorithm receives a loss: (t, yt), which could be
+positive or negative. At the end of each iteration the algorithm observes the realized outcome yt. We will denote with y1:t a sequence of outcomes {y1, y2, . . . , yt}. More-
+over, we denote with:
+
+t
+L(, y1:t) = (, y ),
+ =1
+
+(1)
+
+the cumulative loss of a fixed policy    for a sequence of choices y1:t of the adversary. The goal of the learning algorithm is to achieve loss that is competitive with the best
+fixed policy in hindsight. As the algorithms we consider
+will be randomized, we will analyze the expected regret,
+
+TT
+
+REGRET = sup E
+
+(t, yt) - (, yt) ,
+
+
+
+t=1
+
+t=1
+
+(2)
+
+which is the worst case difference between the cumulative loss of the learner and the loss of any fixed policy   .
+
+We consider adversaries that are adaptive, which means that they can choose the outcome yt at time t, using knowl-
+edge of the entire history of interaction. The only knowl-
+edge not available to an adaptive adversary is any randomness used by the learning algorithm at time t. In contrast,
+an oblivious adversary is one that picks the sequence of outcomes y1:T before the start of the learning process.
+
+To develop computationally efficient algorithms that compete with large sets of policies , we assume that we are given oracle access to the following optimization problem.
+Definition 1 (Optimization oracle). Given outcomes y1:t compute the fixed optimal policy for this sequence:
+
+M y1:t = argminL(, y1:t).
+
+(3)
+
+We will also assume that the oracle performs consistent deterministic tie-breaking: i.e. whenever two policies are tied, then it always outputs the same policy.
+
+1We refer to the choice of the learner as a policy, for uniformity of notation with subsequent sections, where the learner will choose some policy that maps contexts to actions.
+
+Algorithm 1 Follow the perturbed leader with fake sample
+perturbations - FTPL.
+for each time step t do Draw a random sequence of outcomes {z} = (z1, . . . , . . . , zk) independently, based on some time-
+independent distribution over sequences. Both the length of the sequence and the outcome zi  Y at
+each iteration of the sequence can be random Denote with {z}  y1:t-1 the augmented sequence where we append the extra outcome samples {z} at the beginning of sequence y1:t-1 Invoke oracle M and play policy:
+
+t = M {z}  y1:t-1 .
+
+(4)
+
+end for
+
+In this generic setting, we define a new family of FollowThe-Perturbed-Leader (FTPL) algorithms where the perturbation takes the form of extra samples of outcomes (see Algorithm 1). In each round, the learning algorithm draws a random sequence of outcomes independently, and appends this sequence to the outcomes experienced during the learning process. The algorithm invokes the oracle on this augmented outcome sequence, and plays the resulting policy.
+Perturbed Leader Regret Analysis. We give a general theorem on the regret of a perturbed leader algorithm with sample perturbations. In the sections that follow we will give instances of this analysis in specific settings.
+Theorem 1. For a distribution over sample sequences {z} and a sequence of adversarially and adaptively chosen outcomes y1:T , define:
+T
+STABILITY = E{z} (t, yt) - (t+1, yt)
+t=1
+
+
+
+ERROR
+
+=
+
+E{z}
+
+max
+
+
+(, z )
+
+z {z}
+
+
+
+-
+
+E{z}
+
+min
+
+
+(, z ) ,
+
+z {z}
+
+where t is defined in Equation (4). Then the expected regret of Algorithm 1 is upper bounded by,
+
+REGRET  STABILITY + ERROR.
+
+(5)
+
+This theorem shows that any FTPL-variant where the perturbation can be described as a random sequence of outcomes has regret bounded by the two terms STABILITY and
+
+Efficient Algorithms for Adversarial Contextual Learning
+
+ERROR. Below we will instantiate this theorem to obtain concrete regret bounds for several problems.
+The proof of the theorem is based on a well-known "bethe-leader" argument. We first show that if we included the tth loss vector in the oracle call at round t, we would have regret bounded by ERROR, and then we show that the difference between our algorithm and this prescient one is bounded by STABILITY. See Appendix A for the proof.
+
+3. Adversarial Contextual Learning
+Our first specialization of the general setting is to contextual online combinatorial optimization. In this learning setting, the action space is a feasibility set A  {0, 1}K and we use a  A both as a binary vector and as the set {j  [K] : a(j) = 1}. The adversary picks a outcome yt = (xt, f t) where xt belongs to some context space X and f t : A  R is a cost function that maps each feasible action vector a  A to a cost f t(a). The goal of the learning algorithm is to achieve low regret relative to a set of policies   (X  A) that map contexts to feasible action vectors. At each iteration the algorithm picks a policy t and incurs a cost (t, yt) = f t(t(xt)). In this section, we consider the full-information problem, where after each round, the entire loss function f t is revealed to the learner. Online versions of a number of important learning tasks, in-
+cluding cost-sensitive classification, multi-label prediction,
+online linear optimization (Kalai & Vempala, 2005) and online submodular minimization (Hazan & Kale, 2012) are
+all special cases of the contextual online combinatorial optimization problem, as we will see below.
+
+Contextual Follow the Perturbed Leader. We will ana-
+
+lyze the performance of an instantiation of the FTPL algo-
+
+rithm in this setting. To specialize the algorithm, we need
+
+only specify the distribution from which the sequence of
+
+fake outcomes {z} is drawn at each time-step. This distri-
+
+bution is parameterized by a subset of contexts X  X ,
+
+with |X| = d and a noise parameter . We draw the se-
+
+quence {z} as follows: for each context x  X, we add
+
+the fake sample zx = (x, fx) where fx is a linear loss function based on a loss vector x  RK , meaning that fx(a) = a, x . Each coordinate of the loss vector x is
+
+drawn from a independent Laplace distribution with param-
+
+eter , i.e. for each coordinate j  [K] the density of x(j)
+
+at q is f (q) mean 0 and
+
+v=ari2anecxep{2-2 .|Uq|s}i.ngTthheisladttiestrridbiusttiroibnutfioornfahkaes
+
+samples gives an instantiation of Algorithm 1, which we
+
+refer to as CONTEXT-FTPL(X, ) (see Algorithm 2).
+
+We analyze CONTEXT-FTPL(X, ) in two settings: the transductive setting and the small separator setting.
+
+Definition 2. In the transductive setting, at the beginning of the learning process, the adversary reveals to the learner
+
+Algorithm 2 Contextual Follow the Perturbed Leader Algorithm - CONTEXT-FTPL(X, ).
+Input: parameter , set of contexts X, policies . for each time step t do
+Draw a sequence {z} = (z1, . . . , zd) of d fake samples. The context associated with sample zx is equal to x and each coordinate of the loss vector x is drawn i.i.d. from a Laplace() Pick and play according to policy
+
+t = M ({z}  y1:t-1)
+
+(6)
+
+end for
+
+the set of contexts that will arrive, although the ordering and multiplicity need not be revealed.
+Definition 3. In the small separator setting, there exists a set X  X such that for any two distinct policies ,   , there exists x  X such that (x) = (x).
+In the transductive setting, the set X that we use in CONTEXT-FTPL(X, ) is precisely this set of contexts that will arrive, which by assumption is available to the learning algorithm. In this small separator setting, the set X used by CONTEXT-FTPL is the separating set. This enables nontransductive learning, but one must be able to compute a small separator prior to learning. Below we will see examples where this is possible.
+We now turn to bounding the regret of CONTEXT-FTPL(X, ). Let d = |X| be the number of contexts that are used in the definition of the noise distribution, let N = ||, and let m denote the maximum number of non-zero coordinates that any policy can choose on any context, i.e. m = maxaA a 1. Even though at times we might constrain the sequence of loss functions that the adversary can pick (e.g. linear non-negative losses), we will assume that the oracle M can handle at least linear loss functions with both positive and negative coordinates. Our main result is:
+Theorem 2 (Complete Information Regret). CONTEXT-FTPL(X, ) achieves regret against any adaptively and adversarially chosen sequence of contexts and loss functions:
+
+1. In the transductive setting:
+
+T
+REGRET  4K · E
+
+ft
+
+2 
+
++
+
+10 
+
+ dm
+
+log(N )
+
+t=1
+
+2. In the transductive setting, when loss functions are linear and non-negative, i.e. f t(a) = a, t with
+
+Efficient Algorithms for Adversarial Contextual Learning
+
+t  RK0:
+T
+REGRET   · E
+t=1
+
+transductive setting, Theorem 2 can be applied along with
+
+the analog of the Sauer-Shelah lemma, leading to a sublin-
+
+t(xt), t 2
+
++
+
+10 
+
+ dm
+
+log(N )
+
+ear regret bound for classes with finite Natarajan dimension. On the other hand, in the non-transductive case it
+
+is possible to construct examples where achieving sublin-
+
+3. In the small separator setting:
+
+ear regret against a VC class is information-theoretically
+
+T
+REGRET  4Kd · E
+
+ft
+
+2 
+
++
+
+10 
+
+ dm
+
+log(N )
+
+t=1
+
+hard (Ben-David et al., 2009), demonstrating a significant difference between the two settings. See Corollary 15 and Theorem 16 in the Appendix F for details.
+
+where f t  = maxaA |f t(a)|.
+When  is set optimally, loss functions are in [0, 1], and loss vectors are in [0, 1]K, these give regret:2 O (dm)1/4 KT log(N ) in the first set-
+ting, O d1/4m5/4 T log(N ) in the second and
+O m1/4d3/4 KT log(N ) in the third.
+To prove the theorem we separately upper bound the STABILITY and the ERROR terms and then Theorem 2 follows from Theorem 1. One key step is a refined ERROR analysis that leverages the symmetry of theLaplace distribution to obtain a bound with dependence d rather than d. This is possible only if the perturbation is centered about zero, and therefore does not apply to other FPTL variants that use non-negative distributions such as exponential or uniform (Kalai & Vempala, 2005). Due to lack of space we defer proof details to Appendix B.
+This general theorem has implications for many specific settings that have been extensively studied in the literature. We turn now to some examples.
+Example 1. (Transductive Contextual Experts) The contextual experts problem is the online version of costsensitive multiclass classification, and the full-information version of the widely-studied contextual bandit problem. The setting is as above, but A corresponds to sets with cardinality 1, meaning that m = 1 in our formulation. As a result, CONTEXT-FTPL can be applied as is, and the second claim in Theorem 2 shows that the algorithm has regret at most O d1/4 T log(N ) if at most d contexts
+
+Example 2. (Non-contextual Shortest Path Routing and Linear Optimization) For the case when the linear optimization corresponds to computing the shortest (s, t)path in a DAG, then K and m equal to the number of edges and the problem can be solved in poly-time even when edge costs are negative. More generally, CONTEXT-FTPL can also be applied to non-contextual problems, which is a special case where d = 1. In such a case, CONTEXT-FTPL reduces to the classical FTPL algorithm with Laplace instead of Exponential noise, and Theorem 2 matches existing results for online linear optimization (Kalai & Vempala, 2005). In particular, for problems without context, CONTEXT-FTPL has regret that scales with T .
+Example 3. (Online sub-modular minimization) A special case of our setting is the online-submodular minimization problem studied in previous work (Hazan & Kale, 2012; Jegelka & Bilmes, 2011). As above, this is a non-contextual online combinatorial optimization problem, where the loss function f t presented at each round is submodular. Here, CONTEXT-FTPL reduces to the strongly polynomial algorithm of Hazan & Kale (2012), although our noise follows a Laplace instead of Uniform distribution. A straightforward application of the first claim of Theorem 2 shows that CONTEXT-FTPL achieves regret at most O(KH T log(K)) if the losses are bounded in [-H, H], anda slightly refined analysis of the error terms gives O(KH T ) regret. This matches the FTPL analysis of Hazan & Kale (2012), although they also develop an algorithm based on online convex optimization that achieves O(H KT ) regret.
+
+arrive. In the worst case this bound is O(T 3/4 log(N )), since the adversary can choose at most T contexts. To our knowledge, this is the first fully oracle-efficient algorithm for online adversarial cost-sensitive multiclass classification, albeit in the transductive setting.
+
+Example 4. (Contextual Experts with linear policy classes) The third clause of Theorem 2 gives strong guarantees for the non-transductive contextual experts problem, provided one can construct a small separating set of contexts. Often this is possible, and we provide some examples here.
+
+This result can easily be lifted to infinite policy classes that have small Natarajan Dimension (a multi-class analog of VC-dimension), since such classes behave like finite ones once the set of contexts is fixed. Thus, in the
+2Observe that when loss vectors are in [0, 1]K , then the linear loss function is actually in [0, m] not in [0, 1].
+
+1. For binary classification where the policies are boolean disjunctions (conjunctions) over n binary variables, the set of 1-sparse (n - 1-sparse) boolean vectors form a separator of size n. This is easy to see as two disjunctions must disagree on at least one
+variable, so they will make different predictions on
+
+Efficient Algorithms for Adversarial Contextual Learning
+
+the vector that is non-zero only in that component. Note that the size of the small separator is independent of the time horizon T and logarithmic in the number of policies. Thus, Theorem 2 shows that CONTEXT-FTPL suffers at most O( T log(N )) regret since d = log(N ), m = 1 and K = 2.
+
+2. For binary classification in n dimensions, consider a
+
+discretization of linear classifiers defined as follows,
+
+the separating hyperplane of each classifier is defined
+
+by choosing the intercept with each axis from one of
+
+O(1/ ) values (possibly including something denot-
+
+ing no intercept). Then a small separator includes,
+
+for each axis, one point between each pair in the dis-
+
+cretization, for a total of O(n/ ) points. This fol-
+
+lows since any two distinct classifiers have different
+
+intercepts for at least one axis, and our small sepa-
+
+rator has one point between these two different inter-
+
+cepts, leading to different predictions. Note that the number of classifiers in the discretization is O( -n).
+
+Here Theorem 2 shows that CONTEXT-FTPL suf-
+
+fers O(
+
+at
+-n
+
+)m, dost=O(nn,
+
+T
+3/4
+m
+
+(log(
+
+1 
+
+))1/4
+
+)
+
+= 1 and K
+
+regret = 2.
+
+since N = This bound
+
+has a undesireable polynomial dependence on the dis-
+
+cretization resolution  but avoids exponential dimen-
+
+sion dependence. Note that competing with the set of
+
+all linear classifiers (without discretization) is impos-
+
+sible because the class has infinite Littlestone dimen-
+
+sion (Ben-David et al., 2009) (See also Theorem 16 in
+
+Appendix F).
+
+Thus we believe that the smallest separator size for a policy class can be viewed as a new complexity measure, which may be of independent interest.
+
+4. Linear Losses and Semi-Bandit Feedback
+In this section, we consider contextual learning with semibandit feedback and linear non-negative losses. At each round t of this learning problem, the adversary chooses a non-negative vector t  RK0 and sets the loss function to f t(a) = a, t . The learner chooses an action at  A  {0, 1}K accumulates loss f t(at) and observes t(j) for each j  at. In other words, the learner observes the coefficients for only the elements in the set that he picked. Notice that if A is the one-sparse vectors, then this setting is equivalent to the well-studied contextual bandit problem (Langford & Zhang, 2008).
+
+and proceeds to construct a proxy loss vector ^t, which it passes to the instance of CONTEXT-FTPL, before proceeding to the next round.
+To describe the construction of ^t, let pt() = Pr[t = |Ht-1] denote the probability that CONTEXT-FTPL returns policy  at time-step t conditioned on the past history (observed losses and contexts, chosen actions, current iteration's context, internal randomness etc., which we denote with Ht-1). For any element j  [K], let:
+
+qt(j) =
+
+pt()
+
+:j(xt)
+
+(7)
+
+denote the probability that element j is included in the action chosen by CONTEXT-FTPL(X, ) at time-step t.
+Typical semi-bandit algorithms aim to construct proxy loss vectors by dividing the observed coordinates of the loss by the probabilities qt(j) and setting other coordinates to zero, which is the well-known inverse propensity scoring mechanism (Horvitz & Thompson, 1952). Unfortunately, in our case, the probabilities qt(j) stem from randomness fed into the oracle, so that they are implicit maintained and therefore must be approximated.
+We therefore construct ^t through a geometric sampling scheme due to Neu & Barto´k (2013). For each j  t(xt), we repeatedly invoke the current execution of the CONTEXT-FTPL algorithm with fresh noise, until it returns a policy that includes j in its action for context xt. The process is repeated at most L times for each j  t(xt) and the number of invocations is denoted Jt(j). The vector ^t that is returned to the full feedback algorithm is zero for all j / t(xt), and for each j  t(xt) it is ^t(j) = J t(j) · t(j).
+By Lemma 1 of Neu & Barto´k (2013), this process yields a proxy loss vector ^t that satisfies,
+
+E ^t(j) | Ht-1 = 1 - 1 - qt(j) L t(j). (8)
+
+The semi-bandit algorithm feeds this proxy loss vector to the CONTEXT-FTPL instance and proceeds to the next round.
+The formal description of the complete bandit algorithm is given in Algorithm 3 and we refer to it as CONTEXT-SEMI-BANDIT-FTPL(X, , L). We bound its regret in the transductive and small separator setting.
+
+Semi-bandit algorithm. Our semi-bandit algorithm pro-
+ceeds as follows: At each iteration it makes a call to CONTEXT-FTPL(), which returns a policy t and implies a chosen action at = t(xt). The algorithm plays the action at, observes the coordinates of the loss {t(j)}jat
+
+Theorem 3. The expected regret of CONTEXT-SEMI-BANDIT-FTPL(X, , L) in the semibandit setting against any adaptively and adversarially
+chosen sequence of contexts and linear non-negative losses, with t   1, is at most:
+
+Efficient Algorithms for Adversarial Contextual Learning
+
+Algorithm 3 Contextual Semi-Bandit Algorithm -
+CONTEXT-SEMI-BANDIT-FTPL(X, , L).
+Input: parameter , M , set of contexts X, policies . Let D denote a distribution over a sequence of d samples, {z} = (z1, . . . , zd), where the context associated with sample zx is equal to x and each coordinate of the loss vector x is drawn i.i.d. from a Laplace() for each time-step t do
+Draw a sequence {z}t from distribution D.
+Pick and play according to policy
+
+t = M ({z}  (x1:t-1, ^1:t-1))
+
+(9)
+
+Observe loss t(j) for each j  t(xt) Set ^t(j) = 0 for any j / t(xt) Set ^t(j) = Jt(j) · t(j), for each j  t(xt), where Jt(j) is computed by the following geometric sam-
+pling process: for each element j  t(xt) do
+for each iteration i = 1, . . . , L do Draw a sequence {y}i from distribution D. Compute i = M ({y}i  (x1:t-1, ^1:t-1)) If j  i(xt) then stop and return Jt(j) = i
+end for
+end for If process finished without setting Jt(j), then set J t(j) = L
+end for
+
+· In the transductive setting:
+
+REGRET
+
+
+
+2mK T
+
++
+
+10 
+
+ dm
+
+log(N
+
+)
+
++
+
+KT eL
+
+· In the small separator setting:
+
+REGRET
+
+
+
+8K 2dLmT
+
++
+
+10 
+
+ dm
+
+log(N )+
+
+KT eL
+
+ For L = KT and optimal , the regret is O d1/4m3/4 KT log(N ) in the first setting.
+For L = T 1/3 and optimal , the regret is O (md)3/4KT 2/3 log(N ) in the second setting.
+Moreover, each iteration of the algorithm requires mL oracle calls and otherwise runs in polynomial time in d, K.
+
+This is our main result for adversarial variants of the con-
+textual bandit problem. In the most well-studied setting, i.e. contextual bandits, we have m = 1, so our regret bound is O(d1/4 KT log(N )) in the transductive setting and O(d3/4KT 2/3 log(N )) in the small separator setting. Since for the transductive case d  T and for the
+
+small-separator case d can be independent of T (see discussion above), this implies sublinear regret for adversarial contextual bandits in either setting. To our knowledge this is the first oracle-efficient sublinear regret algorithm for variants of the contextual bandit problem. However, as we mentioned before, neither regret bound matches the optimal O( KT log(N )) rate for this problem, which can be achieved by computationally intractable algorithms. An interesting open question is to develop computationally efficient, statistically optimal contextual bandit algorithms.
+5. Switching Policy Regret
+In this section we analyze switching regret for the contextual linear optimization setting, i.e. when competing with the best sequence of policies that switches at most k times. Such a notion of regret was first analyzed by Herbster & Warmuth (1998) and several algorithms, that are not computationally efficient for large policy spaces, have been designed since then (e.g. (Luo & Schapire, 2015)). Our results provide the first computationally efficient switching regret algorithms assuming offline oracle access. Note that (Gyo¨rgy et al., 2012) study a similar setting but assume access to an online oracle that can achieve low regret against the best fixed policy. The offline oracle we consider is significantly weaker.
+For this setting we will assume that the learner knows the exact sequence x1:T of contexts ahead of time and not only the set of potential contexts. The extension stems from the realization that we can simply think of time t as part of the context at time-step t. Thus now the contexts are of the form x~t = (t, xt). Moreover, policies in the augmented context space are now of the form: ~(x~t) = I(t)(xt), where I(t) is a selector which maps a time-step t to a policy index in [N ], with the constraint that the number of timesteps such that I(t) = I(t - 1) is at most k. If the original policy space  was of size N , the new policy space, denoted ~ , is of size N~ at most T kN k, since there are at most T k partitions of time into k consequetive intervals and each of the k intervals can be occupied by N possible policies. Moreover, in this augmented context space, the number of possible contexts, denoted X~ is equal to d~ = T .
+Thus if we run CONTEXT-FTPL(X, ) on this augmented context and policy space, Theorem 2, bounds the regret against all policies in the augmented policy space ~ . Since, regret against the augmented policy space, corresponds to switching regret against the original set of policies, the following corollary is immediate:
+Corollary 4 (Contextual Switching Regret). In the transductive complete information setting, CONTEXT-FTPL(X~ , ) applied to the augmented policy space ~ , achieves k-switching regret against any adaptively and adversarially chosen sequence of contexts and
+
+Efficient Algorithms for Adversarial Contextual Learning
+
+losses at most: O m1/4 Kk log(T N )T 3/4 for general
+loss functions in [0, 1] and O k log(T N )m5/4T 3/4 for linear losses with loss vectors in [0, 1]K.
+
+It remains to show is that we can efficiently solve the offline optimization problem for the new policy space ~ , if we have access to an optimization oracle for the original policy space . Then we can claim that CONTEXT-FTPL(X~ , ) in the augmented context and policy space is also an efficient algorithm. We show that the latter is true via a dynamic programming approach. The approach generalizes beyond contextual linear optimization settings. The proof of the Lemma is provided in the supplementary material.
+Lemma 5. The oracle M~ in the augmented space,
+
+M~ (y~1:T ) = argmin~~
+
+T  =1
+
+~(, x ), 
+
+(10)
+
+is computable in O(T k) time, with O(T 2) calls to the ora-
+cle over the original space, M . This process can be amor-
+tized so that solving a sequence of T problems in the augmented space requires O(T 2) calls to M in total.
+
+6. Efficient Path Length Regret Bounds
+
+In this section we examine a variant of our CONTEXT-FTPL() algorithm that is efficient and achieves regret that is upper bounded by structural properties of the loss sequence. Our algorithm is framed in terms of a generic predictor that the learner has access to and the regret is upper bounded by the deviation of the true loss vector from the predictor. For specific instances of the predictor this leads to path length bounds (Chiang et al., 2012) or variance based bounds (Hazan & Kale, 2010). Our approach allows for generalizations of variance and path length that can incorporate contextual information and can be viewed as an efficient version and a generalization of the results of Rakhlin & Sridharan (2013b) on learning with predictable sequences. Such results have also found applications in learning in game theoretic environments (Rakhlin & Sridharan, 2013a; Syrgkanis et al., 2015).
+The algorithm is identical to CONTEXT-FTPL() with the exception that now the policy that is used at time-step t is:
+
+t = M ({z}  y1:t-1  (xt, Qt))
+
+(11)
+
+where Qt  {0, 1}K  RK is an arbitrary loss function predictor, which can depend on the observed history up to time t. This predictor can be interpreted as partial side information that the learner has about the loss function that will arrive at time-step t. Given such a predictor we define the error between the predictor and the actual sequence:
+
+Et = E
+
+f t - Qt
+
+2 
+
+(12)
+
+Theorem 6 (Predictor based regret bounds). The regret of CONTEXT-FTPL(X, ) with predictors and complete information,
+
+1. In the transductive setting is upper bounded by:
+
+REGRET  4K
+
+T
+
+
+
+Et + 10
+
+dm log(N ) 
+
+t=1
+
+2. In the small separator setting is upper bounded by:
+
+REGRET  4Kd
+
+T
+
+
+
+Et + 10
+
+dm log(N ) 
+
+t=1
+
+Picking  optimally gives regret
+
+O (dm)1/4
+
+K log(N )
+
+T t=1
+
+E
+
+t
+
+in the first set-
+
+ting and O m1/4d3/4
+
+K log(N )
+
+T t=1
+
+E
+
+t
+
+second.
+
+in the
+
+Even without contexts, our result is the first efficient path length regret algorithm for online combinatorial optimization. For instance, for the case of non-contextual, online combinatorial optimization an instantiation of our al-
+
+gorithm achieves regret O m1/4
+
+K log(K)
+
+T t=1
+
+E
+
+t
+
+against adaptive adversaries. For learning with expert advice, m = 1 and K is number of experts, the results of Rakhlin & Sridharan (2013b) provide a non-efficient
+
+O
+
+log(K )
+
+T t=1
+
+E
+
+t
+
+. Thus our bound incurs an extra
+
+
+
+cost of K in comparison. Removing this extra factor of
+
+K in an efficient manner is an interesting open question.
+
+7. Discussion
+In this work we give fully oracle efficient algorithms for adversarial online learning problems including contextual experts, contextual bandits, and problems involving linear optimization or switching experts. Our main algorithmic contribution is a new Follow-The-Perturbed-Leader style algorithm that adds perturbed low-dimensional statistics. Our analysis for this algorithm guarantees sublinear regret against adaptive adversaries for all of these problems.
+While our algorithms achieve sublinear regret in all problems we consider, we do not always attain the optimal regret bounds. An interesting direction for future work is whether fully oracle-based algorithms can achieve optimal regret bounds in the settings we consider. Another interesting direction focuses on a deeper understanding of the small-separator condition and whether it enables efficient non-transductive learning in other settings. We look forward to studying these questions in future work.
+
+Efficient Algorithms for Adversarial Contextual Learning
+
+Acknowledgements
+We thank Jacob Abernethy and Alekh Agarwal for insightful formative discussions and Gergely Neu for providing detailed feedback on an early draft of this paper.
+References
+Agarwal, Alekh, Hsu, Daniel, Kale, Satyen, Langford, John, Li, Lihong, and Schapire, Robert E. Taming the monster: A fast and simple algorithm for contextual bandits. In International Conference on Machine Learning (ICML), 2014.
+Auer, Peter, Cesa-Bianchi, Nicolo, Freund, Yoav, and Schapire, Robert E. Gambling in a rigged casino: The adversarial multi-armed bandit pproblem. In Foundations of Computer Science (FOCS), 1995.
+Awerbuch, Baruch and Kleinberg, Robert. Online linear optimization and adaptive routing. Journal of Computer and System Sciences, 2008.
+Ben-David, Shai, Cesa-Bianchi, Nicolo, Haussler, David, and Long, Philip M. Characterizations of learnability for classes of (0,..., n)-valued functions. Journal of Computer and System Sciences, 1995.
+Ben-David, Shai, Kushilevitz, Eyal, and Mansour, Yishay. Online learning versus offline learning. Machine Learning, 1997.
+Ben-David, Shai, Pa´l, Da´vid, and Shalev-Shwartz, Shai. Agnostic online learning. In COLT, 2009.
+Cesa-Bianchi, Nicolo and Shamir, Ohad. Efficient online learning via randomized rounding. In Advances in Neural Information Processing Systems (NIPS), 2011.
+Cesa-Bianchi, Nicolo, Freund, Yoav, Haussler, David, Helmbold, David P, Schapire, Robert E, and Warmuth, Manfred K. How to use expert advice. Journal of the ACM (JACM), 1997.
+Chiang, Chao-Kai, Yang, Tianbao, Lee, Chia-Jung, Mahdavi, Mehrdad, Lu, Chi-Jen, Jin, Rong, and Zhu, Shenghuo. Online optimization with gradual variations. In Conference on Learning Theory (COLT), 2012.
+Daskalakis, Constantinos and Syrgkanis, Vasilis. Learning in auctions: Regret is hard, envy is easy. arXiv:1511.01411, 2015.
+Dud´ik, Miroslav, Hsu, Daniel, Kale, Satyen, Karampatziakis, Nikos, Langford, John, Reyzin, Lev, and Zhang, Tong. Efficient optimal learning for contextual bandits. In Uncertainty and Artificial Intelligence (UAI), 2011.
+
+Freund, Yoav and Schapire, Robert E. A decision-theoretic generalization of on-line learning and an application to boosting. Journal of Computer and System Sciences, 1997.
+Gyo¨rgy, Andra´s, Linder, Tama´s, and Lugosi, Ga´bor. Efficient tracking of large classes of experts. IEEE Transactions on Information Theory, 2012.
+Haussler, David and Long, Philip M. A generalization of sauer's lemma. Journal of Combinatorial Theory, 1995.
+Hazan, Elad and Kale, Satyen. Extracting certainty from uncertainty: regret bounded by variation in costs. Machine Learning, 2010.
+Hazan, Elad and Kale, Satyen. Online submodular minimization. Journal of Machine Learning Research (JMLR), 2012.
+Herbster, Mark and Warmuth, Manfred K. Tracking the best expert. Machine Learning, 1998.
+Horvitz, Daniel G and Thompson, Donovan J. A generalization of sampling without replacement from a finite universe. Journal of the American Statistical Association (JASA), 1952.
+Hutter, Marcus and Poland, Jan. Adaptive online prediction by following the perturbed leader. Journal of Machine Learning Research (JMLR), 2005.
+Jegelka, Stefanie and Bilmes, Jeff A. Online submodular minimization for combinatorial structures. In International Conference on Machine Learning (ICML), 2011.
+Kakade, Sham M and Kalai, Adam. From batch to transductive online learning. In Advances in Neural Information Processing Systems (NIPS), 2005.
+Kalai, Adam and Vempala, Santosh. Efficient algorithms for online decision problems. Journal of Computer and System Sciences, 2005.
+Langford, John and Zhang, Tong. The epoch-greedy algorithm for multi-armed bandits with side information. In Advances in Neural Information Processing Systems (NIPS), 2008.
+Luo, Haipeng and Schapire, Robert E. Achieving all with no parameters: Adanormalhedge. In Conference on Learning Theory (COLT), 2015.
+Neu, Gergely and Barto´k, Ga´bor. An efficient algorithm for learning with semi-bandit feedback. In Algorithmic Learning Theory (ALT), 2013.
+
+Efficient Algorithms for Adversarial Contextual Learning
+Rakhlin, Alexander and Sridharan, Karthik. Optimization, learning, and games with predictable sequences. In Advances in Neural Information Processing Systems (NIPS), 2013a.
+Rakhlin, Alexander and Sridharan, Karthik. Online learning with predictable sequences. In Conference on Learning Theorem (COLT), 2013b.
+Rakhlin, Alexander and Sridharan, Karthik. BISTRO: an efficient relaxation-based method for contextual bandits. In International Conference on Machine Learning (ICML), 2016.
+Syrgkanis, Vasilis, Agarwal, Alekh, Luo, Haipeng, and Schapire, Robert E. Fast convergence of regularized learning in games. In Advances in Neural Information Processing Systems (NIPS), 2015.
+
+

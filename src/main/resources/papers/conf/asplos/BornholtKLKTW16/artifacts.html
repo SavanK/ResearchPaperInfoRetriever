@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Find Artifacts - conf/asplos/BornholtKLKTW16</title>
+<style type="text/css">
+body {
+	font: normal 11pt Arial, Helvetica, sans-serif;
+}
+
+body.author {
+	background-color: BurlyWood;
+}
+
+body.funding {
+	background-color: LightGreen;
+}
+
+body.artifacts {
+	background-color: orange;
+}
+
+button.matchBootstrap {
+	margin-bottom: 10px;
+	margin-right: 5px;
+	white-space: nowrap;
+}
+
+h1 {
+	text-align: center;
+	margin: 5px;
+}
+
+h2 {
+	text-align: left;
+	margin: 5px;
+}
+
+input[type="radio"].matchBootstrap,
+input[type="checkbox"].matchBootstrap {
+	margin-right: 5px;
+}
+
+input[type="radio"].matchBootstrap,
+input[type="checkbox"].matchBootstrap {
+	margin-bottom: 14px;
+}
+
+input[type="radio"].matchSelect {
+	margin-bottom: 7px;
+}
+
+input[type="radio"].matchText {
+	vertical-align: top;
+}
+
+span.author {
+	font-weight: bold;
+	background-color: yellow;
+}
+
+table {
+	border: none;
+	padding: 0;
+}
+
+table td {
+	vertical-align: top;
+	padding: 0;
+}
+
+table td.info {
+	width: 600px;
+}
+
+table td.diacritics {
+	width: 120px;
+	float: right;
+	text-align: right;
+}
+
+table td.diacriticsBootstrap {
+	width: 140px;
+	float: right;
+	text-align: right;
+}
+
+table td.diacritics button,
+table td.diacriticsBootstrap button {
+	white-space: nowrap;
+}
+
+table td.rowlabel {
+	text-align: right;
+	font-weight: bold;
+	padding-right: 5px;
+}
+
+table.info {
+	width: 600px;
+	padding: 0;
+	margin: 0;
+	border: none;
+}
+
+table.info td {
+	padding: 0;
+}
+
+table.info td.rowlabel input {
+	font-weight: normal;
+}
+
+table.info .bootstrap-select.wide {
+	width: 100% !important;
+}
+
+td.matchBootstrap {
+	padding-top: 6px;
+}
+
+textarea {
+	width: 32em;
+}
+
+.bootstrap-select>.dropdown-toggle {
+	margin-bottom: 5px;
+}
+
+.floater {
+	float: left;
+	padding-right: 20px;
+}
+
+
+.message {
+	color: red;
+}
+
+.pdf {
+	display: none; /* We decided not to server the PDF at all */
+	top: 0px;
+	right: 0px;
+	position: fixed;
+	width: 650px;
+	height: 660px;
+	border: 2px solid black
+}
+
+.pdf object {
+	width: 650px;
+	height: 660px;
+}
+
+.wide {
+	width: 100%;
+}
+
+#keyDest {
+	display: none;
+}
+
+#keySrc {
+	text-decoration: underline;
+	cursor: copy;
+}
+
+.academic {
+}
+
+.nonacademic {
+	color: red;
+}
+</style>
+
+		<script type="text/javascript">
+			function addArtifacts(input) {
+				var id = "artifactsTxt";
+				var element = document.getElementById(id);
+				var sep = element.value != "" ? "\n" : "";
+				
+				element.value += sep + input;
+				return false;
+			}
+		
+			function validateForm(form) {
+				{
+					var panic = document.getElementById("panic").checked;
+					var reason = form["reason"].value;
+					
+					if (panic) {
+						if (reason == "") {
+							alert("You may not panic without entering a reason for doing so.");
+							return false;
+						}
+						else
+							return confirm("In a panic situation, only the reason for the panic is recorded; other information is ignored.  " +
+									"The task will be removed from the queue so that you might possibly continued with other tasks.  " +
+									"Proceed with the panic?");
+					}
+					else
+						if (reason != "") {
+							alert("You must panic if there is reason to do so.  Either check the box or remove the reason.");
+							return false;
+						}
+				}
+				
+				{
+					var artifacts = form["artifacts"].value;
+					var lines = artifacts.split("\n");
+					
+					for (var i = 0; i < lines.length; i++) {
+						var line = lines[i].trim();
+						
+						if (line.length == 0)
+							continue;
+						if (line.indexOf(' ') > 0)
+							if (alert("The artifact \"" + line + "\" contains a space which cannot be part of a URL."))
+								return false;
+						if (",.)-".indexOf(line.charAt(line.length - 1)) >= 0)
+							if (!confirm("The artifact \"" + line + "\" ends in a suspicious punctuation mark.  " +
+									"Are you certain that's correct?"))
+								return false;
+						if (!(line.startsWith("http://") ||
+								line.startsWith("https://") ||
+								line.startsWith("ftp://")))
+							if (!confirm("The artifact \"" + line + "\" does not begin with http://, https://, or ftp://.  " +
+									"A reasonable protocol is highly recommended.  Are you certain that's correct?"))
+								return false;
+					}
+				}
+
+				{
+					var artifacts = form["artifacts"].value;
+					
+					if (artifacts == "" && !confirm("No artifacts are specified.  Are you sure?"))
+						return false;
+				}
+				return true;
+			}
+			
+			function isValid(form) {
+				var panic = document.getElementById("panic").checked;
+				var reason = form["reason"].value;
+				
+				if (panic && reason == "")
+					return false;
+				if (!panic && reason != "")
+					return false;
+				return true;
+			}
+			
+			function updateSubmit() {
+				var form = document.forms["form"];
+				var valid = isValid(form);
+				
+				document.getElementById("submit").disabled = !valid;
+			}
+			
+			function onPanicChanged(panic) {
+				updateSubmit();
+			}
+			
+			function onReasonChanged(reason) {
+				updateSubmit();
+			}
+			
+			function onNonacademicChanged(nonacademic) {
+			}
+
+			function onBadgeChanged(badge) {
+			}
+
+			function copyKey(keySrc) {
+				var text = keySrc.innerText;
+				var keyDest = document.getElementById("keyDest");
+				
+				keyDest.style.display = "inherit";
+				keyDest.value = text;
+				keyDest.select();
+				
+				try {
+					var successful = document.execCommand("copy");
+					
+					if (!successful)
+						console.log("Copying text command failed.");
+				}
+				catch (err) {
+					console.log("Oops, unable to copy");
+				}
+				keyDest.style.display = "none";
+			}
+		</script>
+	</head>
+	<body class="artifacts">
+		<h1>Find Artifacts</h1>
+		<!--div class="pdf">
+			<object data="paper.pdf" type="application/pdf">
+				alt : <a href="paper.pdf">paper.pdf</a>
+			</object>
+			<br>
+		</div-->
+		<div class="floater">
+			<h2>Form</h2>
+			<form name="form" method="post" onsubmit="return validateForm(this);">
+				<input type="hidden" name="key" value="conf/asplos/BornholtKLKTW16">
+				<input type="hidden" name="type" value="artifacts">
+				<input type="hidden" name="queue" value="${queue?html}">
+				<input type="hidden" name="receipt" value="${receipt?html}">
+				<table>
+					<!--<#if message != "">-->
+						<tr>
+							<td class="message rowlabel">Message:</td>
+							<td class="message info">${message}</td>
+						</tr>
+					<!--</#if>-->
+					<tr>
+						<td class="rowlabel">Title:</td>
+						<td class="info">
+							Specifying and Checking File System Crash-Consistency Models.
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">URL:</td>
+						<td class="info">
+							<a href="http://doi.acm.org/10.1145/2872362.2872406" target="_blank">http://doi.acm.org/10.1145/2872362.2872406</a>
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Key:</td>
+						<td class="info">
+							conf/asplos/<span id="keySrc" onclick="return copyKey(this);">BornholtKLKTW16</span>
+							<input id="keyDest" type="text">
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Panic:</td>
+						<td>
+							<table class="info">
+								<tr>
+									<td><input type="checkbox" id="panic" name="panic" onchange="onPanicChanged(this);"></td>
+									<td class="wide"><input class="wide" type="text" name="reason" maxlength="63" oninput="onReasonChanged(this);" placeholder="Reason for panic"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Problem:</td>
+						<td>
+							<table class="info">
+								<tr>
+									<td><input class="wide" type="text" name="problem" maxlength="63" size="63" placeholder="Description of the problematic situation"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Nonacademic:</td>
+						<td class="academic">
+							<input type="checkbox" id="nonacademic" name="nonacademic" onchange="onNonacademicChanged(this);">
+							No research could have been involved (such as in a workshop invitation or report).
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Badge:</td>
+						<td>
+							<input type="checkbox" id="badge" name="badge" onchange="onBadgeChanged(this);">
+							This article boasts some kind of seal of approval from an artifact evaluation committee.
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Artifacts:</td>
+						<td>
+							<table class="info">
+								<tr>
+									<td><textarea class="wide" name="artifacts" id="artifactsTxt" maxlength="1023" rows="4" placeholder="Artifact URLs copied from the article or added with the buttons or blank"></textarea></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('http://dx.doi.org/10.1145/2872362.2872406');">Add</button></td>
+					
+						<td class="info">2016 ACM 978-1-4503-4091-5/16/04. . . $15.00 DOI: <a href="http://dx.doi.org/10.1145/2872362.2872406" target="_blank">http://dx.doi.org/10.1145/2872362.2872406</a>
+
+/* "file" has old data */ fd = open("file.tmp", </td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('http://sandcat.cs.washington.edu/ferrite');">Add</button></td>
+					
+						<td class="info">f FERRITE's source code is publicly available at: <a href="http://sandcat.cs.washington.edu/ferrite" target="_blank">http://sandcat.cs.washington.edu/ferrite</a>.
+Acknowledgments
+We thank Zach Tatlock, our sheph</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('http://austingroupbugs');">Add</button></td>
+					
+						<td class="info">to synchronize filename operations on disk, 2013. <a href="http://austingroupbugs" target="_blank">http://austingroupbugs</a>. net/view.php?id=672.
+[7] F. Bellard. QEMU, a fas</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://code.google.com/p/chromium/');">Add</button></td>
+					
+						<td class="info"> ext4: Filesystem corruption on panic, June 2015. <a href="https://code.google.com/p/chromium/" target="_blank">https://code.google.com/p/chromium/</a> issues/detail?id=502898.
+[11] J. Bonwick. ZFS: Th</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://blogs.oracle.com/bonwick/entry/zfs_');">Add</button></td>
+					
+						<td class="info">ck. ZFS: The last word in filesystems, Oct. 2005. <a href="https://blogs.oracle.com/bonwick/entry/zfs_" target="_blank">https://blogs.oracle.com/bonwick/entry/zfs_</a> the_last_word_in.
+[12] G. Boudol and G. Petri. Re</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://btrfs.wiki.kernel.org/index.php/FAQ');">Add</button></td>
+					
+						<td class="info"> are the crash guarantees of overwrite-by-rename? <a href="https://btrfs.wiki.kernel.org/index.php/FAQ" target="_blank">https://btrfs.wiki.kernel.org/index.php/FAQ</a>.
+[14] H. Chen, D. Ziegler, T. Chajed, A. Chlipala</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('http://lwn.net/');">Add</button></td>
+					
+						<td class="info">3.
+[19] J. Corbet. ext4 and data loss, Mar. 2009. <a href="http://lwn.net/" target="_blank">http://lwn.net/</a> Articles/322823/.
+[20] J. Corbet. That massive fi</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('http://racket-lang');">Add</button></td>
+					
+						<td class="info">nical Report PLTTR-2010-1, PLT Design Inc., 2010. <a href="http://racket-lang" target="_blank">http://racket-lang</a>. org/.
+[24] C. Frost, M. Mammarella, E. Kohler, A</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://bugzilla.kernel.org/show_');">Add</button></td>
+					
+						<td class="info">o-length files and performance degradation, 2010. <a href="https://bugzilla.kernel.org/show_" target="_blank">https://bugzilla.kernel.org/show_</a> bug.cgi?id=15910.
+[42] Linux kernel. Ext4 filesys</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://www.kernel');">Add</button></td>
+					
+						<td class="info">=15910.
+[42] Linux kernel. Ext4 filesystem, 2015. <a href="https://www.kernel" target="_blank">https://www.kernel</a>. org/doc/Documentation/filesystems/ext4.txt.
+[43]</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://blogs.gnome.org/desrt/2010/12/');">Add</button></td>
+					
+						<td class="info">on dconf performance, btrfs and fsync, Dec. 2010. <a href="https://blogs.gnome.org/desrt/2010/12/" target="_blank">https://blogs.gnome.org/desrt/2010/12/</a> 19/more-on-dconf-performance-btrfs-and-fsync/.
+[4</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://msdn.microsoft.com/en-us/library/');">Add</button></td>
+					
+						<td class="info">. Alternatives to using Transactional NTFS, 2015. <a href="https://msdn.microsoft.com/en-us/library/" target="_blank">https://msdn.microsoft.com/en-us/library/</a> windows/desktop/bb968806(v=vs.85).aspx.
+[53] C. M</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://bugzilla.mozilla.org/show_bug');">Add</button></td>
+					
+						<td class="info">82 - Firefox 3 uses fsync excessively, 2008­2015. <a href="https://bugzilla.mozilla.org/show_bug" target="_blank">https://bugzilla.mozilla.org/show_bug</a>. cgi?id=421482.
+[56] S. Neumann. Re: fsync in gli</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://mail.gnome.org/archives/gtk-devel-list/');">Add</button></td>
+					
+						<td class="info">56] S. Neumann. Re: fsync in glib/gio, Mar. 2009. <a href="https://mail.gnome.org/archives/gtk-devel-list/" target="_blank">https://mail.gnome.org/archives/gtk-devel-list/</a> 2009-March/msg00098.html.
+[57] E. B. Nightingale,</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('http://pubs');">Add</button></td>
+					
+						<td class="info">. The Single UNIX Specification, Version 2, 1997. <a href="http://pubs" target="_blank">http://pubs</a>. opengroup.org/onlinepubs/7908799/xsh/fsync.html.</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://www');">Add</button></td>
+					
+						<td class="info">2009.
+[77] SQLite. Atomic commit in SQLite, 2013. <a href="https://www" target="_blank">https://www</a>. sqlite.org/atomiccommit.html.
+[78] A. Sweeney, D</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('http://goo.gl/Ssbj8T');">Add</button></td>
+					
+						<td class="info">virtual bounty to fix mystery Mac bug, Nov. 2013. <a href="http://goo.gl/Ssbj8T" target="_blank">http://goo.gl/Ssbj8T</a>.
+[84] Ubuntu. Bug #317781: Ext4 data loss, Jan. 2</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('https://bugs.launchpad.net/ubuntu/+source/linux/');">Add</button></td>
+					
+						<td class="info">] Ubuntu. Bug #317781: Ext4 data loss, Jan. 2009. <a href="https://bugs.launchpad.net/ubuntu/+source/linux/" target="_blank">https://bugs.launchpad.net/ubuntu/+source/linux/</a> +bug/317781.
+[85] R. Verma, A. A. Mendez, S. Park</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><button onclick="return addArtifacts('http://isabelle.in.tum.de/library/HOL/');">Add</button></td>
+					
+						<td class="info"> aspects of Unix file-system security, Aug. 2014. <a href="http://isabelle.in.tum.de/library/HOL/" target="_blank">http://isabelle.in.tum.de/library/HOL/</a> HOL-Unix/Unix.html.
+[87] C. P. Wright, R. Spillan</td>
+					</tr>
+					<tr><td>&nbsp;</td><td></td></tr>
+					<tr>
+						<td class="rowlabel"><input type="submit" value="Submit" id="submit"></td>
+						<td>&nbsp;</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div class="floater">
+			<h2>Instructions</h2>
+			<ul>
+				<li>Verify by title that you are displaying the correct PDF.</li>
+				<li>If necessary, use the key to find the correct file.</li>
+				<li style="color: red;">
+					Check the article's title (and possibly content) for indication that it
+					deals only with a workshop, for example, and isn't academic research.
+					Tick the nonacademic box in this case.  If the box is already ticked,
+					verify the computer's guess.
+				</li>
+				<li style="color: red;">
+					Check the top right hand corner for a badge and keep an eye
+					out for possible badges elsewhere.  Tick the badge box if found.
+				</li>
+				<li>Look at the end of the paper, footnotes, and acknowledgements for URLs.</li>
+				<li>If need be, query the entire paper for general search terms or specific websites.</li>
+				<li>Paste the URL, along with desription/source if provided.</li>
+			</ul>
+			<div class="floater">
+				<h3>General Search Terms</h3>
+				<ul>
+					<li>artifact<br><br></li>
+
+					<li>code</li>
+					<li>code can be found at</li>
+					<li>source code<br><br></li>
+
+					<li>availability</li>
+					<li>is available</li>
+					<li>made available<br><br></li>
+
+					<li>github</li>
+					<li>bitbucket</li>
+					<li>codeplex</li>
+					<li>git<br><br></li>
+
+					<li>code repository</li>
+					<li>repo<br><br></li>
+
+					<li>download</li>
+					<li>download from<br><br></li>
+
+					<li>our website</li>
+					<li>please visit</li>
+					<li>please see<br><br></li>
+
+					<li>will be released</li>
+				</ul>
+			</div>
+			<div class="floater">
+				<h3>Specific Websites and Address Formats</h3>
+				<ul>
+					<li><a href="https://github.com">github.com</a></li>
+					<li><a href="http://bitbucket.org">bitbucket.org</a></li>
+					<li><a href="https://code.google.com/archive">code.google.com</a></li>
+					<li><a href="http://www.codeplex.com">codeplex.com</a></li>
+					<li><a href="https://sourceforge.net">sourceforge.net</a><br><br></li>
+
+					<li>http: or https:</li>
+					<li>ftp: or ftps:</li>
+					<li>mailto:</li>
+				</ul>
+			</div>
+		</div>
+	</body>
+</html>

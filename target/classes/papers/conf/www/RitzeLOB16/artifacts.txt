@@ -1,0 +1,8 @@
+http://dx.doi.org/10.1145/2872427.2883017
+http://webdatacommons.org/webtables/
+http://commoncrawl.org/
+http://wiki.dbpedia.org/data-set-2014
+http://dws.informatik.uni-mannheim.de/en/research/
+http://webdatacommons.org/webtables/goldstandard
+http://webdatacommons.org/
+http://nlp.cs.rpi.edu/paper/sf2014overview.pdf

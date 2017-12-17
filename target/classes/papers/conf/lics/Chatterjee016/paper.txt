@@ -1,0 +1,2267 @@
+Perfect-Information Stochastic Games with Generalized Mean-Payoff Objectives ∗
+
+Krishnendu Chatterjee
+IST Austria krish.chat@ist.ac.at
+
+Laurent Doyen
+LSV, ENS Cachan & CNRS, France doyen@lsv.fr
+
+Abstract
+Graph games provide the foundation for modeling and synthesizing reactive processes. In the synthesis of stochastic reactive processes, the traditional model is perfect-information stochastic games, where some transitions of the game graph are controlled by two adversarial players, and the other transitions are executed probabilistically. We consider such games where the objective is the conjunction of several quantitative objectives (speciﬁed as meanpayoff conditions), which we refer to as generalized mean-payoff objectives. The basic decision problem asks for the existence of a ﬁnite-memory strategy for a player that ensures the generalized mean-payoff objective be satisﬁed with a desired probability against all strategies of the opponent. A special case of the decision problem is the almost-sure problem where the desired probability is 1. Previous results presented a semi-decision procedure for ε-approximations of the almost-sure problem. In this work, we show that both the almost-sure problem as well as the general basic decision problem are coNP-complete, signiﬁcantly improving the previous results. Moreover, we show that in the case of 1-player stochastic games, randomized memoryless strategies are sufﬁcient and the problem can be solved in polynomial time. In contrast, in two-player stochastic games, we show that even with randomized strategies exponential memory is required in general, and present a matching exponential upper bound. We also study the basic decision problem with inﬁnite-memory strategies and present computational complexity results for the problem. Our results are relevant in the synthesis of stochastic reactive systems with multiple quantitative requirements.
+Categories and Subject Descriptors F.2.2 [Computations on Discrete Structures]
+General Terms Veriﬁcation, Algorithms
+Keywords Stochastic games, Markov decision processes, Meanpayoff.
+∗ This research was partially supported by Austrian Science Fund (FWF) NFN Grant No S11407-N23 (RiSE/SHiNE), ERC Start grant (279307: Graph Games), Vienna Science and Technology Fund (WWTF) through project ICT15-003, and European project Cassting (FP7-601148).
+Publication rights licensed to ACM. ACM acknowledges that this contribution was authored or co-authored by an employee, contractor or afﬁliate of a national government. As such, the Government retains a nonexclusive, royalty-free right to publish or reproduce this article, or to allow others to do so, for Government purposes only.
+LICS’16, July 05 - 08, 2016, New York, NY, USA
+Copyright is held by the owner/author(s). Publication rights licensed to ACM.
+ACM 978-1-4503-4391-6/16/07. . . $15.00
+DOI: http://dx.doi.org/10.1145/2933575.2934513
+
+1. Introduction
+
+Reactive systems are non-terminating processes that interact continually with a changing environment. Since such systems are nonterminating, their behavior is described by inﬁnite sequences of events. The classical framework to model reactive systems with controllable and uncontrollable events are games on graphs. In the presence of uncertainties, we have stochastic reactive systems with probability distributions over state changes. The performance requirement on such systems, such as power consumption or latency, can be represented by rewards (or costs) associated to the events of the system, and a quantitative objective that aggregates the rewards of an execution to a single value. In several modeling domains, however, there is not a single objective to be optimized, but multiple, potentially dependent and conﬂicting goals. For example, in the design of an embedded system, the goal may be to maximize average performance while minimizing average power consumption. Similarly, in an inventory management system, the goal would be to optimize the costs associated to maintaining each kind of product [1, 31]. Thus it is relevant to study stochastic games with multiple quantitative objectives.
+
+Perfect-information stochastic games. A perfect-information
+
+stochastic graph game [26], also known as turn-based stochastic
+
+game
+
+or
+
+2
+
+1 2
+
+-player
+
+graph
+
+game,
+
+consists
+
+of
+
+a
+
+ﬁnite
+
+directed
+
+graph
+
+with three kinds of states (or vertices): player-Max, player-Min,
+
+and probabilistic states. The game starts at an initial state, and
+
+is played as follows: at player-Max states, player Max chooses a
+
+successor state; at player-Min states, player Min (the adversary of
+
+player Max) does likewise; and at probabilistic states, a successor
+
+state is chosen according to a ﬁxed probability distribution. Thus
+
+the result of playing the game forever is an inﬁnite path through the
+
+graph. If there are no probabilistic states, we refer to the game as
+
+a 2-player graph game; if there are no player-Min states, we refer
+
+to
+
+the
+
+(1
+
+1 2
+
+-player)
+
+game
+
+as
+
+a
+
+Markov
+
+decision
+
+process
+
+(MDP);
+
+if
+
+there are no probabilistic states and no player-Min states, then the
+
+(1-player) game is a standard graph.
+
+The class of 2-player graph games has been used for a long
+
+time to synthesize non-stochastic reactive systems [10, 42, 45]:
+
+a reactive system and its environment represent the two play-
+
+ers, whose states and transitions are speciﬁed by the vertices and
+
+edges of a game graph. Similarly, MDPs have been used to model
+
+stochastic
+
+processes
+
+without
+
+adversary
+
+[31,
+
+43].
+
+Consequently,
+
+2
+
+1 2
+
+-
+
+player graph games, which subsume both 2-player graph games and
+
+MDPs, provide the theoretical foundation to model stochastic reac-
+
+tive systems [31, 44].
+
+Mean-payoff objectives. One of the most classical example of quantitative objectives is the mean-payoff objective [29, 31, 33, 43], where a reward is associated to each state and the payoff of a path is the long-run average of the rewards of the path (computed as either lim inf or lim sup of the averages of the ﬁnite preﬁxes to ensure
+
+the payoff value always exists). While traditionally the veriﬁcation and the synthesis problems were considered with Boolean objectives [40, 42, 45], recently quantitative objectives have received a lot of attention [6, 7, 11], as they specify requirements on resource consumption (such as for embedded systems or power-limited systems) as well as performance-related properties.
+
+Various semantics for multiple quantitative objectives. The two
+
+classical semantics for quantitative objectives are as follows [8]: the
+
+ﬁrst is the expectation semantics, which is a probabilistic average of
+
+the quantitative objective over the executions of the system; and the
+
+second is the satisfaction semantics, which consider the probability
+
+of the set of executions where the quantitative objective is at least
+
+a required threshold value ν. The expectation objective is relevant
+
+in situations where we are interested in the “average” behaviour of
+
+many instances of a given system, while the satisfaction objective is
+
+useful for analyzing and optimizing the desired executions, and is
+
+more relevant for the design of critical stochastic reactive systems
+
+(see [8] for a more detailed discussion). For example, consider one
+
+mean-payoff objective that speciﬁes the set of executions where
+
+the average power consumption is at most 5 units, and another
+
+mean-payoff objective that speciﬁes the set of executions where
+
+the average latency is at most 10 units. A multiple objective asks
+
+to satisfy both, i.e., their conjunction. We refer to such objectives
+
+(i.e., conjunction of multiple mean-payoff objectives) as general-
+
+ized mean-payoff objectives1. The goal of player Max is to maxi-
+
+mize the probability of satisfaction of the generalized mean-payoff
+
+objective while player Min tries to minimize this probability, i.e.,
+
+the
+
+game
+
+is
+
+zero-sum.
+
+Concrete
+
+applications
+
+of
+
+2
+
+1 2
+
+-player
+
+graph
+
+games with generalized mean-payoff objectives have been consid-
+
+ered, such as best-effort synthesis where the goal is to minimize
+
+the violation of several incompatible speciﬁcations [12], real-time
+
+scheduling algorithms with requirements on the utility and energy
+
+consumption [21], and electric power distribution in an avionics ap-
+
+plication [4]. In particular, for the real-world avionics application
+
+in [4], both two adversarial players, stochastic transitions, as well
+
+as multiple mean-payoff objectives are required, i.e., the applica-
+
+tion
+
+can
+
+be
+
+modeled
+
+as
+
+2
+
+1 2
+
+-player
+
+graph
+
+games
+
+with
+
+generalized
+
+mean-payoff objectives, but not in a strict subclass.
+
+Computational
+
+questions.
+
+In
+
+this
+
+work,
+
+we
+
+consider
+
+2
+
+1 2
+
+-player
+
+graph games with generalized mean-payoff objectives in the satis-
+
+faction semantics. A strategy for a player is a recipe that given the
+
+history of interaction so far (i.e., the sequence of states) prescribes
+
+the
+
+next
+
+move.
+
+The
+
+basic
+
+decision
+
+problem
+
+asks,
+
+given
+
+a
+
+2
+
+1 2
+
+-player
+
+graph game, a generalized mean-payoff objective, and a probabil-
+
+ity threshold α, whether there exists a strategy for player Max to
+
+ensure the objective be satisﬁed with probability at least α against
+
+all strategies of player Min. Since strategies in games correspond to
+
+implementations of controllers for reactive systems, a particularly
+
+relevant question is to ask for the existence of a ﬁnite-memory strat-
+
+egy in the basic decision problem, instead of an arbitrary strategy.
+
+Moreover, an important special case of the basic decision problem
+
+is the almost-sure problem, where the probability threshold α is
+
+equal to 1.
+
+Previous results. We summarize the main previous results for
+
+MDPs,
+
+2-player
+
+graph
+
+games,
+
+and
+
+2
+
+1 2
+
+-player
+
+graph
+
+games,
+
+with
+
+generalized mean-payoff objectives.
+
+1. MDPs. The basic decision problem for generalized mean-
+
+payoff objectives in MDPs with inﬁnite-memory strategies can
+
+be solved in polynomial time [8]. The problem under ﬁnite-
+
+memory strategies has not been addressed yet.
+
+1 In the veriﬁcation literature, conjunction of reachability, Bu¨chi, and parity objectives, are referred to as generalized reachability, generalized Bu¨chi, and generalized parity objectives, respectively, and generalized meanpayoff objectives naming is for consistency.
+
+2. 2-player games. The following results are known [47]: the basic
+
+decision problem for generalized mean-payoff objectives in 2-
+
+player graph games, both under ﬁnite-memory and inﬁnite-
+
+memory strategies, is coNP-complete; moreover, for inﬁnite-
+
+memory strategies if the mean-payoff objective is deﬁned as
+
+the limit supremum of the averages (rather than limit inﬁmum
+
+of the average), then the problem is in NP ∩ coNP.
+
+3.
+
+2
+
+1 2
+
+-player
+
+games.
+
+The
+
+almost-sure
+
+problem
+
+for
+
+generalized
+
+mean-payoff
+
+objectives
+
+in
+
+2
+
+1 2
+
+-player
+
+graph
+
+games
+
+under
+
+ﬁnite-
+
+memory strategies was considered in [4], and a semi-algorithm
+
+(or semi-decision procedure) was presented for approximations
+
+of the problem.
+
+4. Memory of strategies. Inﬁnite-memory strategies are strictly
+
+more powerful than ﬁnite-memory strategies, even in 1-player
+
+graph games thus also in MDPs and 2-player graph games: there
+
+are games where an inﬁnite-memory strategy can ensure the
+
+objective with probability 1 while all ﬁnite-memory strategies
+
+fail to do so2 [47].
+
+Our
+
+contributions.
+
+The
+
+previous
+
+results
+
+suggest
+
+that
+
+2
+
+1 2
+
+-player
+
+graph games with generalized mean-payoff objectives are consider-
+
+ably more complicated than 2-player graph games as well as MDPs,
+
+as even the decidability of the almost-sure problem was open for
+
+2
+
+1 2
+
+-player
+
+graph
+
+games
+
+for
+
+ﬁnite-memory
+
+strategies
+
+(the
+
+previous
+
+result neither gives an exact algorithm, nor establishes decidability
+
+for approximation). In this work we present a complete picture of
+
+decidability as well as computational complexity. Our results are as
+
+follows:
+
+1. MDPs. First we study the generalized mean-payoff prob-
+
+lem under ﬁnite-memory strategies in MDPs. We present a
+
+polynomial-time algorithm, and show that with randomization,
+
+memoryless strategies (which do not depend on histories but
+
+only on the current state) are sufﬁcient, i.e., for ﬁnite-memory
+
+optimal strategies no memory is required.
+
+2.
+
+2
+
+1 2
+
+-player
+
+games.
+
+For
+
+2
+
+1 2
+
+-player
+
+graph
+
+games
+
+with
+
+generalized
+
+mean-payoff objectives we show that: (1) the basic decision
+
+problem is coNP-complete under ﬁnite-memory strategies (sig-
+
+niﬁcantly improving the known semi-decidability result for ap-
+
+proximation of the almost-sure problem [4]), and moreover, the
+
+same complexity holds for the almost-sure problem; and (2) un-
+
+der inﬁnite-memory strategies, the computational complexity
+
+results coincide with the special case of 2-player graph games.
+
+3. Memory of strategies. Under ﬁnite-memory strategies, in con-
+
+trast to MDPs where we show with randomization no memory
+
+is required, we establish an exponential lower bound (even with
+
+randomization)
+
+for
+
+memory
+
+required
+
+in
+
+2
+
+1 2
+
+-player
+
+graph
+
+games
+
+with generalized mean-payoff objectives. We also present a
+
+matching upper bound showing that exponential memory is suf-
+
+ﬁcient.
+
+Key technical insights. We show that for generalized mean-payoff objectives, for the adversary, pure and memoryless strategies are sufﬁcient. Under ﬁnite-memory strategies for player Max, this result is established using the following ideas:
+• In general for preﬁx-independent objectives (objectives that do not change if ﬁnite preﬁxes are added or removed from a path), we show that sub-game perfect strategies exist, where a strategy is sub-game perfect if it is optimal after every ﬁnite history. Such a result is known for inﬁnite-memory strategies using results from martingale theory [35]. Our proof for ﬁnitememory strategies is conceptually simpler, and uses combina-
+
+2 However, in some variants of the decision problem (such as requiring the mean-payoff value, computed as the lim inf of the averages of the ﬁnite preﬁxes, be strictly greater than a threshold ν) ﬁnite-memory strategies are as powerful as inﬁnite-memory strategies [25].
+
+torial arguments and well-known discrete properties of MDPs
+
+(see Lemma 2, Section 3).
+
+• Then using the above result we show that for a sub-class of
+
+preﬁx-independent objectives (that subsume generalized mean-
+
+payoff objectives) for the adversary pure memoryless strategies
+
+sufﬁce (see Theorem 1, Section 3). Moreover, for this class of
+
+objectives we establish determinacy when each player is re-
+
+stricted to ﬁnite-memory strategies, which is of independent in-
+
+terest (see also Theorem 1); and also show that such determi-
+
+nacy result does not hold for all preﬁx-independent objectives
+
+(see Remark 3).
+
+• For MDPs, we generalize a result of [39] from graphs to
+
+MDPs, to obtain a linear-programming solution for the gener-
+
+alized mean-payoff objectives under ﬁnite-memory strategies
+
+(see Theorem 3, Section 4).
+
+Combining these results we obtain the coNP upper bound for the
+
+basic
+
+decision
+
+problem
+
+for
+
+2
+
+1 2
+
+-player
+
+graph
+
+games
+
+and
+
+the
+
+coNP
+
+lower bound follows from existing results on 2-player graph games
+
+(see Theorem 5, Section 4). Detailed proofs are available in [16].
+
+Related works. We have described the most relevant related works
+
+in the paragraph Previous results. We discuss other relevant related
+
+works. Markov decision processes with multiple objectives have
+
+been studied in numerous works, for various quantitative objec-
+
+tives, such as mean-payoff [8, 13], discounted sum [18, 20], total
+
+reward [32] as well as qualitative objectives [30], and their combi-
+
+nations [2, 3, 23, 25]. The problem of 2-player graph games with
+
+multiple quantitative objectives has also been widely studied both
+
+for ﬁnite-memory strategies [9, 22, 37, 46, 47] as well as inﬁnite-
+
+memory
+
+strategies
+
+[17,
+
+47].
+
+In
+
+contrast,
+
+for
+
+2
+
+1 2
+
+-player
+
+games
+
+with
+
+multiple quantitative objectives only few results are known [4, 24],
+
+because of the inherent difﬁculty to handle two-players, probabilis-
+
+tic transitions, as well as multiple objectives all at the same time.
+
+A semi-decision procedure for approximation of the almost-sure
+
+problem
+
+for
+
+2
+
+1 2
+
+-player
+
+games
+
+with
+
+generalized
+
+mean-payoff
+
+objec-
+
+tives was presented in [4], which we signiﬁcantly improve. The
+
+class
+
+of
+
+2
+
+1 2
+
+-player
+
+graph
+
+games
+
+with
+
+positive
+
+Boolean
+
+combina-
+
+tions of total-reward objectives was considered in [24], and the
+
+problem was established to be PSPACE-hard and undecidable for
+
+pure strategies.
+
+2. Deﬁnitions
+Probability distributions. For a ﬁnite set S, we denote by ∆(S) the set of all probability distributions over S, i.e., the set of functions p : S → [0, 1] such that s∈S p(s) = 1. The support of p is the set Supp(p) = {s ∈ S | p(s) > 0}. For a set U ⊆ S let p(U ) = s∈U p(s).
+Perfect-information stochastic games. A perfect-information stochastic game (for brevity, stochastic games in the sequel) is a tuple G = S, (SMax, SMin), A, δ , consisting of a ﬁnite set S = SMax ⊎ SMin of states partitioned into the set SMax of states controlled by player Max (depicted as round states in ﬁgures) and the set SMin of states controlled by player Min (depicted as square states in ﬁgures), a ﬁnite set A of actions, and a probabilistic transition function δ : S × A → ∆(S). If δ(s, a)(s′) > 0, we say that s′ is an a-successor of s. A transition δ(s, a) is deterministic if δ(s, a)(s′) = 1 for some state s′. The underlying graph of G is (S, E) where E = {(s, s′) | δ(s, a)(s′) > 0 for some a ∈ A}.
+For complexity results, we consider that the probabilities in stochastic games are rational numbers with numerator and denominator encoded in binary.
+Markov decision processes and end-components. A Markov decision process (MDP) is the special case of a stochastic game where either SMax = ∅, or SMin = ∅. Given a state s ∈ S and a set U ⊆ S, let AU (s) be the set of all actions a ∈ A such that
+
+Supp(δ(s, a)) ⊆ U . A closed set in an MDP is a set U ⊆ S such that AU (s) = ∅ for all s ∈ U . A set U ⊆ S is an endcomponent [27] if (i) U is closed, and (ii) the graph (U, EU ) is strongly connected where EU = {(s, t) ∈ U × U | δ(s, a)(t) > 0 for some a ∈ AU (s)} denote the set of edges given the actions. We denote by E (M ) the set of all end-components of an MDP M .
+Markov chains and recurrent sets. A Markov chain is the special case of an MDP where the action set A is a singleton. In Markov chains, end-components are called closed recurrent sets.
+Plays and strategies. A play is an inﬁnite sequence s0s1 . . . ∈ Sω of states. A randomized strategy for Max is a recipe to describe what is the next action to play after a preﬁx of a play ending in a state controlled by player Max; formally, it is a function σ : S∗SMax → ∆(A) that provides probability distributions over the action set. A pure strategy is a function σ : S∗SMax → A that provides a single action, which can be seen as a special case of randomized strategy where for every play preﬁx ρ ∈ S∗SMax there exists an action a ∈ A such that σ(ρ)(a) = 1.
+We consider the following memory restrictions on strategies. A strategy σ is memoryless if it is independent of the past and depends only on the current state, that is σ(ρ) = σ(Last(ρ)) for all play preﬁxes ρ ∈ S∗SMax, where Last(s0 . . . sk) = sk. In the sequel, we call memoryless strategies the pure memoryless strategies, and we emphasize that strategies σ : SMax → ∆(A) are not necessarily pure by calling them randomized memoryless.
+A strategy σ uses ﬁnite memory if it can be described by a transducer M, m0, σu, σn consisting of a ﬁnite set M (the memory set), an initial memory value m0 ∈ M , an update function σu : M × S → M for the memory, and a next-action function σn : M → ∆(A); the transducer M, m0, σu, σn deﬁnes the strategy σ such that σ(ρ) = σn(σˆu(m0, ρ)) for all play preﬁxes ρ ∈ S∗SMax where σˆu extends σu to sequences of states as usual (i.e., σˆu(m, ρ · s) = σu(σˆu(m, ρ), s)). Given a ﬁnite-memory strategy σ for player Max, let Gσ = S′, (∅, SM′ in), A, δ′ be the MDP obtained by playing σ in G, where S′ = SM′ in = S × M and the transition function δ′ is deﬁned for all s, m ∈ S′ and action a ∈ A of player Min as follows, for all s′ ∈ S, where m′ = σu(m, s):
+• if s ∈ SMax, then δ′( s, m , a)( s′, m′ ) = b∈A σn(m′)(b) · δ(s, b)(s′);
+• if s ∈ SMin, then δ′( s, m , a)( s′, m′ ) = δ(s, a)(s′).
+Strategies π for player Min are deﬁned analogously, as well as the memory restrictions. A strategy that is not ﬁnite-memory is referred to as an inﬁnite-memory strategy. We denote by Σ the set of all strategies for player Max, and by ΣP M , and ΣF M respectively the set of all pure memoryless, and all ﬁnite-memory strategies for player Max. We use analogous notation Π, ΠP M , and ΠF M for player Min.
+Objectives. An objective is a Borel-measurable set of plays [5]. In this work we consider conjunctions of mean-payoff objectives. Some of our results are related to more general classes of preﬁxindependent and shufﬂe-closed objectives. We deﬁne the relevant objectives below:
+1. Preﬁx-independent objectives. An objective Ω ⊆ Sω is preﬁxindependent if for all plays ρ ∈ Sω, and all states s ∈ S, we have ρ ∈ Ω if and only if s · ρ ∈ Ω, that is the objective is independent of the ﬁnite preﬁxes (of arbitrary length) of the plays.
+2. Shufﬂe-closed objectives. A shufﬂe of two plays ρ1, ρ2 is a play ρ = u1u2u3 . . . such that ui ∈ S∗ for all i ≥ 1, and ρ1 = u1u3u5 . . . and ρ2 = u2u4u6 . . . . An objective Ω ∈ Sω is closed under shufﬂing, if all shufﬂes of all plays ρ1, ρ2 ∈ Ω belong to Ω.
+
+3. Multi-mean-payoff objectives. Let rwd : S → Qk be a reward function3 that assigns a k-dimensional vector of weights to each state. For 1 ≤ j ≤ k, we denote by rwdj : S → Q the projection of the function rwd on the j-th dimension. The
+conjunction of mean-payoff-inf objectives (which we refer as
+generalized mean-payoff objectives) is the set
+
+MeanInf =
+
+s0s1 · · · ∈ Sω |
+
+k
+
+lim inf n→∞
+
+1 n
+
+·
+
+n−1
+rwdj (si )
+
+≥
+
+0
+
+j=1
+
+i=0
+
+that contains all plays for which the long-run average of weights (computed as lim inf) is non-negative4 in all dimensions. The objectives inside the above conjunction (indexed by j) are
+called one-dimensional mean-payoff-inf objectives (in dimen-
+sion j), and denoted MeanInfj. The conjunction of meanpayoff-sup objectives is the set MeanSup deﬁned analogously, replacing lim inf by lim sup in the deﬁnition of MeanInf.
+
+Remark 1. It is easy to show that mean-payoff-inf objectives are closed under shufﬂing, and that the conjunction of objectives that are closed under shufﬂing is closed under shufﬂing [38]. However, the conjunctions of mean-payoff-sup objectives are in general not closed under shufﬂing [47, Example 1].
+
+Probability measures. Given an initial state s, and a pair of strategies (σ, π) for Max and Min, a ﬁnite preﬁx ρ = s0 · · · sn of a play is compatible with σ and π if s0 = s and for all 0 ≤ i ≤ n − 1, there exists an action ai ∈ A such that δ(si, ai)(si+1) > 0, and either si ∈ SMax and σ(s0 · · · si)(ai) > 0, or si ∈ SMin and π(s0 · · · si)(ai) > 0. A probability can be assigned in a standard way to every ﬁnite play preﬁx ρ, and by Caratheodary’s extension theorem a probability measure Pσs,π(·) of objectives can be uniquely deﬁned. For MDPs, we omit the strategy of the player with empty set of states, and for instance if SMin = ∅ we denote by Pσs (·) the probability measure under strategy σ of player Max.
+Value and almost-sure winning. The optimal value from an initial state s of a game with objective Ω is deﬁned by
+
+Max
+
+val (Ω,
+
+s)
+
+=
+
+sup
+σ∈Σ
+
+inf
+π∈Π
+
+Pσs ,π (Ω).
+
+By Martin’s determinacy result [41], the optimal value is also Min val (Ω, s) = infπ∈Π supσ∈Σ Pσs,π(Ω), the inﬁmum proba-
+bility of satisfying Ω that player Min can ensure against all strategies of player Max. In other words the determinacy shows that
+Max val (Ω, s) = Min val (Ω, s), and the order of sup and inf
+in the quantiﬁcation of the strategies can be exchanged.
+A strategy σ for player Max is optimal from a state s if for all strategies π for player Min it ensures that Pσs,π(Ω) ≥
+Max val (Ω, s). The value (or winning probability) of a strategy σ in state s is σ val (Ω, s) = infπ∈Π Pσs,π(Ω). We omit analogous deﬁnitions for player Min.
+We say that player Max wins almost-surely from an initial
+state s if there exists a strategy σ for Max such that for every strategy π of player Min we have Pσs,π(Ω) = 1. The state s and the strategy σ are called almost-sure winning for player Max.
+
+Finite-memory values and almost-sure winning. The optimal ﬁnite-memory value (for player Max) is deﬁned analogously, when the players are restricted to ﬁnite-memory strategies:
+
+Max
+
+FM val
+
+(Ω,
+
+s)
+
+=
+
+sup
+
+inf Pσs,π(Ω).
+
+σ∈ΣF M π∈ΠF M
+
+3 We use rational rewards to be able to state complexity results. All other results in this paper hold if the rewards are real numbers.
+4 Note that it is not restrictive to deﬁne mean-payoff objectives with a threshold 0 since we can obtain mean-payoff objectives deﬁned as the longrun average of weights above any threshold ν by subtracting the constant ν to the reward function.
+
+A strategy σ is optimal for ﬁnite memory from a state s if
+
+it uses ﬁnite memory and for all ﬁnite-memory strategies π
+
+for player Min it ensures that Pσs,π(Ω) ≥
+
+Max
+
+FM val
+
+(Ω,
+
+s).
+
+We deﬁne analogously almost-sure winning with ﬁnite-memory
+
+strategies, and the ﬁnite-memory value
+
+σ
+
+FM val
+
+(Ω,
+
+s)
+
+of
+
+σ
+
+in state s (against ﬁnite-memory strategies of player Min).
+
+We deﬁne the ﬁnite-memory value for player Min by
+
+Min
+
+FM val
+
+(Ω,
+
+s)
+
+=
+
+infπ∈ΠFM supσ∈ΣFM Pσs,π(Ω) and
+
+the ﬁnite-memory value of strategy π for player Min by
+
+π
+
+FM val
+
+(Ω,
+
+s)
+
+=
+
+supσ∈ΣF M Pσs,π(Ω). We show in Theorem 1
+
+for a large class of objectives (namely, preﬁx-independent shufﬂe-
+
+closed objectives) that the ﬁnite-memory value for player Max
+
+and for player Min coincide, and allowing arbitrary strategies for
+
+player Min (against ﬁnite-memory strategies for player Max) does
+
+not change the ﬁnite-memory value.
+
+Subgame-perfect strategies. Given a strategy σ for Max, and a
+ﬁnite preﬁx ρ = s0 · · · sk of a play, we denote by σρ the strategy that plays from the initial state sk what σ would play after the preﬁx ρ, i.e. such that σρ(sk · ρ′) = σ(ρ · ρ′) for all play preﬁxes ρ′, and σρ(s · ρ′) is arbitrarily deﬁned for all s = sk.
+A strategy σ for Max is subgame-perfect if for all nonempty play preﬁxes ρ ∈ S+, the strategy σρ is optimal from the initial state Last(ρ). Analogously, the strategy σ is subgame-perfect-for-
+ﬁnite-memory if all strategies σρ are optimal-for-ﬁnite-memory strategies from Last(ρ).
+
+Value problems. Given an objective Ω, a threshold λ ∈ Q, and
+
+an initial state s, the value-strategy problem asks whether there
+
+exists a strategy σ for player Max such that σ val (Ω, s) ≥ λ
+
+(or whether there exists a ﬁnite-memory strategy σ for player Max
+
+such that
+
+σ
+
+FM val
+
+(Ω,
+
+s)
+
+≥
+
+λ).
+
+The
+
+value
+
+problem
+
+asks
+
+whether
+
+Max val (Ω, s) ≥ λ (resp., whether
+
+Max
+
+FM val
+
+(Ω,
+
+s)
+
+≥
+
+λ).
+
+End-component lemma. An important property of the endcomponents in MDPs is that for all strategies (with ﬁnite memory or not) with probability 1 the set of states that are visited inﬁnitely often along a play is an end-component [27, 28]. Given a play ρ ∈ Sω, let Inf(ρ) be the set of states that occur inﬁnitely often in ρ.
+
+Lemma 1. [27, 28] Given an MDP M , for all states s ∈ S and all strategies σ ∈ Σ, we have Pσs ({ρ | Inf(ρ) ∈ E (M )}) = 1.
+
+Remark 2 (Key properties for MDPs). The end-component lemma is useful in the analysis of MDPs with preﬁx-independent objectives, which can be decomposed into the analysis of the endcomponents (which have useful connectedness properties), and a reachability analysis to the end-components. Moreover, suppose we consider preﬁx-independent objectives, and the MDP restricted to an end-component U . Then it follows from the results of [14] that either all states of U have value 1 or all states of U have value 0. Hence for preﬁx-independent objectives in MDPs, the optimal value is the optimal reachability probability to the winning end-components, where a winning end-component is an endcomponent with value 1.
+
+3. Half-Memoryless Result under Finite-Memory Strategies
+We show a general result that gives a sufﬁcient condition for existence of memoryless strategies (for one of the players) in games played with ﬁnite-memory strategies.
+Comment on ﬁnite- vs. inﬁnite-memory proof. The statement and proof structure of the result are similar to [35, Theorem 5.2] that established a sufﬁcient condition for existence of memoryless optimal strategies in games played with arbitrary (inﬁnite-memory) strategies. However, the proof uses different techniques. The key
+
+s0, m0 Gσ
+
+s0, m0 Gσ′
+
+s, ms s, m′
+
+s, ms s, m′
+
+MinGσ
+
+FM val
+
+(Ω,
+
+s, ms
+
+)>
+
+MinGσ
+
+FM val
+
+(Ω,
+
+s, m′
+
+)
+
+Figure 1. Lemma 2: construction of a strategy σ′ with higher value in subgames than the optimal-for-ﬁnite-memory strategy σ.
+
+to establish the existence of memoryless strategies for one of the players is to ﬁrst establish the existence of subgame-perfect strategies for the other player. We establish such a result in Lemma 2 for ﬁnite-memory strategies. Without the restriction of ﬁnite memory, only the existence of ε-subgame-perfect strategies is known, and the proof requires intricate arguments and involved mathematical machinery such as Doob’s convergence theorem for martingales [35, Theorem 4.1]. Our proof is combinatorial and uses basic results on MDPs (e.g., discrete properties of end-components).
+Key ideas of the proof. The proof of Lemma 2 consists in constructing from a ﬁnite-memory strategy σ a strategy that is subgameperfect-for-ﬁnite-memory by successively “improving” the value of the strategy σρ for each ﬁnite preﬁx ρ. Improvements are obtained by modifying some transitions in the transducer deﬁning σ, from the state reached after following the ﬁnite preﬁx ρ. The modiﬁcation of transitions does not change the memory space of the strategy, and since we consider ﬁnite-memory strategies, although there may be inﬁnitely many ﬁnite preﬁxes ρ where the strategy needs to be “improved”, there is only a ﬁnite number of memory states to consider for improvement, which guarantees the improvement process to terminate and yields a subgame-perfect-for-ﬁnite-memory strategy.
+Lemma 2. In every stochastic game with a preﬁx-independent objective, there exists a subgame-perfect-for-ﬁnite-memory strategy for player Max.
+Proof. Our proof is established using the following key steps: 1. Existence of an optimal-for-ﬁnite-memory strategy for player
+Max. 2. Modiﬁcation of the strategy for improvement of values after
+ﬁnite preﬁxes. 3. The proof that the modiﬁcation provides an improvement in
+two parts: once the strategy for player Max is ﬁxed, we have an MDP. In the MDP, we ﬁrst show properties of the endcomponents, and second we provide bounds on the optimal reachability probability to the end-components to establish the improvement.
+Optimal-for-ﬁnite-memory strategy. We show the existence of a ﬁnite-memory strategy σ for player Max in the game G such that σ is optimal-for-ﬁnite-memory from every state for the preﬁxindependent objective Ω. The fact that such a strategy always exists is as follows: it follows from [34, Theorem 4.3] that it sufﬁces to prove the result for almost-sure winning strategies. Consider the set Z of states with value 1 for ﬁnite-memory strategies. We need to show that there exists a ﬁnite-memory almost-sure winning strategy in Z. Let 0 < ε < 1, and consider a ﬁnite-memory strategy that ensures value at least 1 − ε from all states in Z. If a strategy
+
+can ensure positive winning from every state of a game, then it is almost-sure winning by the result of [14]. The existence of an optimal-for-ﬁnite-memory strategy follows.
+
+Notation. Consider an optimal-for-ﬁnite-memory strategy σ. Thus
+
+for all states s of the game G there exists a memory value
+
+ms in the transducer of σ such that the value of the objec-
+
+tive Ω in the MDP Gσ is the optimal ﬁnite-memory value, that is
+
+MinGσ
+
+FM val
+
+(Ω,
+
+s, ms
+
+)
+
+=
+
+MaxG
+
+FM val
+
+(Ω,
+
+s)
+
+where
+
+the
+
+sub-
+
+script in MinGσ indicates that the value is computed in the MDP Gσ (which is a MDP for player Min) while MaxG gives the optimal
+
+value for player Max in the game G.
+
+Modiﬁcation of the strategy. If the strategy σ is subgame-perfect-
+
+for-ﬁnite-memory, then the proof is done. Otherwise, there ex-
+
+ists a state s, m′ in Gσ with value below the optimal ﬁnite-
+
+memory value of s, namely such that
+
+MinGσ
+
+FM val
+
+(Ω,
+
+s, ms
+
+)>
+
+MinGσ
+
+FM val
+
+(Ω,
+
+s, m′
+
+). We construct an improved
+
+strategy σ′
+
+as follows: the strategy σ′ plays like σ except that when the state
+
+s, m′ is reached, the strategy σ′ plays like σ is playing from state
+
+s, ms (equivalently, we remove the outgoing transitions from state s, m′ in Gσ, and replace them by a deterministic transition
+
+to state s, ms on all actions to obtain Gσ′ , as illustrated in Figure 1). Note that the new strategy σ′ has the same memory set as
+
+σ. We show below that the value of every state in Gσ′ is at least as large as the value of the same state in Gσ (⋆). It follows that the value of state s, m′ in Gσ′ is the optimal ﬁnite-memory value
+from s, and by repeating the same construction in every state where
+
+the value is below the optimal ﬁnite-memory value, we obtain (in
+
+ﬁnitely many steps) a subgame-perfect-for-ﬁnite-memory strategy
+
+for player Max.
+
+Proof of (⋆). We proceed with the proof of (⋆), which has two steps as mentioned above. We ﬁrst deﬁne the notion of value class.
+
+Value class and properties. In the MDP Gσ, a value class is a maximal subset of states that have the same value (deﬁned as the inﬁmum over the strategies of player Min). The following property holds in Gσ, for every state l = ·, · , and action a ∈ A: consider the value class of l, if there is an a-successor of l in a lower value class, then there is also an a-successor of l in a higher
+value class (Figure 2). If we consider the partition deﬁned by the value classes in Gσ, this property also holds in the modiﬁed MDP Gσ′ corresponding to strategy σ′, because the new deterministic transition (dashed edge of Figure 1) goes to a higher value class.
+
+Properties of end-components. Now, we claim that in the modiﬁed MDP Gσ′ every end-component is included in some value class (of the original MDP Gσ). We show this by contradiction (see also Figure 2). Assume that there is an end-component C in Gσ′ with non-empty intersection with different value classes (of the original
+MDP Gσ). Let x ∈ C be a state of C with largest value. Since C is strongly connected, there is a path from x to a lower value class, and on this path there is a state y ∈ C with largest value that has an a-successor z with lower value (for some a ∈ AC(y)). It follows that y has also an a-successor with higher value, according
+to the above property. This successor is outside C since there is
+no larger value class in C than the value class of y. This is in
+contradiction with the fact that end-components are closed sets (and that a ∈ AC(y)). We conclude that in Gσ′ every end-component is included in some value class (of the original MDP Gσ). Therefore, the value of each end-component in Gσ′ is at least as large as the value of the value class containing it (in Gσ). It also follows that the new deterministic transitions from s, m′ to s, ms do not belong to any end-component in Gσ′ .
+
+Optimal reachability probability. The key steps to obtain the bound on optimal reachability probability is as follows: we observe that the optimal reachability probability in MDPs is characterized by a minimizing linear-programming solution, and we show that the
+
+C Gσ
+
+× x zy
+
+l a
+
+lowest value class
+
+increasing value class
+
+highest value class
+
+Figure 2. Lemma 2: value-class analysis. No end-component C can lie across several value classes.
+
+solution before the modiﬁcation is a feasible solution after the modiﬁcation. We now present the details.
+Optimal value via optimal reachability. We show that the value of the state s, m′ in Gσ′ is strictly greater than the value of s, m in Gσ (for player Max). Let Slosing be the union of all endcomponents in Gσ with value 0 for the preﬁx-independent objective Ω (thus losing for player Max, and winning for player Min). By Remark 2, the optimal value for player Min in the MDP is the optimal reachability probability to Slosing.
+Optimal reachability probability to Slosing. Consider the following linear program in Gσ = S′, (∅, SM′ in), A, δ′ that computes the value (for player Min) of each state l ∈ S′ of Gσ in variable xl, by solving a reachability problem to the states in Slosing:
+
+minimize l∈S′ xl xl ≥ k∈S′ δ′(l, a)(k) · xk for all l ∈ S′, a ∈ A xl = 1 for all l ∈ Slosing
+
+The correctness of the linear program to compute optimal reachability probability is standard [31]. Let x∗ be an optimal solu-
+
+tion of this linear program. Note that the values are computed for
+
+player Min, and thus x∗l = 1 −
+
+Max
+
+FM val
+
+(Ω,
+
+l).
+
+It
+
+follows
+
+that
+
+x∗s,ms < x∗s,m′ .
+
+Feasible solution. Consider the modiﬁed MDP Gσ′ (with same state space as Gσ), in which the union of end-components with value 0 is contained in Slosing. Therefore, considering the same linear program for Gσ′ provides an upper bound on the new value (for player Min). For each l ∈ S′, deﬁne yl =
+x∗l if l = s, m′ x∗s,ms if l = s, m′
+Then (yl)l∈S′ is a feasible solution to the linear program for Gσ′ , and for the optimal solution y∗, we have yl∗ ≤ yl ≤ x∗l (and for l′ = s, m′ we have yl∗′ ≤ yl′ < x∗l′ ). Since yl∗′ is only an upper bound of the new value of s for player Min in Gσ′ , it shows that the value improved for player Max in every state. Since the value of
+
+s, ms in Gσ was the optimal ﬁnite-memory value, it follows that in Gσ′ the value of s, ms is also the optimal ﬁnite-memory value. Since all transitions of s, m′ lead to s, ms , the value of s, m′ in Gσ′ is the optimal ﬁnite-memory value from s, which concludes the proof of (⋆).
+
+The result of [35, Theorem 5.2] shows that in games where the players are allowed to use arbitrary strategies (thus not restricted to ﬁnite-memory strategies), memoryless optimal strategies exist for player Min if the objective of player Max is preﬁx-independent and closed under shufﬂing. The proof of this result uses an analogue of Lemma 2 for arbitrary strategies, and relies on edge induction,
+
+a technique that became standard [15, 35, 36, 38]. The shape of the argument is not speciﬁc to games with arbitrary strategies: in games where the players are restricted to ﬁnite-memory strategies, we can follow the same line of proof (using Lemma 2) to show that if the objective of a player is preﬁx-independent and closed under shufﬂing, then memoryless optimal strategies exist for the other player.
+
+Theorem 1. In stochastic games, if the objective Ω of player Max is preﬁx-independent and closed under shufﬂing, and player Max is restricted to ﬁnite-memory strategies, then player Min has a memoryless optimal-for-ﬁnite-memory strategy (as well as a memoryless optimal strategy), and determinacy holds under ﬁnite-memory strategies. More precisely, for all states s we have:
+
+Max
+
+FM val
+
+(Ω,
+
+s)
+
+=
+
+Min
+
+FM val
+
+(Ω,
+
+s)
+
+=:
+
+v(s),
+
+and
+
+sup
+σ∈ΣF M
+
+inf
+π∈Π
+
+Pσs ,π (Ω,
+
+s)
+
+=
+
+v(s)
+
+=
+
+inf
+π∈ΠP M
+
+sup
+σ∈ΣF M
+
+Pσs ,π (Ω,
+
+s).
+
+Signiﬁcance of Theorem 1. We ﬁrst remark on the signiﬁcance
+
+of the result, and then present the main steps of the proof.
+
+First, the result establishes determinacy for ﬁnite-memory strate-
+
+gies i.e.,
+
+Max
+
+FM val
+
+(Ω,
+
+s)
+
+=
+
+Min
+
+FM val
+
+(Ω,
+
+s)
+
+=
+
+v(s), which
+
+implies that even for ﬁnite-memory strategies the order of sup
+
+and inf can be exchanged. However, note that the ﬁnite-memory
+
+value is different from the value under inﬁnite-memory strate-
+
+gies, and the determinacy for ﬁnite-memory does not follow
+
+from the determinacy for inﬁnite-memory strategies. Second, supσ∈ΣF M infπ∈Π Pσs,π(Ω, s) = v(s) implies that as long as player Max is restricted to ﬁnite-memory strategies, whether
+
+player Min uses ﬁnite-memory or inﬁnite-memory strategies does not matter. Finally, v(s) = infπ∈ΠPM supσ∈ΣF M Pσs,π(Ω, s) implies that against ﬁnite-memory strategies of player Max there ex-
+
+ists a pure memoryless strategy for player Min that is optimal (even
+
+considering all inﬁnite-memory strategies for player Min).
+
+Main steps of the proof. We present the key steps of the proof of Theorem 1, and we show that the argument in the proof of [35, Theorem 5.2] (which we refer to for the precise technical steps) can be adapted for ﬁnite-memory strategies. The key steps are: (i) induction on the number of player-Min states; (ii) creating different games for different choices at a player-Min state, in which player Min has memoryless optimal strategies by induction hypothesis; and (iii) showing the value of the original game is at least the minimum of the value of the different games, thus memoryless strategies sufﬁce.
+
+Induction on player-Min states. The proof is by induction on the number of states of player Min. The base case |SMin| = 0 corresponds to games with only states of player Max. The result holds trivially in that case (the empty strategy of player Min is memo-
+ryless). For the induction step, assume that the result holds for all games with |SMin| < k, and consider a game G with |SMin| = k.
+
+Different games for different choices. We explain the rest of the
+proof assuming the action set contains only two actions, that is A = {a, b}. The proof is the same for an arbitrary ﬁnite set of actions, with more complication in the notation. In G, consider a state sˆ ∈ SMin of player Min and construct two games Ga and Gb obtained from G by removing sˆ and by replacing the incoming transitions to sˆ by transitions to its a-successors and b-successors respectively. The transition function of Gx (for x ∈ {a, b}) is deﬁned by δx(s, c)(s′) = δ(s, c)(s′) + δ(s, c)(sˆ) · δ(sˆ, x)(s′) for all s, s′ ∈ S \ {sˆ}, and all actions c ∈ A.
+
+Value of original game at least the minimum of the value of the
+two games. In Ga and Gb the number of states of player Min is k − 1. Hence by the induction hypothesis there exist memoryless strategies πGa and πGb for player Min that are optimal-for-ﬁnite-
+
+s1 s2
+1 −1
+Figure 3. A game with preﬁx-independent objective Bu¨chi(s2) ∧ (coBu¨chi(s2) ∨ MeanSup) that is not determined under ﬁnitememory strategies.
+
+memory (as well as optimal among the inﬁnite-memory strategies)
+in Ga and Gb respectively. The proof proceeds by showing that in the game G, player Min cannot obtain a lower (i.e., better) value
+than in one of the games Ga or Gb, that is for all strategies π of player Min, for all states s = sˆ we have5:
+
+πG
+
+FM val
+
+(Ω,
+
+s)
+
+≥
+
+min
+
+πGa
+
+FM val
+
+(Ω,
+
+s),
+
+πGb
+
+FM val
+
+(Ω,
+
+s)
+
+.
+
+(1)
+
+To show this, we consider subgame-perfect-for-ﬁnite-memory
+
+strategies σa and σb for player Max in games Ga and Gb respec-
+
+tively (which exist by Lemma 2), and we construct a ﬁnite-memory
+
+strategy σ in G that achieves, against all strategies π, a value at least
+
+as large as either σa in Ga or σb in Gb. Intuitively, σ switches be-
+
+tween σa and σb, playing according to σa when in the last visit
+
+to sˆ player Min played action a (thus as in Ga), and playing ac-
+
+cording to σb when in the last visit to sˆ player Min played action
+
+b (thus as in Gb). To formally deﬁne σ, given a play preﬁx in G we
+
+use projections onto plays in Ga (resp., Gb) that erase all sub-plays
+
+between successive visits to sˆ where action b (resp., action a) was
+
+played in sˆ. Note that σ uses ﬁnite memory. The plays compatible
+
+with σ and π are shufﬂes of plays compatible with σa in Ga and
+
+plays compatible with σb in Gb, and since the objective Ω is closed
+
+under shufﬂing, the probability measure of the plays satisfying the
+
+objective in G is no lower than the value of either games Ga or Gb:
+
+Pσs,π(Ω) ≥ min
+
+πGa
+
+FM val
+
+(Ω,
+
+s),
+
+πGb
+
+FM val
+
+(Ω,
+
+s)
+
+.
+
+It follows that (1) holds, and thus the optimal-for-ﬁnite-memory
+
+(as well as optimal among inﬁnite-memory strategies) strategies
+
+in the games Ga and Gb (extended to play a and b respectively in sˆ) are sufﬁcient for player Min in G. Therefore by the induc-
+
+tion hypothesis, memoryless strategies are sufﬁcient for player Min
+
+to achieve the optimal ﬁnite-memory value, let π be such a strat-
+
+egy. By the same argument and using the induction hypothesis,
+
+for the ﬁnite-memory strategy σ for player Max in G we have
+
+σ val (Ω, s) =
+
+σ
+
+FM val
+
+(Ω,
+
+s)
+
+=
+
+π
+
+FM val
+
+(Ω,
+
+s),
+
+which
+
+gives
+
+Max
+
+FM val
+
+(Ω,
+
+s)
+
+=
+
+Min
+
+FM val
+
+(Ω,
+
+s).
+
+Note
+
+that
+
+our
+
+proof
+
+han-
+
+dled that the strategies for player Min are allowed to be inﬁnite-
+
+memory, and the result still holds.
+
+Remark 3. The determinacy result of Theorem 1, which allows
+
+to switch the sup and inf operators ranging over ﬁnite-memory
+
+strategies, is true for preﬁx-independent shufﬂe-closed objectives.
+
+We present an example to show that such a result does not hold
+
+for general preﬁx-independent objectives that are not closed un-
+
+der shufﬂing. Consider the game of Figure 3, with the objective
+
+Ω = Bu¨chi(s2) ∧ (coBu¨chi(s2) ∨ MeanSup) where Bu¨chi(s2) is the set of plays that visit s2 inﬁnitely often, and coBu¨chi(s2)
+
+is the set of plays that eventually stay in s2 forever. Note that the
+
+game is even non-stochastic. We show that
+
+Max
+
+FM val
+
+(Ω,
+
+s1)
+
+=
+
+0
+
+and
+
+Min
+
+FM val
+
+(Ω,
+
+s1)
+
+=
+
+1. Intuitively, after either player ﬁxed
+
+a ﬁnite-memory strategy, the other player can win using slightly
+
+more memory than the ﬁrst player (but still ﬁnite memory). For
+
+all ﬁnite-memory strategies σ of player Max, either (i) there ex-
+
+5 We assume that the value
+
+πG
+
+FM val
+
+(Ω,
+
+s)
+
+of
+
+a
+
+strategy
+
+πG
+
+is
+
+computed
+
+in the game G in superscript.
+
+ists a compatible play that eventually stays forever in s1, and
+
+then the objective Bu¨chi(s2) is violated, or (ii) s2 is visited in-
+
+ﬁnitely often in all compatible plays and player Min can ensure
+
+with a ﬁnite-memory strategy that both objectives MeanSup and
+
+coBu¨chi(s2) are violated by staying in s2 one more time than
+
+player Max stayed in s1, and then going back to s1. It follows
+
+that
+
+σ
+
+FM val
+
+(Ω,
+
+s1
+
+)
+
+=
+
+0.
+
+Analogously,
+
+against
+
+all
+
+ﬁnite-memory
+
+strategies π of player Min, player Max can ensure that the objec-
+
+tive Ω is satisﬁed (by staying in s1 one more time than player Min
+
+stayed in s2, and then going to s2), thus
+
+π
+
+FM val
+
+(Ω,
+
+s1
+
+)
+
+=
+
+1.
+
+Hence
+
+Max
+
+FM val
+
+(Ω,
+
+s1
+
+)
+
+=
+
+Min
+
+FM val
+
+(Ω,
+
+s1
+
+)
+
+and
+
+the
+
+game
+
+of
+
+Figure 3 is not determined under ﬁnite-memory strategies.
+
+Upper bound on memory. We now show that for preﬁx-independent shufﬂe-closed objectives, the memory required for player Max is exponential as compared to the memory required for the same objective in MDPs. If there are k states for player Min, then the optimal-for-ﬁnite-memory strategy σ constructed for player Max in the proof of Theorem 1 is as follows: it considers strategies in the choice-ﬁxed games (Ga and Gb) with k − 1 states for player Min, and the strategy in the original game considers projections of plays and then copies the strategies of the choice-ﬁxed games. Thus the memory required for player Max in games with k states for player Min is the union of the memory required for the choice-ﬁxed games with k −1 states, and there are at most |A| such choice-ﬁxed games. If we denote by M (k) the memory required for player Max in games with k player-Min states, then the following recurrence is satisﬁed:
+M (k) = |A| · M (k − 1).
+Note that M (0) represents the memory bound for MDPs, and thus we get a bound on M (k) = |A|k · M (0) in games that is greater than the memory bound for MDPs by an exponential factor.
+Theorem 2. In stochastic games with a preﬁx-independent shufﬂeclosed objective Ω, an upper bound on the memory required for optimal-for-ﬁnite-memory strategies is |A||SMin| · M (0), where M (0) is an upper bound on memory required for objective Ω in MDPs.
+
+4. Generalized Mean-Payoff Objectives under Finite-Memory Strategies
+
+In generalized-mean-payoff games, inﬁnite-memory strategies
+
+are more powerful than ﬁnite-memory strategies, even in 1-
+
+player games with only deterministic transitions, i.e., graphs [47,
+
+Lemma 7].6 It follows that in general Max val (Ω, s) =
+
+Max
+
+FM val
+
+(Ω,
+
+s)
+
+in
+
+generalized-mean-payoff
+
+games
+
+(for
+
+both
+
+Ω = MeanSup and Ω = MeanInf). In this section, we consider the
+
+value problem for ﬁnite-memory strategies, and present complex-
+
+ity results showing that the problem is in PTIME for MDPs, and is
+
+coNP-complete for games. Finally we present optimal bounds for
+
+memory
+
+required
+
+in
+
+2
+
+1 2
+
+-player
+
+games.
+
+4.1 Generalized mean-payoff objectives under ﬁnite-memory in MDPs
+
+We consider the value problem for ﬁnite-memory strategies in MDPs with generalized mean-payoff objectives. First we show that randomized memoryless strategies are as powerful as ﬁnitememory strategies, and then using this result we show that the value problem can be solved in polynomial time.
+Note that in ﬁnite-state Markov chains with a ﬁxed reward function, from all states s, the probability that the conjunction
+
+6 In the example of [47, Lemma 7] all ﬁnite-memory strategies have winning probability 0 while there exists an almost-sure winning strategy (with inﬁnite memory).
+
+f1
+
+(−3, 4) s2
+
+f2
+
+(0, 0) s1
+
+f4
+1/2
+f3 1/2 f5
+
+(−2, 1) s3
+(3, −2) s4
+
+ 
+
+f1 = f2
+
+  (E1)
+
+
+f1 + f3 = f2 + f4 + f5
+
+f4
+
+=
+
+f3 2
+
+ 
+
+f5 =
+
+f3 2
+
+(E2)
+
+−3f2 − 2f4 + 3f5 ≥ 0 4f2 + f4 − 2f5 ≥ 0
+
+(E3) f1 + f2 + f3 + f4 + f5 = 1
+
+Figure 4. Linear program for an MDP with two-dimensional mean-payoff objective (the constraints fi ≥ 0 for i = 1, . . . , 5 are omitted in the ﬁgure).
+
+f1 f2
+
+f6 f4
+
+(−1, 1) s1
+
+(−1, −1) s2
+f3 f5
+
+(1, −1) s3
+
+Figure 5. The (disjoint) union of two
+
+end-components corresponds to a solution
+
+of LP (f1
+
+=
+
+f6
+
+=
+
+1 2
+
+and f2
+
+=
+
+f3
+
+=
+
+f4 = f5 = 0). However, no single end-
+
+component is a solution.
+
+MeanSup of mean-payoff-sup objectives holds from s is the same
+
+as the probability that the conjunction MeanInf of mean-payoff-
+
+inf objectives holds from s [31]. It follows that in MDPs with
+
+ﬁnite-memory strategies, the value for mean-payoff-sup and mean-
+
+payoff-inf objectives coincides, thus
+
+Max
+
+FM val
+
+(MeanSup,
+
+s)
+
+=
+
+Max
+
+FM val
+
+(MeanInf ,
+
+s)
+
+for
+
+all
+
+states
+
+s.
+
+Key ideas. Let M = S, A, δ be an MDP and rwd : S → Rk be
+
+a reward function. The key ideas to show that randomized memo-
+
+ryless strategies are sufﬁcient for generalized mean-payoff objec-
+
+tives are: (i) ﬁrst observe that the mean-payoff value of a play de-
+
+pends only on the frequency of occurrence of each state, (ii) un-
+
+der ﬁnite-memory strategies the frequencies are well deﬁned (with
+
+probability 1) for each state and action, and (iii) given the frequen-
+
+cies of a ﬁnite-memory strategy, a randomized memoryless strategy
+
+that plays at every state an action with probability proportional to
+
+the given frequencies achieves the same frequencies as the ﬁnite-
+
+memory strategy.
+
+Thus randomized memoryless strategies can achieve the same
+
+values as arbitrary ﬁnite-memory strategies. By Remark 2 the win-
+
+ning probability from an initial state is the maximum probability
+
+to reach end-components with value 1, which is obtained by a pure
+
+memoryless strategy. It follows that randomized memoryless strate-
+
+gies are sufﬁcient in MDPs with mean-payoff objectives to realize
+
+the ﬁnite-memory value.
+
+Lemma 3. In all MDPs with a generalized mean-payoff objective, there exists an optimal-for-ﬁnite-memory strategy that is randomized memoryless.
+
+Polynomial-time algorithm We present a polynomial-time algorithm to compute the value in generalized mean-payoff MDPs with ﬁnite-memory strategies. The key steps of the algorithm are:
+• The algorithm determines all end-components with value 1 (the winning end-components), and then computes the maximum probability to reach the union of the winning end-components (see Remark 2).
+• The ﬁrst step to obtain the winning end-components is to deﬁne a linear program based on the frequencies that gives a union of end-components with frequencies that satisfy the generalized mean-payoff objective. However, this union of end-components itself may not be connected, even though it is part of a larger end-component. In the inﬁnite-memory strategy case, the paths between the union of end-components can be used with vanishing frequency to ensure the generalized mean-payoff objectives. However, for ﬁnite-memory strategies connectedness of the union of the end-components must be ensured. We show how to combine the linear program with a graph-based algorithm to ensure connectedness and get a polynomial-time algorithm.
+Frequency-based linear program. It is known that the winning probability for reachability objectives can be computed in polyno-
+
+mial time using a reduction to linear programming [31]. To complete the proof, we present a solution to compute the winning endcomponents in polynomial time. Our approach extends a technique for ﬁnding in a graph a cycle with sum of rewards equal to zero in all dimensions [39]. First, we present a linear program LP to ﬁnd a union of end-components with nonnegative sum of rewards (the end-components may be disjoint). The variables fs,a represent the frequency of playing action a in state s. The linear program LP consists of the following constraints (see also Figure 4):
+
+(E1) for each s ∈ S: a∈A fs,a = t∈S a∈A ft,a · δ(t, a)(s)
+
+(E2) s∈S a∈A fs,a · rwd(s) ≥ 0 (component-wise) (E3) s∈S a∈A fs,a = 1
+
+(E4) for each s ∈ S and a ∈ A: fs,a ≥ 0
+
+The equations (E1) above express that in every state, the incoming frequency is equal to the outgoing frequency. Equation (E2) ensures that the mean-payoff value is nonnegative (in all dimensions). Equations (E3) and (E4) require that the frequencies are nonnegative and sum up to 1.
+
+Illustration. In the example of Figure 4, a solution to the linear pro-
+
+gram gives for instance
+
+f1
+
+=
+
+1 16
+
+and
+
+f3
+
+=
+
+7 16
+
+,
+
+which
+
+corresponds
+
+to a randomized memoryless strategy that chooses from s1 to go to
+
+s2
+
+with probability
+
+1 1+7
+
+=
+
+1 8
+
+and to go to {s3, s4}
+
+with probability
+
+7 1+7
+
+=
+
+7 8
+
+.
+
+This
+
+strategy
+
+satisﬁes
+
+the
+
+conjunction
+
+of
+
+mean-payoff
+
+objectives with probability 1 (it ensures that the long-run average
+
+of
+
+the
+
+rewards is
+
+1 32
+
+≥
+
+0 in both
+
+dimensions).
+
+Issues regarding connectedness. Arguments similar to the proof
+
+of [39, Theorem 2.2] show that the linear program LP has a solu-
+
+tion if and only if there exists a union of end-components in M and
+
+associated frequencies with nonnegative sum of rewards. However,
+
+this union of end-components need not to be connected and thus
+
+may not be an end-component (see Figure 5 where the union of the
+
+end-components {s1} and {s3} corresponds to a solution of LP).
+
+Note that connectedness is not an issue for inﬁnite-memory strate-
+
+gies: in the example of Figure 5 there exists an inﬁnite-memory
+
+strategy to ensure the mean-payoff objectives with probability 1
+
+(see [47, Lemma 7]).
+
+Ensuring connectedness and frequencies. To ﬁnd single end-
+components with nonnegative sum of rewards, we adapt a technique presented in [39, Section 3]. Construct a graph GM with set S of vertices, and for each pair (s, a) ∈ S × A, if the linear program LP ∧ fs,a > 0 has a solution, add edges (s, t) in GM for all a-successors t of s. If the graph GM is strongly connected, then it deﬁnes an end-component with nonnegative sum of rewards in M . Otherwise, consider the maximum-scc decomposition of GM , and iterate the algorithm in each scc, until the state space reduces to one
+element. The algorithm identiﬁes in this way all (maximal) winning
+
+end-components and arguments similar to [39, Theorem 3.3] show that this algorithm runs in polynomial time, as the recursion depth is bounded by the number of states, and the scc decomposition ensures that the graphs in each recursive call of a given depth are disjoint.
+
+Theorem 3. The following assertions hold for MDPs with generalized mean-payoff objectives Ω ∈ {MeanSup, MeanInf}:
+
+1. There exists a randomized memoryless strategy σ such that
+
+Max
+
+FM val
+
+(Ω,
+
+s)
+
+=
+
+Pσs (Ω,
+
+s)
+
+for
+
+all
+
+states
+
+s
+
+(i.e.,
+
+randomized
+
+memoryless optimal strategies wrt. to ﬁnite-memory strategies).
+
+2. The value and value-strategy problems for generalized mean-
+
+payoff MDPs under ﬁnite-memory strategies (i.e., whether
+
+Max
+
+FM val
+
+(Ω,
+
+s)
+
+≥
+
+λ)
+
+can
+
+be
+
+solved
+
+in
+
+polynomial
+
+time.
+
+Insufﬁciency of pure memoryless strategies. While we show that
+
+randomized memoryless strategies are sufﬁcient, the example of
+
+Figure 4 shows that pure memoryless strategies are not sufﬁcient to
+
+achieve the optimal ﬁnite-memory value: from s1, a pure memory-
+
+less strategy can either choose s2 and then the mean-payoff value
+
+in
+
+the
+
+ﬁrst
+
+dimension
+
+is
+
+−
+
+3 2
+
+<
+
+0, or choose {s3, s4} and then the
+
+mean-payoff
+
+value in the
+
+second dimension is
+
+−
+
+1 2
+
+<
+
+0.
+
+Thus for all
+
+pure memoryless strategies, the generalized mean-payoff objective
+
+is violated with probability 1 although there exists an almost-sure
+
+winning randomized memoryless strategy (see the paragraph Illus-
+
+tration after Lemma 3).
+
+4.2 Generalized mean-payoff objectives under ﬁnite-memory
+
+in
+
+2
+
+1 2
+
+-player
+
+games
+
+We present a result analogous to Theorem 1 for generalized mean-
+
+payoff stochastic games showing that memoryless strategies are
+
+sufﬁcient for player Min against ﬁnite-memory strategies. Note that
+
+the result extends Theorem 1 as mean-payoff-sup objectives are not
+
+closed under shufﬂing (Remark 1).
+
+Theorem 4. In stochastic games with objective Ω ∈ {MeanSup, MeanInf}, there exists an optimal-for-ﬁnite-memory strategy for player Max, there exists a memoryless optimal-forﬁnite-memory strategy for player Min, and determinacy holds under ﬁnite-memory strategies, that is for all states s:
+
+Max
+
+FM val
+
+(Ω,
+
+s)
+
+=
+
+Min
+
+FM val
+
+(Ω,
+
+s)
+
+=:
+
+v(s),
+
+and
+
+sup
+σ∈ΣF M
+
+inf
+π∈Π
+
+Pσs ,π (Ω,
+
+s)
+
+=
+
+v(s)
+
+=
+
+inf
+π∈ΠP M
+
+sup
+σ∈ΣF M
+
+Pσs ,π (Ω,
+
+s).
+
+It follows that the value problem for generalized mean-payoff games with ﬁnite-memory strategies can be solved in coNP by guessing a memoryless strategy for player Min and checking whether the value of the resulting MDP under ﬁnite-memory strategies for player Max is above the given threshold, which can be done in polynomial time (Theorem 3). By the result of [47, Lemma 5, Lemma 6], the problem of deciding the existence of a ﬁnitememory almost-sure winning strategy for player Max in a game (even with only deterministic transitions) with a conjunction of mean-payoff-sup or mean-payoff-inf objectives is coNP-hard. Theorem 5 summarizes the results of this section.
+
+Theorem 5. The value and value-strategy problems for stochastic games with generalized mean-payoff-(inf or sup) objectives played with ﬁnite-memory strategies for player Max (and ﬁnite- or inﬁnitememory strategies for player Min) are coNP-complete.
+
+4.3
+
+Memory
+
+bounds
+
+for
+
+strategies
+
+in
+
+2
+
+1 2
+
+-player
+
+games
+
+We present both exponential lower bound and upper bound on
+
+memory of strategies. We show that in games where ﬁnite memory
+
+is sufﬁcient to win almost-surely a conjunction of mean-payoff
+
+objectives, exponential memory is necessary in general, even with randomized strategies [16].
+Theorem 2 and Theorem 3 establish an |A||SMin| upper bound on memory required for optimal-for-ﬁnite-memory strategies. Thus we obtain the following result.
+Theorem 6. The optimal bound for memory required for optimalfor-ﬁnite-memory strategies for player Max in generalized meanpayoff stochastic games is exponential.
+
+5. Generalized Mean-Payoff Objectives under Inﬁnite-Memory Strategies
+In this section, we consider games with a conjunction of meanpayoff objectives and inﬁnite-memory strategies for player Max (which are more powerful than ﬁnite-memory strategies [47, Lemma 7]).
+5.1 MeanInf objectives
+Since MeanInf objectives are preﬁx-independent and closed under shufﬂing, it follows from the results of [35, Theorem 5.2] that for player Min memoryless optimal strategies exist. Therefore the value and value-strategy problems can be solved in coNP by guessing a (optimal) memoryless strategy for player Min, and then solving an MDP with conjunction of mean-payoff objectives under inﬁnite-memory strategies, which can be done in polynomial time by the result of [8, Section 3.2]. A matching coNP-hardness bound is known for 2-player games [47, Theorem 7].
+Theorem 7. The value and the value-strategy problems for stochastic games with generalized mean-payoff-inf objectives under inﬁnite-memory strategies are coNP-complete.
+5.2 MeanSup objectives
+It follows from the results of [19, Lemma 7] and [34, Theorem 4.1] that to establish the complexity result for the value and the value-strategy problem it sufﬁces to establish the complexity for the almost-sure problem. For mean-payoff-sup objectives, we show that the almost-sure winning problem is in NP ∩ coNP. For player Max to be almost-sure winning for a conjunction of meanpayoff-sup objectives, it is necessary to be almost-sure winning for each one-dimensional mean-payoff-sup objective, and we show that it is sufﬁcient. An almost-sure winning strategy is to play in rounds according to the almost-sure winning strategy of each onedimensional objective successively, for a duration that is always ﬁnite but longer and longer in each round to ensure the corresponding one-dimensional average of rewards (thus over ﬁnite plays) tends to the objective mean-payoff value with high probability (that tends to 1 as the number of rounds increases).
+Theorem 8. The value and the value-strategy problems for stochastic games with generalized mean-payoff-sup objectives under inﬁnite-memory strategies are in NP ∩ coNP.
+Improving the NP ∩ coNP bound to PTIME for even single dimensional objectives would be a major breakthrough, as it would imply a polynomial solution for simple stochastic games [26].
+
+6. Conclusion
+
+In
+
+this
+
+work
+
+we
+
+consider
+
+2
+
+1 2
+
+-player
+
+games
+
+with
+
+generalized
+
+mean-
+
+payoff objectives. We establish an optimal complexity result of
+
+coNP-completeness under ﬁnite-memory strategies, which signif-
+
+icantly improves the previously known semi-decision procedure,
+
+even for the special case of the almost-sure problem. We also es-
+
+tablish optimal bounds for the memory required for ﬁnite-memory
+
+strategies. Given several quantitative objectives, a more general
+
+problem is to consider a different probability threshold for each ob-
+
+jective (in contrast we consider the probability of the conjunction
+
+of the objectives). For the almost-sure problem the more general
+
+problem coincides with the problem we consider. The more general
+
+problem is open, even for the special case of multiple reachability
+
+objectives
+
+in
+
+2
+
+1 2
+
+-player
+
+games.
+
+References
+[1] E. Altman. Constrained Markov Decision Processes (Stochastic Modeling). Chapman & Hall/CRC, 1999.
+[2] C. Baier, C. Dubslaff, and S. Klu¨ppelholz. Trade-off analysis meets probabilistic model checking. In CSL-LICS 2014, pages 1:1–1:10, 2014.
+[3] C. Baier, J. Klein, S. Klu¨ppelholz, and S. Wunderlich. Weight monitoring with linear temporal logic: complexity and decidability. In CSLLICS 2014, pages 11:1–11:10, 2014.
+[4] N. Basset, M. Z. Kwiatkowska, U. Topcu, and C. Wiltsche. Strategy synthesis for stochastic games with multiple long-run objectives. In TACAS, LNCS 9035, pages 256–271. Springer, 2015.
+[5] P. Billingsley. Probability and Measure. Wiley-Interscience, 1995.
+[6] R. Bloem, K. Chatterjee, T. A. Henzinger, and B. Jobstmann. Better quality in synthesis through quantitative objectives. In Proc. of CAV, LNCS 5643, pages 140–156. Springer, 2009.
+[7] A. Bohy, V. Bruye`re, E. Filiot, and J.-F. Raskin. Synthesis from LTL speciﬁcations with mean-payoff objectives. In Proc. of TACAS, LNCS 7795, pages 169–184. Springer, 2013.
+[8] T. Bra´zdil, V. Brozek, K. Chatterjee, V. Forejt, and A. Kucera. Markov decision processes with multiple long-run average objectives. Logical Methods in Computer Science, 10(1:13), 2014.
+[9] R. Brenguier and J.-F. Raskin. Pareto curves of multidimensional mean-payoff games. In CAV 2015, pages 251–267, 2015.
+[10] J. R. Bu¨chi and L. H. Landweber. Solving sequential conditions by ﬁnite-state strategies. SIAM J. on Control and Opt., 25(1):206–230, 1987.
+[11] P. Cerny´, K. Chatterjee, T. A. Henzinger, A. Radhakrishna, and R. Singh. Quantitative synthesis for concurrent programs. In Proc. of CAV, LNCS 6806, pages 243–259. Springer, 2011.
+[12] P. Cerny´, S. Gopi, T. A. Henzinger, A. Radhakrishna, and N. Totla. Synthesis from incompatible speciﬁcations. In Proc. of EMSOFT, pages 53–62. ACM-Press, 2012.
+[13] K. Chatterjee. Markov decision processes with multiple long-run average objectives. In FSTTCS, pages 473–484, 2007.
+[14] K. Chatterjee. Concurrent games with tail objectives. Theor. Comput. Sci., 388(1-3):181–198, 2007.
+[15] K. Chatterjee and L. Doyen. Energy parity games. Theoretical Computer Science, 458(2):49–60, 2012.
+[16] K. Chatterjee and L. Doyen. Perfect-information stochastic games with generalized mean-payoff objectives. CoRR, arXiv:1604.06376, 2016.
+[17] K. Chatterjee and Y. Velner. Hyperplane separation technique for multidimensional mean-payoff games. In CONCUR, pages 500–515, 2013.
+[18] K. Chatterjee, R. Majumdar, and T. A. Henzinger. Markov Decision Processes with multiple objectives. In STACS, pages 325–336, 2006.
+[19] K. Chatterjee, T. A. Henzinger, and F. Horn. Stochastic games with ﬁnitary objectives. In MFCS, LNCS 5734, pages 34–54. Springer, 2009.
+[20] K. Chatterjee, V. Forejt, and D. Wojtczak. Multi-objective discounted reward veriﬁcation in graphs and MDPs. In LPAR, LNCS 8312, pages 228–242. Springer, 2013.
+[21] K. Chatterjee, A. Pavlogiannis, A. Ko¨ßler, and U. Schmid. A framework for automated competitive analysis of on-line scheduling of ﬁrmdeadline tasks. In RTSS, pages 118–127. IEEE, 2014.
+
+[22] K. Chatterjee, M. Randour, and J.-F. Raskin. Strategy synthesis for multi-dimensional quantitative objectives. Acta Inf., 51:129–163, 2014.
+[23] K. Chatterjee, Z. Koma´rkova´, and J. Kret´ınsky´. Unifying two views on multiple mean-payoff objectives in Markov decision processes. In LICS 2015, pages 244–256, 2015.
+[24] T. Chen, V. Forejt, M. Z. Kwiatkowska, A. Simaitis, and C. Wiltsche. On stochastic games with multiple objectives. In MFCS, LNCS 8087, pages 266–277. Springer, 2013.
+[25] L. Clemente and J.-F. Raskin. Multidimensional beyond worst-case and almost-sure problems for mean-payoff objectives. In Proc. of LICS: Logic in Computer Science, pages 257–268. IEEE, 2015.
+[26] A. Condon. The complexity of stochastic games. Inf. Comput., 96(2): 203–224, 1992.
+[27] C. Courcoubetis and M. Yannakakis. The complexity of probabilistic veriﬁcation. J. ACM, 42(4):857–907, 1995.
+[28] L. de Alfaro. Formal Veriﬁcation of Probabilistic Systems. PhD thesis, Stanford University, 1997.
+[29] A. Ehrenfeucht and J. Mycielski. Positional strategies for mean payoff games. Int. Journal of Game Theory, 8(2):109–113, 1979.
+[30] K. Etessami, M. Z. Kwiatkowska, M. Y. Vardi, and M. Yannakakis. Multi-objective model checking of Markov decision processes. Logical Methods in Computer Science, 4(4), 2008.
+[31] J. Filar and K. Vrieze. Competitive Markov Decision Processes. Springer, 1997.
+[32] V. Forejt, M. Z. Kwiatkowska, G. Norman, D. Parker, and H. Qu. Quantitative multi-objective veriﬁcation for probabilistic systems. In TACAS, pages 112–127, 2011.
+[33] D. Gillette. Stochastic games with zero stop probability. Contributions to the Theory of Games, 3:179–187, 1957.
+[34] H. Gimbert and F. Horn. Solving simple stochastic tail games. In Proc. of SODA, pages 847–862. SIAM, 2010.
+[35] H. Gimbert and E. Kelmendi. Two-player perfect-information shiftinvariant submixing stochastic games are half-positional. CoRR, abs/1401.6575, 2014.
+[36] H. Gimbert and W. Zielonka. Games where you can play optimally without any memory. In CONCUR, LNCS 3653, pages 428–442. Springer, 2005.
+[37] M. Jurdzinski, R. Lazic, and S. Schmitz. Fixed-dimensional energy games are in pseudo-polynomial time. In ICALP, pages 260–272, 2015.
+[38] E. Kopczynski. Half-positional determinacy of inﬁnite games. In ICALP (2), LNCS 4052, pages 336–347. Springer, 2006.
+[39] S. R. Kosaraju and G. F. Sullivan. Detecting cycles in dynamic graphs in polynomial time (preliminary version). In STOC, pages 398–406. ACM, 1988.
+[40] O. Kupferman and M. Y. Vardi. Safraless decision procedures. In FOCS, pages 531–542. IEEE Computer Society Press, 2005.
+[41] D. A. Martin. The determinacy of Blackwell games. J. Symb. Log., 63 (4):1565–1581, 1998.
+[42] A. Pnueli and R. Rosner. On the synthesis of a reactive module. In Proc. of POPL, pages 179–190. ACM Press, 1989.
+[43] M. L. Puterman. Markov Decision Processes. J. Wiley & Sons, 1994.
+[44] T. Raghavan and J. Filar. Algorithms for stochastic games — a survey. ZOR — Methods and Models of Oper. Research, 35:437–472, 1991.
+[45] P. J. Ramadge and W. M. Wonham. Supervisory control of a class of discrete-event processes. SIAM Journal of Control and Optimization, 25(1):206–230, 1987.
+[46] Y. Velner. Finite-memory strategy synthesis for robust multidimensional mean-payoff objectives. In CSL-LICS 2014, pages 79:1–79:10, 2014.
+[47] Y. Velner, K. Chatterjee, L. Doyen, T. A. Henzinger, A. Rabinovich, and J.-F. Raskin. The complexity of multi-mean-payoff and multienergy games. Information and Computation, 241:177–196, 2015.
+
+

@@ -1,0 +1,13 @@
+http://dx.doi.org/10.1145/2987443.2987462
+https://www.certificate-transparency.org/ev-ct-plan
+https://commoncrawl.org/
+https://drownattack.com/
+https://www.eff.org/observatory
+https://tacticalsecret.com/124-days-of-lets-encrypt/
+http://www.certificate-transparency.org/
+https://letsencrypt.org/certificates/
+https://publicsuffix.org/
+https://security.googleblog.com/2015/10/
+https://www.startssl.com/
+http://freakattack.com/
+https://www.verisign.com/en_US/channel-resources/

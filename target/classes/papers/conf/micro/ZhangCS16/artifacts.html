@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Find Artifacts - conf/micro/ZhangCS16</title>
+		<style type="text/css">
+body {
+	font: normal 11pt Arial, Helvetica, sans-serif;
+}
+
+body.author {
+	background-color: BurlyWood;
+}
+
+body.funding {
+	background-color: LightGreen;
+}
+
+body.artifacts {
+	background-color: orange;
+}
+
+button.matchBootstrap {
+	margin-bottom: 10px;
+	margin-right: 5px;
+	white-space: nowrap;
+}
+
+h1 {
+	text-align: center;
+	margin: 5px;
+}
+
+h2 {
+	text-align: left;
+	margin: 5px;
+}
+
+input[type="radio"].matchBootstrap,
+input[type="checkbox"].matchBootstrap {
+	margin-right: 5px;
+}
+
+input[type="radio"].matchBootstrap,
+input[type="checkbox"].matchBootstrap {
+	margin-bottom: 14px;
+}
+
+input[type="radio"].matchSelect {
+	margin-bottom: 7px;
+}
+
+input[type="radio"].matchText {
+	vertical-align: top;
+}
+
+span.author {
+	font-weight: bold;
+	background-color: yellow;
+}
+
+table {
+	border: none;
+	padding: 0;
+}
+
+table td {
+	vertical-align: top;
+	padding: 0;
+}
+
+table td.info {
+	width: 600px;
+}
+
+table td.diacritics {
+	width: 120px;
+	float: right;
+	text-align: right;
+}
+
+table td.diacriticsBootstrap {
+	width: 140px;
+	float: right;
+	text-align: right;
+}
+
+table td.diacritics button,
+table td.diacriticsBootstrap button {
+	white-space: nowrap;
+}
+
+table td.rowlabel {
+	text-align: right;
+	font-weight: bold;
+	padding-right: 5px;
+}
+
+table.info {
+	width: 600px;
+	padding: 0;
+	margin: 0;
+	border: none;
+}
+
+table.info td {
+	padding: 0;
+}
+
+table.info td.rowlabel input {
+	font-weight: normal;
+}
+
+table.info .bootstrap-select.wide {
+	width: 100% !important;
+}
+
+td.matchBootstrap {
+	padding-top: 6px;
+}
+
+textarea {
+	width: 32em;
+}
+
+.bootstrap-select>.dropdown-toggle {
+	margin-bottom: 5px;
+}
+
+.floater {
+	float: left;
+	padding-right: 20px;
+}
+
+
+.message {
+	color: red;
+}
+
+.pdf {
+	display: none; /* We decided not to server the PDF at all */
+	top: 0px;
+	right: 0px;
+	position: fixed;
+	width: 650px;
+	height: 660px;
+	border: 2px solid black
+}
+
+.pdf object {
+	width: 650px;
+	height: 660px;
+}
+
+.wide {
+	width: 100%;
+}
+
+#keyDest {
+	display: none;
+}
+
+#keySrc {
+	text-decoration: underline;
+	cursor: copy;
+}
+
+.academic {
+}
+
+.nonacademic {
+	color: red;
+}
+		</style>
+		<script type="text/javascript">
+// See https://www.thecodeship.com/web-development/javascript-url-object/
+function getUrlObject(options) {
+	var default_options = {
+		'url': window.location.href,
+		'unescape': true,
+		'convert_num': false
+	};
+
+	if (typeof options !== "object")
+		options = default_options;
+	else
+		for (var option_key in default_options)
+			if (default_options.hasOwnProperty(option_key))
+				if (options[option_key] === undefined)
+					options[option_key] = default_options[option_key];
+
+	var a = document.createElement('a');
+	a.href = options.url;
+	var url_query = a.search.substring(1);
+	var url_search_arr = url_query.split('&');
+	var url_get_params = {};
+
+	if (url_search_arr[0].length > 1)
+		for (var i = 0; i < url_search_arr.length; i += 1) {
+			var get_param = url_search_arr[i].split("=");
+			var key, value;
+			
+			if (options.unescape) {
+				key = decodeURIComponent(get_param[0]);
+				val = decodeURIComponent(get_param[1]);
+			} 
+			else {
+				key = get_param[0];
+				val = get_param[1];
+			}
+
+			if (options.convert_num)
+				if (val.match(/^\d+$/))
+					val = parseInt(val, 10);
+				else 
+					if (val.match(/^\d+\.\d+$/))
+						val = parseFloat(val);
+
+			if (url_get_params[key] === undefined)
+				url_get_params[key] = val;
+			else
+				if (typeof url_get_params[key] === "string")
+					url_get_params[key] = [url_get_params[key], val];
+				else
+					url_get_params[key].push(val);
+		}
+
+	urlObj = {
+		protocol: a.protocol,
+		hostname: a.hostname,
+		host: a.host,
+		port: a.port,
+		hash: a.hash.substr(1),
+		pathname: a.pathname,
+		search: a.search,
+		parameters: url_get_params
+	};
+	return urlObj;
+}
+
+function prepform() {
+	var urlObject = getUrlObject();
+	var action = urlObject.parameters["action"];
+	var message = urlObject.parameters["message"];
+	var receipt = urlObject.parameters["receipt"];
+	
+	if (typeof action !== "undefined" && action != "")
+		document.getElementById("form").action = action;
+	
+	if (typeof message !== "undefined" && message != "") {
+		document.getElementById("message").innerHTML = message;
+		document.getElementById("messageRow").style.display = "table-row";
+	}
+	
+	if (typeof receipt !== "undefined" && receipt != "")
+		document.getElementById("receipt").value = receipt;
+	updateSubmit();
+}
+		</script>
+		<script type="text/javascript">
+			function addArtifacts(input) {
+				var id = "artifactsTxt";
+				var element = document.getElementById(id);
+				var sep = element.value != "" ? "\n" : "";
+				
+				element.value += sep + input;
+				return false;
+			}
+		
+			function validateForm(form) {
+				{
+					var panic = document.getElementById("panic").checked;
+					var reason = form["reason"].value;
+					
+					if (panic) {
+						if (reason == "") {
+							alert("You may not panic without entering a reason for doing so.");
+							return false;
+						}
+						else
+							return confirm("In a panic situation, only the reason for the panic is recorded; other information is ignored.  " +
+									"The task will be removed from the queue so that you might possibly continued with other tasks.  " +
+									"Proceed with the panic?");
+					}
+					else
+						if (reason != "") {
+							alert("You must panic if there is reason to do so.  Either check the box or remove the reason.");
+							return false;
+						}
+				}
+				
+				{
+					var artifacts = form["artifacts"].value;
+					var lines = artifacts.split("\n");
+					
+					for (var i = 0; i < lines.length; i++) {
+						var line = lines[i].trim();
+						
+						if (line.length == 0)
+							continue;
+						if (line.indexOf(' ') > 0)
+							if (alert("The artifact \"" + line + "\" contains a space which cannot be part of a URL."))
+								return false;
+						if (",.)-".indexOf(line.charAt(line.length - 1)) >= 0)
+							if (!confirm("The artifact \"" + line + "\" ends in a suspicious punctuation mark.  " +
+									"Are you certain that's correct?"))
+								return false;
+						if (!(line.startsWith("http://") ||
+								line.startsWith("https://") ||
+								line.startsWith("ftp://")))
+							if (!confirm("The artifact \"" + line + "\" does not begin with http://, https://, or ftp://.  " +
+									"A reasonable protocol is highly recommended.  Are you certain that's correct?"))
+								return false;
+					}
+				}
+
+				{
+					var artifacts = form["artifacts"].value;
+					
+					if (artifacts == "" && !confirm("No artifacts are specified.  Are you sure?"))
+						return false;
+				}
+				return true;
+			}
+			
+			function isValid(form) {
+				var panic = document.getElementById("panic").checked;
+				var reason = form["reason"].value;
+				var receipt = form["receipt"].value;
+				
+				if (panic && reason == "")
+					return false;
+				if (!panic && reason != "")
+					return false;
+				if (receipt == "")
+					return false;
+				return true;
+			}
+			
+			function updateSubmit() {
+				var form = document.forms["form"];
+				var valid = isValid(form);
+				
+				document.getElementById("submit").disabled = !valid;
+			}
+			
+			function onPanicChanged(panic) {
+				updateSubmit();
+			}
+			
+			function onReasonChanged(reason) {
+				updateSubmit();
+			}
+			
+			function onNonacademicChanged(nonacademic) {
+			}
+
+			function onBadgeChanged(badge) {
+			}
+
+			function copyKey(keySrc) {
+				var text = keySrc.innerText;
+				var keyDest = document.getElementById("keyDest");
+				
+				keyDest.style.display = "inherit";
+				keyDest.value = text;
+				keyDest.select();
+				
+				try {
+					var successful = document.execCommand("copy");
+					
+					if (!successful)
+						console.log("Copying text command failed.");
+				}
+				catch (err) {
+					console.log("Oops, unable to copy");
+				}
+				keyDest.style.display = "none";
+			}
+		</script>
+	</head>
+	<body class="artifacts" onload="prepform();">
+		<h1>Find Artifacts</h1>
+		<!--div class="pdf">
+			<object data="paper.pdf" type="application/pdf">
+				alt : <a href="paper.pdf">paper.pdf</a>
+			</object>
+			<br>
+		</div-->
+		<div class="floater">
+			<h2>Form</h2>
+			<form id="form" name="form" action="" method="post" onsubmit="return validateForm(this);">
+				<input type="hidden" name="key" value="conf/micro/ZhangCS16">
+				<input type="hidden" name="type" value="artifacts">
+				<input type="hidden" id="receipt" name="receipt" value="">
+				<table>
+					<tr id="messageRow" style="display: none;">
+						<td class="message rowlabel">Message:</td>
+						<td id="message" class="message info"></td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Title:</td>
+						<td class="info">Exploiting semantic commutativity in hardware speculation.</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">URL:</td>
+						<td class="info">
+							<a href="http://dx.doi.org/10.1109/MICRO.2016.7783737" target="_blank">http://dx.doi.org/10.1109/MICRO.2016.7783737</a>
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Key:</td>
+						<td class="info">
+							conf/micro/<span id="keySrc" onclick="return copyKey(this);">ZhangCS16</span>
+							<input id="keyDest" type="text">
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Panic:</td>
+						<td>
+							<table class="info">
+								<tr>
+									<td><input type="checkbox" id="panic" name="panic" onchange="onPanicChanged(this);"></td>
+									<td class="wide"><input class="wide" type="text" name="reason" maxlength="63" oninput="onReasonChanged(this);" placeholder="Reason for panic"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Problem:</td>
+						<td>
+							<table class="info">
+								<tr>
+									<td><input class="wide" type="text" name="problem" maxlength="63" size="63" placeholder="Description of the problematic situation"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Nonacademic:</td>
+						<td class="academic">
+							<input type="checkbox" id="nonacademic" name="nonacademic" onchange="onNonacademicChanged(this);" >
+							No research could have been involved (such as in a workshop invitation or report).
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Badge:</td>
+						<td>
+							<input type="checkbox" id="badge" name="badge" onchange="onBadgeChanged(this);">
+							This article boasts some kind of seal of approval from an artifact evaluation committee.
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Artifacts:</td>
+						<td>
+							<table class="info">
+								<tr>
+									<td><textarea class="wide" name="artifacts" id="artifactsTxt" maxlength="1023" rows="4" placeholder="Artifact URLs copied from the article or added with the buttons or blank"></textarea></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr><td>&nbsp;</td><td></td></tr>
+					<tr>
+						<td class="rowlabel"><input type="submit" value="Submit" id="submit"></td>
+						<td>&nbsp;</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div class="floater">
+			<h2>Instructions</h2>
+			<ul>
+				<li>Verify by title that you are displaying the correct PDF.</li>
+				<li>If necessary, use the key to find the correct file.</li>
+				<li style="color: red;">
+					Check the article's title (and possibly content) for indication that it
+					deals only with a workshop, for example, and isn't academic research.
+					Tick the nonacademic box in this case.  If the box is already ticked,
+					verify the computer's guess.
+				</li>
+				<li style="color: red;">
+					Check the top right hand corner for a badge and keep an eye
+					out for possible badges elsewhere.  Tick the badge box if found.
+				</li>
+				<li>Look at the end of the paper, footnotes, and acknowledgements for URLs.</li>
+				<li>If need be, query the entire paper for general search terms or specific websites.</li>
+				<li>Paste the URL, along with desription/source if provided.</li>
+			</ul>
+			<div class="floater">
+				<h3>General Search Terms</h3>
+				<ul>
+					<li>artifact<br><br></li>
+
+					<li>code</li>
+					<li>code can be found at</li>
+					<li>source code<br><br></li>
+
+					<li>availability</li>
+					<li>is available</li>
+					<li>made available<br><br></li>
+
+					<li>github</li>
+					<li>bitbucket</li>
+					<li>codeplex</li>
+					<li>git<br><br></li>
+
+					<li>code repository</li>
+					<li>repo<br><br></li>
+
+					<li>download</li>
+					<li>download from<br><br></li>
+
+					<li>our website</li>
+					<li>please visit</li>
+					<li>please see<br><br></li>
+
+					<li>will be released</li>
+				</ul>
+			</div>
+			<div class="floater">
+				<h3>Specific Websites and Address Formats</h3>
+				<ul>
+					<li><a href="https://github.com">github.com</a></li>
+					<li><a href="http://bitbucket.org">bitbucket.org</a></li>
+					<li><a href="https://code.google.com/archive">code.google.com</a></li>
+					<li><a href="http://www.codeplex.com">codeplex.com</a></li>
+					<li><a href="https://sourceforge.net">sourceforge.net</a><br><br></li>
+
+					<li>http: or https:</li>
+					<li>ftp: or ftps:</li>
+					<li>mailto:</li>
+				</ul>
+			</div>
+		</div>
+	</body>
+</html>

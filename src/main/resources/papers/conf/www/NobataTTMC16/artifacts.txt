@@ -1,0 +1,10 @@
+http://dx.doi.org/10.1145/2872427.2883062
+http://www.nytimes.com/2013/05/29/business/media/
+https://www.washingtonpost.com/
+https://webscope.sandbox.yahoo.com/
+https://www.kaggle.com/c/
+https://github.com/JohnLangford/vowpal_wabbit
+http://www
+http://clearnlp.wikispaces.com/
+https://github.com/turian/
+https://code.google.com/p/word2vec/

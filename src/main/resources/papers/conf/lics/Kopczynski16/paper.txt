@@ -1,0 +1,228 @@
+Invisible Pushdown Languages
+Eryk Kopczyn´ski
+University of Warsaw erykk@mimuw.edu.pl
+
+Abstract
+Context-free languages allow one to express data with hierarchical structure, at the cost of losing some of the useful properties of languages recognized by ﬁnite automata on words. However, it is possible to restore some of these properties by making the structure of the tree visible, such as is done by visibly pushdown languages, or ﬁnite automata on trees. In this paper, we show that the structure given by such approaches remains invisible when it is read by a ﬁnite automaton (on word). In particular, we show that separability with a regular language is undecidable for visibly pushdown languages, just as it is undecidable for general context-free languages.
+Categories and Subject Descriptors F.1.1 [Automata]; F.4.3 [Classes deﬁned by grammars or automata]
+Keywords regular languages of trees, visibly pushdown automata, separability, XML
+1. Introduction
+Finite automata are a well known formalism for describing the simplest formal languages. Regular languages – ones which are recognized by ﬁnite automata – have very nice closure properties, such as decidability of most problems such as universality or disjointness, equivalence of deterministic ﬁnite automata (DFA) and non-deterministic ﬁnite automata (NFA), and closure under complement.
+However, most programming and natural languages have to describe a hierarchical (tree) structure, and ﬁnite automata on words are no longer appropriate. To capture such a hierarchical structure, Noam Chomsky proposed the classic notion of context-free languages. Context-free languages are recognized by context-free grammars (CFGs), or equivalently by pushdown automata (PDA).
+However, context-free languages do not have as good properties as regular ones – for example, universality and disjointness are no longer decidable, deterministic PDA are less powerful than nondeterministic ones, and they are not closed under complement. These properties fail since, although words from a context-free language have an underlying tree structure, it is hard to tell what this structure is just by looking at the word – two completely different derivation trees can yield a very similar output, consider for example the English sentences Time ﬂies like an arrow and fruit ﬂies like a banana, or The complex houses married and single soldiers and their families – after reading the four ﬁrst words of
+Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for proﬁt or commercial advantage and that copies bear this notice and the full citation on the ﬁrst page. Copyrights for components of this work owned by others than the author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior speciﬁc permission and/or a fee. Request permissions from Permissions@acm.org. LICS ’16, July 05 - 08, 2016, New York, NY, USA Copyright is held by the owner/author(s). Publication rights licensed to ACM. ACM 978-1-4503-4391-6/16/07?$15.00 DOI: http://dx.doi.org/10.1145/2933575.2933579
+
+the latter sentence, one could think that the complex houses is the subject and married is the verb, while in fact, the complex is the subject and houses is the verb. This is also a big problem in practical computer science, since such a possibility of incorrect parsing leads to many errors – one famous example is the SQL injection attack, which is based on fabricating SQL queries which will be parsed incorrectly, allowing unauthorized access to a database.
+There are two popular approaches to solve this. The classic approach is to use the ﬁnite automata on trees (TFAs) [5], which work on trees directly. There are several ways of ﬂattening a tree to a string in such a way that the tree structure can be unambiguously read from the output. One common way is the XML encoding; an XML encoding of a regular language of trees can be viewed as a context-free grammar where every terminal a ∈ Σ has a matching closing tag a¯, and every production is of form N → aX1 . . . Xka¯. Nowadays, XML [4] is widely used in web services and databases for the representation of data structures. XML documents are validated with DTDs (document type deﬁnitions) [9], which can be viewed as a special kind of ﬁnite automata working on the tree of the document. Another common way is the functional encoding, which can be viewed as a CFG where every production is of form N → a(X1 . . . Xk), where ( and ) are special bracket symbols.
+Another approach is to use visibly pushdown automata (VPDAs), also known as languages of nested words [2], where every symbol in our alphabet has a ﬁxed type with respect to the stack – it either always pushes a new symbol, or always pops a symbol, or it never pushes or pops symbols – this property allows the tree structure to be easily read. For example, XML and functional grammars given above can be recognized by VPDAs – opening tags and brackets always push a symbol on the stack, while closing tags and brackets always pop.
+Since both of these approaches boil down to working on trees directly in a regular way, they can be seen as equivalent, and most properties of regular languages of words are retained – nondeterministic and deterministic VPDAs and ﬁnite automata on trees are equivalent, and universality and intersection problems are decidable. Hence, representing our data as trees, instead of forcing a linear word structure, deﬁnitely solves many problems – both theoretical and practical – efﬁciently.
+In this paper, we show that not all problems are solved by these approaches. In particular, we show that, informally, although (ﬂattened) TFAs and VPDAs are successful at making the structure visible to powerful computation models such as Turing machines, the structure still remains invisible to the simple ones, such as ﬁnite automata on words. We use our technique to show that the following problem is undecidable, just as in the usual “invisible” context-free case [8, 12]: given two VPDAs (or TFAs ﬂattened in some way) accepting languages L1 and L2 such that L1 and L2 are disjoint, is there a regular language R such that R accepts all words from L1, but no words from L2?
+Our proof is a reduction from the context-free case; essentially, it is shown that the extra structural information can be made in-
+
+visible to all ﬁnite automata. We show that this can be done even when, intuitively, the ﬁnite automaton has access to any structural information that it could reasonably see while traversing the tree – therefore, our method works not only with VPDAs, but also with any “reasonable” string encoding of trees, such as XML or functional encoding.
+A similar property is also obtained for separating by other classes of languages, as long as the corresponding problem for CFGs is undecidable, and the separating class has basic closure properties and a pumping property – the precise conditions are listed in the sequel. In [8] it is shown that the separability problem of context-free languages is undecidable for any class which includes all deﬁnite languages. On the other hand, it has been shown recently that the problem of separability of CFLs by piecewise testable languages is decidable [6].
+Our method solves the following open problem, which has appeared on Rajeev Alur’s website in early 2013 [1]:
+A Challenging Open Problem
+Consider the following decision problem: given two regular languages L1 and L2 of nested words, does there exist a regular language R of words over the tagged alphabet such that Intersection(R,L1) equals L2? [...]
+We say that L2 is a regular restriction of L1 iff the above holds. Since disjoint languages L1 and L2 are separable iff L2 is a regular restriction of L1 ∪ L2, and separability is undecidable, restrictionregularity is undecidable too.
+Rajeev Alur’s question is inspired by [11], where it is shown that, for a fully recursive DTD d, it is decidable whether the language accepted by d is (regularly) recognizable, that is, there is a regular language R such that, for any properly structured word w (in this case, a proper XML document), w is valid with respect to d iff it is accepted by R. This can be viewed as a special case of separability – we take DTDs instead of arbitrary ﬁnite automata on trees, and we want to separate L from its complement. For a fully recursive DTD d, a local automaton (also called standard automaton) Ad is constructed, and it is shown that d is streamable iff it is validated by Ad. More progress is made in [10], where an attempt is made to generalize the result to DTDs which are not fully recursive, by introducing the notion of a separating semigroup H for the DTD d, and allowing the local automaton to acknowledge H. The existence of such a separating semigroup can be reduced to the word problem for ﬁnite groups; however, this problem is known to be undecidable.
+On the other hand, in [3] it is shown that regular recognizability is decidable for visibly push-down languages (an input has to recognize a given language knowing that the input is a well matched word, that is, symbols that push and pop symbols on the stack match correctly). The method used in [3] works for VPDAs and the functional encoding of trees, but it does not extend to the XML encoding, where every opening tag a has to be matched by a matching closing tag a, potentially providing extra information; and thus, the problem of recognizability of XML in full generality remains open, as far as we know (and, although the problem of regularity of a context-free language is also undecidable, the reduction presented in this paper does not immediately work in this case either). In the conclusion of [3], the authors mentioned that they were working on the regular restriction problem for VPDAs, but as far as we know, they were not successful.
+2. Preliminaries
+We remind the basic notions of automata theory; see [7]. For an alphabet Σ, Σ∗ denotes the set of words over Σ, and
+denotes the empty word.
+
+A deterministic ﬁnite automaton (DFA) over Σ is a tuple A = (Σ, Q, qI , F, δ), where Σ is the alphabet of A, Q is the set of states, qI ∈ Q is the initial state, F ⊆ Q is the ﬁnal state, and δ : Q×Σ → Q is the transition function. We extend δ to δ : Q × Σ∗ → Q in the following way: δ(q, ) = q, δ(q, wx) = δ(δ(q, w), x).
+A context-free grammar (CFG) is a tuple G = (V, Σ, R, S), where V is the set of non-terminal symbols, Σ is the set of terminal symbols, R is a set of productions of form N → X1 . . . Xk where N is a non-terminal symbol and and each Xi is either a terminal or non-terminal symbol, and S ∈ V is the start symbol. The language accepted by G, L(G) ⊆ Σ∗, is the set of words which can be obtained from the start symbol S by replacing non-terminal symbols with words, according to the productions.
+A ﬂattened tree grammar (FTG) over Σ is a context-free grammar, whose set of terminal symbols is Σ := Σ∪{♦, ♦}, and every production is of form N → t or N → ♦N1N2 . . . Nk♦, where N1, N2, . . . , Nk are non-terminals, and t is a terminal. A binary ﬂattened tree grammar (BFG) is a ﬂattened tree grammar which uses only k ∈ {0, 2}. A BFG corresponds to the XML encoding of a regular language of binary trees (♦ and ♦ correspond to the opening <a> and closing </a> tag, respectively), and languages recognized by ﬂattened tree grammars are visibly pushdown languages. These two facts are routine to check – we omit this to avoid having to state the deﬁnitions of VPDAs and TFAs; we have decided to use ﬂattened tree grammars in this paper since they are easier to deﬁne than both of these formalisms.
+DEFINITION 2.1. We say that two languages L1 and L2 are separable if there is a regular language R such that for each w ∈ L1, w ∈ R, but for each w ∈ L2, w ∈/ R.
+PROBLEM 2.2 (CFG-SEPARABILITY). INPUT Two context-free grammars G1 and G2 such that
+L(G1) and L(G2) are disjoint OUTPUT Are L(G1) and L(G2) separable?
+The CFL separation problem is known to be undecidable [8, 12]. For convenience, we include the idea of the proof here. Encode conﬁgurations of a deterministic Turing machine M as words, and say that w1 → w2 iff a machine in conﬁguration w1 reaches the conﬁguration w2 in next step. It can be easily shown that (for simple encodings) the languages {w1#w2R : w1 → w2} and {w1R#w2 : w1 → w2} are context-free, and thus the languages L1 and L2 below are also context-free.
+L1 = {w1#w2# . . . w2k#a2k : w1 = wI , w2i−1 → w2Ri}
+L2 = {w1#w2# . . . w2k#ak : w1 = wI , w2Ri → w2i+1}
+The languages L1 and L2 are separable iff M terminates from the initial conﬁguration wI . Indeed, if M terminates after n steps, then we can recognize whether w ∈ L1 or w ∈ L2 by reading the conﬁgurations wi given by w, until we ﬁnd one which does not match the run of M – if i is even, then we know that w ∈/ L1, and if i is odd, then we know that w ∈/ L2. If the sequence ends after l ≤ n conﬁgurations, count the number of a’s, and say w ∈/ L1 iff there are not exactly 2k of them, and w ∈/ L2 if there are not exactly k of them. Since the run is ﬁxed, this can be done with a ﬁnite automaton (which accepts the word if it proves that w ∈/ L2, and rejects if it proves that w ∈/ L1).
+On the other hand, if M does not terminate, consider two words w, w from L1 and L2 respectively where the number of conﬁgurations given is 2k, and they correctly describe the run of M , up to 2k steps. The ﬁnite automaton A now has to tell whether the number of a’s is k or 2k. Since for every ﬁnite automaton A there is a number ω ∈ N such that A cannot tell aω from a2ω in any context (Lemma 4.3 below), A cannot separate the words w, w for k = ω.
+
+3. Overview of the main result
+PROBLEM 3.1 (BFG-SEPARABILITY, FTG-SEPARABILITY).
+INPUT Two BFGs (FTGs) G1 and G2 such that L(G1) and L(G2) are disjoint
+OUTPUT Are L(G1) and L(G2) separable?
+Our main result is the following:
+THEOREM 3.2. The problems BFG-SEPARABILITY and FTGSEPARABILITY are undecidable.
+We will prove Theorem 3.2 in both cases by reducing CFGSEPARABILITY. We will transform a CFG G into a FTG (BFG) G by adding extra productions and structural symbols ♦, ♦. This transformation won’t change the structure of the word: if we take the language L(G ) and remove all the structural symbols, we still have the language L(G).
+Therefore, if L(G1) and L(G2) are separable, then so are L(G1) and L(G2) – a regular language separating L(G1) and L(G2) can also separate L(G1) and L(G2) simply by ignoring the structural symbols (Lemma 4.1). We still have to show that if L(G1) and L(G2) are separable by some R, then L(G1) and L(G2) are also separable; in other words, a regular language cannot use the extra structural information given by the structural symbols.
+This is done the following way: take w ∈ L(Gi), and the corresponding w ∈ L(Gi). Using the fact (Lemma 4.3) that for every regular language R there is an ω such that R cannot tell vω from v2ω in any context (they are syntactically equivalent), we construct the word w which is also in L(Gi), and is syntactically equivalent to T (w), where T (w) is w padded with speciﬁc sequences of structural symbols. This way, we make all the structural information contained in w invisible for R. If R separates L(G1) and L(G2), we could also separate L(G1) from L(G2) in the following way: take w ∈ L(Gi), obtain T (w) by padding; w ∈ L(G1) iff T (w) ∈ R.
+Since BFGs are FTGs, undecidability of separability of FTGs follows from the undecidability of separability of BFGs. However, in the next section, we show the undecidability of FTGSEPARABILITY separately. This is because the proof is considerably easier in this case. The two proofs differ in how the CFG G is transformed to G , and how to construct the padding T , and how to transform w into w syntactically equivalent to T (w). Note that, since the languages recognized by FTGs are visibly pushdown, undecidability of separability of visibly pushdown languages already follows from undecidability of FTG-SEPARABILITY.
+
+4. Separability of FTGs
+In this section, we show that separability is undecidable for FTGs. We will reduce the problem CFG-SEPARABILITY to FTG-
+SEPARABILITY. To do this, we will take two CFGs G1 and G2, and create two FTGs G1 and G2 such that G1 and G2 are separable iff G1 and G2 are. Without loss of generality, we can assume that grammars Gi do not accept the empty word, or any word of length 1.
+Given a context-free grammar G = (V, Σ, P, S), we will construct a ﬂattened tree grammar G = (V , Σ , P , S ), in the following way:
+
+• For each X ∈ V , we have a non-terminal X . We also have one special non-terminal E . The starting symbol of G is S .
+
+• For each production N → t in P , we have the corresponding production in P :
+
+N →t
+
+(1)
+
+• For each production N → N1 . . . Nk in P , we have the corresponding bracketed production in P :
+
+N → ♦E N1E N2E . . . NkE ♦
+
+(2)
+
+• Where the productions for E are as follows:
+
+E → ♦♦ E → ♦E ♦ E → ♦E E ♦
+
+(3) (4) (5)
+
+• For each non-terminal N , we also have the following production in P :
+
+N → ♦N ♦
+
+(6)
+
+Consider π : Σ → Σ, the homomorphism which simply removes the structural symbols ♦ and ♦. By applying π to all the production rules for G , we obtain a grammar π(G ) which accepts exactly π(L(G )). It is straightforward to check that π(G ) is in fact equivalent to G – the only difference is that E is inserted in some places, but all words generated by E reduce to the empty word after applying π. Therefore, π(L(Gi)) equals L(Gi), which makes the following straightforward:
+
+LEMMA 4.1. If L(G1) and L(G2) are separable, then so are L(G1) and L(G2).
+
+Proof π−1(R) is a regular language which separates L(G1) and L(G2) – in other words, the automaton separating these two languages works exactly as the one separating L(G1) and L(G2) (it just ignores all the closing and structural symbols).
+The rest of this section will prove the other direction:
+THEOREM 4.2. If L(G1) and L(G2) are separable, then so are L(G1) and L(G2).
+Assume that L(G1) and L(G2) are separable. Therefore, there is a ﬁnite automaton A such that R = L(A) accepts all words from L(G1), but no words from L(G2). We say that two words w1, w2 ∈ Σ ∗ are syntactically equivalent with respect to R iff for any words v, x ∈ Σ ∗, we have vw1x ∈ R iff vw2x ∈ R. Syntactic equivalence is a congruence with respect to concatenation.
+LEMMA 4.3. There is a number ω ∈ N such that for any w ∈ Σ ∗, wω is syntactically equivalent to w2ω with respect to R.
+
+Proof The set S of all the equivalence classes is a semigroup with concatenation as the operation. This semigroup is called the syntactic semigroup of A, and it is ﬁnite – if for two words w1 and w2 we have δ(q, w1) = δ(q, w2) for each q ∈ Q, then they are syntactically equivalent. For any ﬁnite semigroup (S, ·), there is a number ω ∈ N such that for any s ∈ S, we have s2ω = sω – since k → sk yields an ultimately periodic sequence with period at most |S|, ω = |S|! will work.
+We say that T : Σ∗ → Σ ∗ is a padding iff there exist eL, e, eR ∈ (Σ − Σ)∗ such that, for any w = t1 . . . tn ∈ Σ∗, T (w) is the word eLt1et2e . . . etneR.
+LEMMA 4.4. For a padding T , the languages L(G1) and L(G2) are separable, iff T (L(G1)) and T (L(G2)) are.
+
+Proof The forward direction is straightforward, and proven just as Lemma 4.1 – the automaton simply ignores all the symbols from Σ − Σ (in fact, the stronger version of this lemma where eL, e, eR ∈ Σ ∗ is also true).
+
+For the backward direction, we take the DFA A which separates T (L(G1)) and T (L(G2)): A = (Σ , Q, qI , F, δ). We can assume that there are no transitions to the initial state qI in A – otherwise, we create a copy of qI and make it the new initial state.
+We construct a new DFA A = (Σ, Q, qI , F , δ ) in the following way: take δ (qI , t) = δ(qI , eLt), and δ (q, t) = δ(q, et) for q = qI . For F we take the set of states q such that δ(q, eR) ∈ F . The automaton A working on w ∈ Σ∗ simulates the automaton A working on T (w), hence it accepts w iff A accepts T (w).
+LEMMA 4.5. There is a padding T with the following property: for each w ∈ L(Gi), there is a word w ∈ L(Gi) which is equivalent to T (w) with respect to R.
+This proves Theorem 4.2 and thus Theorem 3.2. Indeed, we will show that T (L(G1)) and T (L(G2)) are separated by R – then, after applying Lemma 4.4, we get our claim.
+Consider w ∈ L(Gi); we have to show that A accepts T (w) iff i = 1. From Lemma 4.5 we know that there is some w ∈ L(Gi) which is equivalent to T (w) with respect to R. Therefore, we know that T (w) ∈ R iff w ∈ R, and since w ∈ L(Gi), T (w) ∈ R iff i = 1.
+Proof of Lemma 4.5 in the FTG case We will show that the padding T given by eL = e = eR = (♦ω♦ω)ω satisﬁes our claim. Let w ∈ L(Gi). We know that w = π(w ) for some w ∈ L(Gi). We have w = e0w1e1w2 . . . ek−1wkek, where each ei ∈ {♦, ♦}∗, for i = 0, . . . , k. We can assume the following facts about ei:
+• Each ei starts with ♦ and ends with ♦. This follows from our productions P (the production 2 puts E before and after each non-terminal, and E must start with ♦ and end with ♦, according to productions 3, 4, 5).
+• Let χ(ei) be the number of times ♦♦ appears in ei. Without loss of generality, we can assume that χ(ei) is divisible by ω for each i. Indeed, suppose that ei = u♦♦v. Since the only production in P which could produce ♦♦ is the production E → ♦♦ 3, we could replace the application of that production with E → ♦E E ♦ → ♦♦♦E ♦ → ♦♦♦♦♦♦ (productions 4, 5), increasing χ(ei) by 1. Repeat until χ(ei) is divisible by ω.
+• For each production N → ♦N1 . . . Nk♦ in P (where N or any Ni could be E ), we also have a production N → ♦N ♦ (productions 4, 6). Therefore, every time we introduce the structural symbols ♦ and ♦, we can introduce as many of them as we want (as long as they match). Without loss of generality, we can assume that each structural symbol is multiplied ω times. Thus, ei ∈ (♦ω + ♦ω)∗.
+From these three properties, ei has to be syntactically equivalent with respect to R to e = eL = eR. Indeed, since syntactic equivalence is a congruence, and wω is equivalent to w2ω for any w, ei ∈ (♦ω + ♦ω)∗ has to be syntactically equivalent to (♦ω♦ω)χ(ei), and since χ(ei) is divisible by ω, it has to be syntactically equivalent to (♦ω♦ω)ω.
+Hence, the word w is equivalent to T (w).
+5. Separability of BFGs
+While the proof above is sufﬁcient to solve the problem for visibly pushdown languages, and for XML encoding of trees, it leaves us with a craving for more, for the following reasons.
+
+First, if we consider languages of terms, it is natural to consider
+different symbols for nodes with different arities (numbers of chil-
+dren) – while the proof above heavily uses the fact that the XML encoding cannot tell whether ♦ comes from the structurally significant production N → ♦E X1E X2 . . . XkE ♦, or it is a fake inserted by the X → ♦X♦ or E → ♦E E ♦ productions. Since the arities here are respectively 2k + 1, 1 and 2, this fails if the
+automaton sees them.
+Moreover, if we consider the process of ﬂattening a tree as
+the result of an automaton which traverses the tree recursively
+and react to what it is seeing on its path, it is natural to assume
+that such an automaton sees the arity, and moreover, between returning from the i-th child of v and progressing to the (i + 1)th child, the automaton should see that i of n children are progressed. This corresponds to ﬂattening productions of form N → ♦k0 X1♦k1 X2♦k2 X3 . . . Xk♦kk.
+Restricting ourselves to the binary case allows us to solve the
+problem in full generality – while the encoding in the deﬁnition of BFG does not explicitely say whether ♦ comes from the “empty leaf” production E → ♦♦ or from one of the binary branching
+rules, a ﬁnite automaton can easily tell which one is the case by
+looking at the neighborhood. Also, while we do not write the inﬁx structural symbols ♦21 explicitely, the automaton can tell that it is at such a branching point iff the last symbol was ♦, and the next one is ♦.
+The rest of this section shows that separability is undecidable
+even when restricted to BFGs.
+
+Proof of Theorem 3.2 in the BFG case The general structure of the proof is the same as of the proof of the FTG case, given in Section 4. We have to adjust the productions P so that we obtain a BFG. As in the proof of the FTG case, we can assume that grammars Gi do not accept the empty word, or any word of length 1. We can also assume that these grammars are in the Chomsky normal form, that is, each production is of form N → N1N2 or N → t, where N , N1 and N2 are non-terminals, and t is a terminal. It is well known that any context-free grammar is effectively equivalent to a grammar in Chomsky normal form [7]. Given a context-free grammar G = (V, Σ, P, S) in Chomsky normal form, we will construct a binary ﬂattened tree grammar G = (V , Σ , P , S ), in the following way:
+
+• For each X ∈ V , we have a non-terminal X . We also have one special non-terminal E . The starting symbol of G is S .
+
+• For each production N → t in P , we have the corresponding
+
+production in P :
+
+N →t
+
+(7)
+
+• For each production N → N1N2 in P , we have the corresponding bracketed production in P :
+
+N → ♦N1N2♦
+
+(8)
+
+• For each X ∈ V , we also have the following productions for X:
+
+X → ♦E X ♦ X → ♦X E ♦
+
+(9) (10)
+
+• Where the productions for E are as follows: E → ♦♦ E → ♦E E ♦
+
+(11) (12)
+
+Lemmas 4.1, 4.3, and 4.4 are proven exactly in the same way as in the FTG case. It is sufﬁcient to prove the counterpart of Lemma 4.5 to prove Theorem 4.2, and thus Theorem 3.2.
+
+Proof of Lemma 4.5 in the BFG case Let ♥ = ♦♦♦, ♥ = ♦♦♦. Thus, for any non-terminal N ∈ V , by applying one of productions ( 9, 10 or 12) and then (11), we have N →∗ ♥N ♦ and N →∗ ♦N ♥. Also, let ν = ω − 1.
+By applying the above many times to non-terminals K and L , we get K →∗ b1K b2 and L →∗ c1L c2, where:
+
+b1 = (♦ν ♥ν )ω♦ν b2 = ♥ν (♦ν ♥ν )ω c1 = ♥ν (♥ν ♦ν )ω c2 = (♥ν ♦ν )ω♦ν
+
+(13) (14) (15) (16)
+
+Now, whenever we have a production N → KL in P , we can do the following in P :
+
+N → ♦K L ♦ →∗ ♦b1K b2c1L c2♦
+
+(17)
+
+This can be written as N → eLK eL eR, where:
+
+eL = ♦b1 e = b2c1
+eR = c2♦
+
+(18) (19) (20)
+
+We claim that the padding T given by the words eL, e, eR
+deﬁned above satisﬁes our claim. Indeed, take w ∈ L(Gi). Consider the derivation tree of w in
+Gi; repeat this derivation in Gi, replacing each production N → KL with N → eLK eL eR according to the chain of productions (17) above, and each production N → t with N → t (7). In the end, for w = t1 . . . tn, we obtain the word w ∈ L(Gi), which contains the symbols t1, . . . , tn separated with e, possibly
+accompanied by eL’s on the right side and eR’s on the left side,
+and with at least one eL before t1 and at least one eR after tN . In
+other words,
+
+w = elL1 t1erR1 eelL2 t2erR2 eelL3 . . . tnerRN where all li, ri are integers, and l1, rn ≥ 1. Let ≡ be the relation of syntactic equivalence with respect to R; note that wω ≡ w2ω for any w ∈ Σ ∗, and that ≡ is a congruence with respect to concatenation. Remembering that ♦ is a left factor of ♥ and thus ♦ω+ν ♥ ≡ ♦ν ♥, and similarly ♥♦ω+ν ≡ ♥♦ν , it can be checked that the following equivalences (*) hold:
+• eLeL is equivalent to eL:
+eLeL = ♦b1♦b1 = = ♦(♦ν ♥ν )ω♦ν ♦(♦ν ♥ν )ω♦ν ≡ ≡ ♦(♦ν ♥ν )ω♦ω(♦ν ♥ν )ω♦ν ≡ ≡ ♦(♦ν ♥ν )ω(♦ν ♥ν )ω♦ν ≡ ♦(♦ν ♥ν )ω♦ν = ♦b1 = eL
+• eReR is equivalent to eR:
+eReR = c2♦c2♦ = = (♥ν ♦ν )ω♦ν ♦(♥ν ♦ν )ω♦ν ♦ ≡ ≡ (♥ν ♦ν )ω♦ω(♥ν ♦ν )ω♦ν ♦ ≡ ≡ (♥ν ♦ν )ω(♥ν ♦ν )ω♦ν ♦ ≡ (♥ν ♦ν )ω♦ν ♦ = c2♦ = eR
+• eeL is equivalent to e:
+eeL = b2c1♦b1 = = b2♥ν (♥ν ♦ν )ω♦(♦ν ♥ν )ω♦ν ≡ ≡ b2♥ν (♥ν ♦ν )ω♦♦ν (♥ν ♦ν )ω ≡ ≡ b2♥ν (♥ν ♦ν )ω(♥ν ♦ν )ω ≡ b2♥ν (♥ν ♦ν )ω = b2c1 = e
+
+• eRe is equivalent to e:
+eRe = c2♦b2c1 = = (♥ν ♦ν )ω♦ν ♦♥ν (♦ν ♥ν )ωc1 ≡ ≡ (♥ν ♦ν )ω♥ν (♦ν ♥ν )ωc1 ≡ ≡ (♥ν ♦ν )ω(♥ν ♦ν )ω♥ν c1 ≡ (♥ν ♦ν )ω♥ν c1 = b2c1 = e
+These rules allow us to reduce all li and ri to zeros (except l1 and rn, which can be reduced to 1). Hence, the word w is equivalent to T (w).
+Remark. The appropriate words e, eL, eR which work in Lemma 4.5 in the BFG case have been found with a computer program. The approach which yielded the answer was to assume a ﬁxed value of ω, consider uvωw to be equivalent to uv2ωw, and exhaustively search for the words eL, e, eR such that eLK eL eR can be derived from N , and the required equivalences (*) hold. By looking at the words obtained for ω = 2, 3, one could guess the general formula. The previous approach was to use a computer program to search for a solution where the words eL, e, eR are equal, just as it works in the non-binary case; however, no such solution was found in the binary case (even when considering a ﬁxed ﬁnite syntactic semigroup instead of just a ﬁxed ω, which ensured that the program had a ﬁnite amount of cases to check, and thus ﬁnd an answer if one existed); however, this previous approach has shown that the weaker, but still sufﬁcient, equivalences (*) should be possible to obtain.
+6. Conclusion
+We can also consider the separation problem for other classes of languages – that is, is it decidable whether languages accepted by two BFGs are separable by a language of class C? From the proof above, this problem is undecidable for class C, as long as the following conditions are satisﬁed:
+• The respective problem for CFGs is undecidable.
+• The class C has the following pumping property: for any L ∈ C, there exists some ω such that for any words v, w, x, vwωx ∈ L iff vw2ωx ∈ L. (This is Lemma 4.3, and it is used in the proof of Lemma 4.5.)
+• If π is a homomorphism which ignores a subset of symbols, and L ∈ C, then π−1(L) ∈ C. (Used in the proofs of Lemma 4.1 and 4.4.)
+• For a padding T (t1 . . . tk) = eLt1et2e . . . etkeR, T (L1) and T (L2) are separable iff L1 and L2 are. (This is Lemma 4.4.)
+Hence, the separability problem is also undecidable for other classes of languages, such as the class of languages recognizable by ﬁrst-order logic.
+Acknowledgments
+Thanks to Charles Paperman for introducing me to the separability problem for VPDAs, and for helping me with the references.
+This work is supported by Poland’s National Science Centre grant 2013/11/D/ST6/03075.
+References
+[1] R. Alur. homepage. https://web.archive.org/web/ 20130103185520/http://www.cis.upenn.edu/~alur/nw. html. A snapshot from 2013-01-03.
+[2] R. Alur and P. Madhusudan. Visibly pushdown languages. In L. Babai, editor, Proceedings of the 36th Annual ACM Symposium on Theory of Computing, Chicago, IL, USA, June 13-16, 2004, pages 202–211.
+
+ACM, 2004. ISBN 1-58113-852-0. doi: 10.1145/1007352.1007390. URL http://doi.acm.org/10.1145/1007352.1007390.
+[3] V. Ba´ra´ny, C. Lo¨ding, and O. Serre. Regularity problems for visibly pushdown languages. In B. Durand and W. Thomas, editors, STACS 2006, volume 3884 of Lecture Notes in Computer Science, pages 420– 431. Springer Berlin Heidelberg, 2006. ISBN 978-3-540-32301-3. doi: 10.1007/11672142 34. URL http://dx.doi.org/10.1007/ 11672142_34.
+[4] T. Bray, M. Sperberg-McQueen, J. Paoli, F. Yergeau, and E. Maler. Extensible markup language (XML) 1.0 (third edition). W3C recommendation, W3C, Feb. 2004. http://www.w3.org/TR/2004/REC-xml20040204.
+[5] H. Comon, M. Dauchet, R. Gilleron, C. Lo¨ding, F. Jacquemard, D. Lugiez, S. Tison, and M. Tommasi. Tree automata techniques and applications. Available on: http://www.grappa.univ-lille3. fr/tata, 2007. release October, 12th 2007.
+[6] W. Czerwinski, W. Martens, L. van Rooijen, and M. Zeitoun. A note on decidable separability by piecewise testable languages. In A. Kosowski and I. Walukiewicz, editors, Fundamentals of Computation Theory - 20th International Symposium, FCT 2015, Gdan´sk, Poland, August 17-19, 2015, Proceedings, volume 9210 of Lecture Notes in Computer Science, pages 173–185. Springer, 2015. ISBN 978-3-319-22176-2. doi: 10.1007/978-3-319-22177-9 14. URL http://dx.doi.org/10.1007/978-3-319-22177-9_14.
+[7] J. E. Hopcroft, R. Motwani, and J. D. Ullman. Introduction to Automata Theory, Languages, and Computation (3rd Edition). AddisonWesley Longman Publishing Co., Inc., Boston, MA, USA, 2006. ISBN 0321455363.
+[8] H. B. Hunt, III. On the decidability of grammar problems. J. ACM, 29(2):429–447, Apr. 1982. ISSN 0004-5411. doi: 10.1145/322307. 322317. URL http://doi.acm.org/10.1145/322307.322317.
+[9] E. Maler, T. Bray, F. Yergeau, J. Cowan, M. Sperberg-McQueen, and J. Paoli. Extensible markup language (XML) 1.1. W3C recommendation, W3C, Feb. 2004. http://www.w3.org/TR/2004/REC-xml1120040204/.
+[10] L. Segouﬁn and C. Sirangelo. Constant-memory validation of streaming XML documents against dtds. In T. Schwentick and D. Suciu, editors, Database Theory - ICDT 2007, 11th International Conference, Barcelona, Spain, January 10-12, 2007, Proceedings, volume 4353 of Lecture Notes in Computer Science, pages 299–313. Springer, 2007. ISBN 3-540-69269-X. doi: 10.1007/11965893 21. URL http://dx.doi.org/10.1007/11965893_21.
+[11] L. Segouﬁn and V. Vianu. Validating streaming XML documents. In L. Popa, S. Abiteboul, and P. G. Kolaitis, editors, Proceedings of the Twenty-ﬁrst ACM SIGACT-SIGMOD-SIGART Symposium on Principles of Database Systems, June 3-5, Madison, Wisconsin, USA, pages 53–64. ACM, 2002. ISBN 1-58113-507-6. doi: 10.1145/ 543613.543622. URL http://doi.acm.org/10.1145/543613. 543622.
+[12] T. G. Szymanski and J. H. Williams. Non-canonical extensions of bottom-up parsing techniques. Technical report, Ithaca, NY, USA, 1975.
+
+

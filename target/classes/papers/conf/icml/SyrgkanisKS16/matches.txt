@@ -1,0 +1,3 @@
+Vasilis_Syrgkanis:AKSHAYKR@CS.CMU.EDU
+Akshay_Krishnamurthy:VASY@MICROSOFT.COM
+Robert_E._Schapire:SCHAPIRE@MICROSOFT.COM

@@ -1,0 +1,119 @@
+ICCAD-2016 CAD Contest in Pattern Classiﬁcation for Integrated Circuit Design Space Analysis and Benchmark Suite
+(Invited Paper)
+
+Rasit O. Topaloglu
+IBM, Hopewell Junction, NY
+rasit@us.ibm.com
+
+ABSTRACT
+Layout pattern classiﬁcation has been utilized in recent years in integrated circuit design towards various goals such as design space analysis, design rule generation, and systematic yield optimization. There is a need for open source or academic solutions as very limited vendors are available to provide this functionality. Speed and accuracy are key aspects to target in the solutions. Given a circuit layout and various markers, contestants are asked to provide a reduced set of representative layout clips around these markers. Each such representative clip identiﬁes a class and has an associated set of one or more unique layout markers.
+1. BACKGROUND
+Integrated circuit design requires polygons that will be printed on wafers to be drawn ﬁrst in layout. A layout thus contains all polygons for all features that will eventually be present on a wafer.1 Whenever a defect is found on wafer, a design space analysis may be conducted to ﬁnd relevant layout clips of interest. Often times, these clips are similar to each other and replicated throughout the layout. It then becomes useful to categorize these clips and cluster ones that are similar to each other. This step is called layout pattern classiﬁcation, or pattern classiﬁcation in short. It serves to make the number of patterns to analyze manageable. This paper proposes the pattern classiﬁcation problem and provides a link to a benchmark suite consisting of layouts, necessary inputs, and the outputs.
+While pattern classiﬁcation has been utilized in literature, there has not been a standard problem deﬁnition nor a common set of benchmarks. Some usages relevant to pattern classiﬁcation are as follows: [2] provides an overall ﬂow for
+1Certain features, such as ﬁlls, may be added later on in data preparation stages before a mask is written. Readers may refer to [1] for an overview of ﬁll insertion from a previous ICCAD Contest.
+Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for proﬁt or commercial advantage and that copies bear this notice and the full citation on the ﬁrst page. Copyrights for components of this work owned by others than the author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior speciﬁc permission and/or a fee. Request permissions from permissions@acm.org.
+ICCAD ’16, November 07 - 10, 2016, Austin, TX, USA
+c 2016 Copyright held by the owner/author(s). Publication rights licensed to ACM. ISBN 978-1-4503-4466-1/16/11. . . $15.00
+DOI: http://dx.doi.org/10.1145/2966986.2980073
+
+pattern classiﬁcation. [3] utilizes wavelet analysis to identify high and low frequency components, where the latter is used as an approximation.
+We have used layout pattern classiﬁcation and pattern matching towards determining and optimizing electrical performance caused by stress or local layout eﬀects [4]. Authors of [5] and [6] have utilized machine learning methods towards classiﬁcation and hotspot detection. [7] focuses on developing a metric that can be used for hotspot classiﬁcation. Wuu et al. [8] utilize support vector machines towards layout pattern classiﬁcation. Wu et al. [9] implement improvements to pattern classiﬁcation in order to classify patterns without interference from ﬁlls for an EUV-speciﬁc technology.
+A number of work in the literature has focused on the application aspects of design ﬂows utilizing layout patterns. Xu et al. [10] and Chang at al. [11] utilize patterns in design for manufacturability (DFM) optimization. Gennari et al. [12] have linked TCAD to EDA using a pattern-based system.
+While layout pattern classiﬁcation is a specialized problem to VLSI, earlier work in the literature focus on more general aspects of data or image clustering. For example, Wright et al. [13] implement facial recognition using sparse representations. Lu et al. [14] implement neural networks to classify text. Aharon et al. [15] implement a k-dimensional singular value decomposition technique for sparse representation of data. Kanungo et al. [16] implement a k-means based clustering algorithm. Comaniciu et al. [17] conduct a feature space analysis using a mean shift methodology.
+2. INPUT TO REQUESTED TOOL
+• Layout in GDS format
+• Markers (polygons) to indicate hotspots on this layout.
+The markers are placed on a diﬀerent layer than the design layer. For example design features could be present on layer 10 in the GDS, whereas the markers would all be present in layer 11. Marker sizes and shapes do not have to be ﬁxed within the same layout.
+Markers also indicate where a clip would be centered. Clip is a set of polygons that is extracted from the original design; an example is shown in Figure 1. The center point of a clip can fall anywhere within or on the edges of a marker polygon. For most practical cases, marker sizes will be picked small. Assuming the center point for a marker is also the clip center
+
+point could be a reasonable assumption. A square that is of width and height equal to the minimum width allowed in that layer of layout could be a practical marker choice. Markers do not have to intersect any design feature on the layout, i.e., they can be placed on space between features.
+X	
+
+Let us deﬁne a clips R and call it a representative clip of a cluster. Clip R does not have to be present in the design but all other clips that are to be a member of this cluster can be obtained by modifying the representative clip according to a constraint.
+The ACC requires that [Area(Xor(R, S))]/w.h ≤ (1 − a) for a clip S to be considered in the same cluster as R. Here, the Area() function takes in a set of polygons deﬁned in the geometric space R2 and outputs the total area of the polygons. Xor(R, S) is a geometric exclusive OR operation that is applied across two clips, it takes two sets of polygons deﬁned in R2 as input and returns a set of polygons that shows the geometric diﬀerence between the two input sets. Figure 2 shows an example.
+
+Figure 1: An example layout clip. Three interconnects are shown, with the center one utilizing a routing track jumper. X indicates the center point of the clip, the boundary of which is shown with the dashed border.
+
+3. PARAMETERS OF REQUESTED TOOL
+• Clip size of interest
+• Area match constraint (a)
+• Edge displacement constraint (e)
+In addition to the inputs of the problem, a set of parameters are also used. These would correspond to the parameters a user of your pattern classiﬁcation EDA tool could select. For the same GDS and marker inputs, multiple different parameters may be asked in diﬀerent runs of the tool. With diﬀerent input parameters, the output will be diﬀerent. In regular usage, a user of your tool would be setting these parameters. The default parameters of a=1 and e=0nm corresponds to ﬁnding exact match for patterns.
+Clip size is the size of a rectangular or square window around a clip, e.g., the dashed border in Figure 1. It is given as an (w, h) pair, the former indicating the width of the window and the latter indicating the height of the window in nanometers. If h is selected equal to w, a square window is implied.
+Your pattern classiﬁcation EDA tool will support two main classiﬁcation setups. These are
+1. area-constrained clustering,
+2. edge-constrained clustering
+A cluster in this context is a group of clips that resemble each other. The resemblance is determined according to the area-constrained and edge-constrained criteria. Furthermore, mirrored images can also be clustered together.
+In area constrained clustering (ACC), an area match constraint parameter is provided. This parameter indicates the maximum area match ratio allowed between any clip of a cluster and the representative clip of a cluster.
+
+Figure 2: Xor function demonstrated. Assuming inputs to the Xor function are the set of polygons from Figure 1 and the set from Figure 3, the output is shown in this ﬁgure.
+Parameter a is a real number and can be set anywhere in between and including 0 and 1, however for most practical cases, it will be set to close to 1. Setting it to 1 would indicate an exact area match.
+In the edge-constrained clustering (ECC), e is a parameter given in nanometers and indicates by how much a given edge can shift inward or outward. Multiple edges can shift by varying amounts as long as each shift is ≤ e. Edges can only shift with a Manhattan grid restriction, i.e., with orthogonal projections. Polygon edges connected to a shifted edge gets projected so that no gaps will exist. ECC operation is illustrated in Figure 3. Any clip of a cluster should satisfy ECC constraints with respect to the representative clip of a cluster.
+Your tool is asked to run in either ACC or ECC mode, but not both at the same time.
+Parameter e is a non-negative real number. For practical cases, it will be set close to 0. Setting it to 0 would indicate an exact edge match.
+4. OUTPUT OF REQUESTED TOOL
+• Clip border overlay ﬁle in GDS
+Your pattern classiﬁcation EDA tool needs to extract one clip covering each marker, and ﬁnd the minimum number of clusters. The clusters will be named by a number starting from 1, i.e., cluster1, 2, 3, etc. Clusters are ranked by the number of clips they represent and the largest one becomes
+
+XX		
+X	
+Figure 3: ECC demonstrated. Two edges shown to be extruded outward, increasing the area of original polygons. Both horizontal and vertical edge displacements shown. One edge is displaced inward, reducing the area of original polygon.
+cluster1. Each cluster contains one or more clips. The clip border overlay ﬁle contains all the clip borders as rectangles or squares as speciﬁed by the user. All member clip borders of a given cluster will be printed on the same layer. Cluster1 clip borders will be printed on layer 1, cluster2 on 2, and so on.
+5. SCORING OF SOLUTION QUALITY
+To validate your tool output, the following are recommended. Some of these checks can be done by visual inspection of your output GDS ﬁles by opening it in a layout viewer.
+1. Check that each input marker is covered in a cluster. In the clip border overlay ﬁle, a marker should be covered by one clip border.
+2. Check that a marker is not listed in more than one cluster.
+3. Cluster clip counts, when summed, should equal total number of markers in the layout.
+Coverage metric constitutes 51% of score and is deﬁned as follows:
+Let us deﬁne three sets: Let S11 be pairs that are in the same cluster in reference vs. submitted solution, S10 be pairs in same cluster in reference solution but not in submitted solution, S01 be pairs in same cluster in submitted solution but not in reference solution.
+Let us deﬁne nxy = |Sxy|, i.e., size of each set. Then let us deﬁne a metric as n11/(n11 + n10 + n01). This metric (i.e. Jaccard index [18]) gives a higher score if submitted score has more similarity to a reference solution. This metric times 0.51 is added to overall score.
+Maximum cluster size (Cmax, size of largest cluster) score is set to 12%. Each diﬀerence of 1 below a reference solution deducts 0.01 from total score until a full reduction of 0.12 is reached.
+Cluster number (Cnum, total number of clusters) score is set to 12%. Each diﬀerence of 1 above a reference solution deducts 0.01 from total score until a full reduction of 0.12 is reached.
+
+Runtime (t) constitutes 25% of score. Each one second diﬀerence above a reference solution deducts 0.01 from ﬁnal score, until a full deduction of 0.25 is reached. We have the following scoring formula, where sub refers to submitted and ref refers to reference solution:
+
+(0.51n11)/(n11 + n10 + n01)+ max[0, min(0.12, 0.12 − 0.01 ∗ (Cmax−ref − Cmax−sub))]+ max[0, min(0.12, 0.12 − 0.01 ∗ (Cnum−sub − Cnum−ref ))]+
+max[0, min(0.25, 0.25 − 0.01 ∗ (tsub − tref ))] (1)
+The larger score is the better. All testcases have equal weight.
+6. TESTCASES
+As of this writeup, 10 testcases have been provided including input parameter variations, each of which requires a separate run and unique outputs. The following table summarizes runtime and cluster statistics. Testcases 1 and 2 use 0.2x0.2µm2 clips, whereas testcases 3 use 0.25x0.25µm2.
+
+name
+testcase1 testcase1ap95 testcase1e4 testcase2 testcase2ap95 testcase2ap90 testcase2e4 testcase3 testcase3ap95 testcase3ap90
+
+tref (s)
+0.903 1.808 1.324 1.167 0.854 1.168 0.874 1.48 1.123
+1.5
+
+Cnum−ref
+8 4 5 26 13 10 18 85 53 39
+
+Cmax−ref
+5 6 5 104 106 114 104 776 784 1040
+
+7. CONTEST RESULTS
+This paper is written before the contest is over. For updates to the contest and results, as well as testcases to download and an extensive Q&A, please visit: http://cad-contest-2016. el.cycu.edu.tw/problem C/default.html
+
+8. REFERENCES
+[1] R.O. Topaloglu, “ICCAD-2014 CAD Contest In Design For Manufacturability Flow For Advanced Semiconductor Nodes And Benchmark Suite,” Proc. ICCAD, 2014, pp. 367-368.
+[2] Y.-C. Lai, F.E. Gennari, M.W. Moskewicz, J. Lei, and W. Lai, “Method and System for Performing Pattern Classiﬁcation Of Patterns In Integrated Circuit Designs,” US8,079,005.
+[3] M. Gabrani and P. Hurley, “IC Layout Pattern Matching And Classiﬁcation System And Method,” US8,363,922.
+[4] R.O. Topaloglu, “Methods For Fabricating An Electrically Correct Integrated Circuit,” US8,336,011.
+[5] D. Ding, X. Wu, J. Ghosh, and D.Z. Pan, “Machine Learning Based Lithographic Hotspot Detection with Critical-Feature Extraction and Classiﬁcation,” Proc. IEEE Int. Conf. IC Design and Technology, 2009, pp. 219-222.
+
+[6] Y.-T. Yu, G.-H. Lin, I.H.-R. Jiang, and C. Chiang, “Machine-Learning-Based Hotspot Detection Using Topological Classiﬁcation and Critical Feature Extraction,” Proc. DAC, 2013, pp. 1-6.
+[7] J. Guo, F. Yang, S. Sinha, C. Chiang, and X. Zeng, “Improved Tangent Space Based Distance Metric for Accurate Lithographic Hotspot Classiﬁcation,” Proc. DAC, 2012, pp. 1169-1174.
+[8] J.-Y. Wuu, F.G. Pikus, A. Torres, M. Marek-Sadowska, “Rapid Layout Pattern Classiﬁcation,” Proc. ASP-DAC, 2011, pp. 781-786.
+[9] P.-H. Wu, C.-W. Chen, C.-R. Wu, and T.-Y. Ho, “Triangle-based Process Hotspot Classiﬁcation with Dummiﬁcation in EUVL,” Proc. VLSI-DAT, 2014, pp. 1-4.
+[10] J. Xu, K.N. Krishnamoorthy, E. Teoh, V. Dai, and L. Capodieci, “Design Layout Analysis and DFM Optimization using Topological Patterns,” Proc. SPIE 94270Q-2, 2015.
+[11] C.C. Chang, I.C. Shih, J.F. Lin, Y.S. Yen, C.M. Lai, et al. “Layout Patterning Check for DFM,” Proc. SPIE 69251R-1, 2008.
+[12] F.E. Gennari and A.R. Neureuther, “A Pattern Matching System for Linking TCAD and EDA,” Proc. ISQED, 2004, pp. 165-170.
+
+[13] J. Wright, A.Y. Yang, A. Ganesh, S.S. Sastry, and Y. Ma, “Robust Face Recognition via Sparse Representation,” IEEE Tran. on Pattern Analysis And Machine Intelligence, Vol. 31, No. 2, 2009, pp. 210-227.
+[14] G. Lu and F.T.S. Yu, “Pattern Classiﬁcation Using A Joint Transform Correlator Based Nearest Neighbor Classiﬁer,” SPIE Opt. Eng, 35(8), 1996, pp. 2162-2170.
+[15] M. Aharon, M. Elad, and A. Bruckstein, “K-SVD: An Algorithm for Designing Overcomplete Dictionaries for Sparse Representation,” IEEE Tran. Signal Processing, Vol. 54, No. 11, 2006, pp. 4311-4322.
+[16] T. Kanungo, D.M. Mount, N.S. Netanyahu, C.D. Piatko, R. Silverman, and A.Y. Wu, “An Eﬃcient k-Means Clustering Algorithm: Analysis and Implementation,” IEEE Tran. Pattern Analysis And Machine Intelligence, Vol. 24, No. 7, 2002, pp. 881-892.
+[17] D. Comaniciu and P. Meer, “Mean Shift: A Robust Approach Toward Feature Space Analysis,” IEEE Tran. Pattern Analysis And Machine Intelligence, Vol. 24, No. 5, 2002, pp. 603-619.
+[18] S. Wagner and D. Wagner, “Comparing Clusterings An Overview,” 2007. http://citeseerx.ist.psu.edu/ viewdoc/summary?doi=10.1.1.164.6189
+
+

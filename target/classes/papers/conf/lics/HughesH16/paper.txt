@@ -1,0 +1,1431 @@
+Conﬂict nets: Efﬁcient locally canonical MALL proof nets
+
+Dominic Hughes
+Logic Group University of California, Berkeley
+
+Willem Heijltjes
+Department of Computer Science University of Bath
+
+Abstract
+Proof nets for MLL (unit-free multiplicative linear logic) and ALL (unit-free additive linear logic) are graphical abstractions of proofs which are efﬁcient (proofs translate in linear time) and canonical (invariant under rule commutation). This paper solves a threedecade open problem: are there efﬁcient canonical proof nets for MALL (unit-free multiplicative-additive linear logic)?
+Honouring MLL and ALL canonicity, in which all commutations are strictly local proof-tree rewrites, we deﬁne local canonicity for MALL: invariance under local rule commutation. We present new proof nets for MALL, called conﬂict nets, which are both efﬁcient and locally canonical.
+Categories and Subject Descriptors F.4.1 [Mathematical Logic and Formal Languages]: Mathematical Logic—Proof theory
+Keywords linear logic, proof nets, MALL, multiplicative-additive linear logic
+
+1. Introduction
+Proof nets for MLL (unit-free multiplicative linear logic [13]) are geometric abstractions of MLL proofs. For example, the two proofs
+
+⊗PP QQ P P⊗Q Q R R ⊗ P P⊗Q Q⊗R R
+
+QQ RR⊗ ⊗ P P Q Q⊗R R
+P P⊗Q Q⊗R R
+
+translate to the same MLL proof net, with 3 axiom links:
+
+P P⊗Q Q⊗R R
+The net abstracts away the arbitrary choice of order between the independent ⊗ rules, one introducing P ⊗Q and the other Q⊗R, in separate parts of the sequent. MLL proof nets are canonical in the sense that they are invariant under rule commutation: proofs differing by a commutation of adjacent rules have the same net. For example, the net above is invariant upon commuting adjacent ⊗ rules.
+Similarly, proof nets for ALL (unit-free additive linear logic) in binary-relation formulation [18, 21, 25, 26] are canonical geometric abstractions of ALL proofs. For example, the two ALL proofs
+
+Permission to make digital or hard copies of part or all of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for proﬁt or commercial advantage and that copies bear this notice and the full citation on the ﬁrst page. Copyrights for components of this work owned by others than ACM must be honored. Abstracting with credit is permitted. To copy otherwise, to republish, to post on servers, or to redistribute to lists, contact the Owner/Author(s). Request permissions from permissions@acm.org or Publications Dept., ACM, Inc., fax +1 (212) 869-0481.
+LICS ’16 July 5–8, 2016, New York, NY, USA Copyright © 2016 held by owner/author(s). Publication rights licensed to ACM. ACM 978-1-4503-4391-6/16/07. . . $15.00 DOI: http://dx.doi.org/10.1145/2933575.2934559
+
+PP PP&
+
+P&P P P&P P⊕Q
+
+⊕1
+
+⊕1
+
+P
+
+PP P⊕Q
+
+P
+
+PP P⊕Q
+
+⊕1
+
+&
+
+P&P P⊕Q
+
+differ by a ⊕1/& rule commutation and translate to the same ALL proof net, with 2 axiom links:
+
+P&P P⊕Q
+Both MLL and ALL proof nets are efﬁcient: a proof translates to a net in linear time. This paper solves a problem which has been open since the inception of linear logic [13]:
+• Problem: are there efﬁcient canonical proof nets for MALL (unitfree multiplicative-additive linear logic)?
+Our solution has two parts:
+1. Honouring MLL and ALL canonicity, in which every rule commutation is a strictly local rewrite in a proof tree, we deﬁne local canonicity for MALL: invariance under local rule commutation.
+2. We introduce new MALL proof nets, called conﬂict nets, which are both efﬁcient and locally canonical.
+
+1.1 Local canonicity
+Each rule commutation of MLL and ALL is a local rewrite in a proof tree. For example, here is an MLL rule commutation which raises a ⊗-rule up over the `-rule immediately above it:
+
+⊗ RR SS
+
+⊗ PP QQ
+
+R R⊗S S `
+
+P P⊗Q Q R⊗S R`S ⊗
+
+P P⊗Q Q⊗(R⊗S) R`S
+
+`
+
+P`(P⊗Q) Q⊗(R⊗S) R`S
+
+⊗ PP QQ ⊗ RR SS
+
+P P⊗Q Q
+
+R R⊗S S ⊗
+
+→ P P⊗Q Q⊗(R⊗S) R S
+
+`
+
+P P⊗Q Q⊗(R⊗S) R`S
+
+`
+
+P`(P⊗Q) Q⊗(R⊗S) R`S
+
+This commutation is a strictly local rewrite: the two upper subproofs of P P ⊗Q Q and R R ⊗ S S (shaded grey) remain intact, as does the continuation below the commutation (also shaded). All
+six rule commutations of MLL and ALL are shown in Fig. 1. The example above is an instance of the `/⊗-commutation in Fig. 1 with Γ =P P⊗Q, A=Q, B=R⊗S, ∆ empty, C=R, and D=S.
+MALL has four additional rule commutations. Faithful to MLL
+and ALL locality, three of them are also local, for example,
+
+ΓABC ΓABD
+
+ΓABC
+
+ΓABD
+
+&`
+
+`
+
+Γ A B C&D
+
+→ Γ A`B C Γ A`B D
+
+`&
+
+Γ A`B C&D
+
+Γ A`B C&D
+
+This commutation duplicates the `-rule locally, but does not duplicate either of the subproofs of Γ A B C or Γ A B D. The three local rule commutations of MALL are in Fig. 2.
+
+ΓABCD
+
+Γ ABCD
+
+``
+
+Γ A B C`D ↔ Γ A`B C D
+
+``
+
+Γ A`B C`D
+
+Γ A`B C`D
+
+ΓAC ΓAD ΓBC ΓBD
+
+ΓAC ΓBC ΓAD ΓBD
+
+& && &
+
+Γ A C&D
+
+Γ B C&D ↔ Γ A&B C
+
+Γ A&B D
+
+&&
+
+Γ A&B C&D
+
+Γ A&B C&D
+
+B∆C DΣ⊗
+
+⊗ΓA B∆C
+
+⊗ Γ A B ∆ C⊗D Σ ↔ Γ A⊗B ∆ C D Σ ⊗
+
+Γ A⊗B ∆ C⊗D Σ
+
+Γ A⊗B ∆ C⊗D Σ
+
+⊕i
+
+Γ
+
+Γ
+
+Γ Ai Bj A1 B1 ⊕B2
+
+⊕j
+
+A1 ⊕A2 B1 ⊕B2
+
+↔
+
+⊕i
+
+Γ
+
+Γ Ai Bj A1 ⊕A2 B
+
+Cj
+
+Γ A1 ⊕A2 B1 ⊕B2
+
+⊕j
+
+B∆CD `
+
+⊗ΓA B∆CD
+
+⊗ Γ A B ∆ C`D
+
+↔
+
+Γ A⊗B ∆ C D `
+
+Γ A⊗B ∆ C`D
+
+Γ A⊗B ∆ C`D
+
+Γ A Ci Γ B Ci &
+
+⊕i
+
+Γ
+
+Γ A&B Ci A&B C1⊕C2
+
+↔
+
+⊕i
+
+Γ
+
+Γ A
+
+A Ci C1⊕C2
+
+⊕i
+
+Γ
+
+Γ B Ci B C1⊕C2
+
+Γ A&B C1⊕C2
+
+&
+
+Figure 1. The rule commutations of MLL (left) and ALL (right). Each is a local rewrite in a proof tree.
+
+However, the fourth, the ⊗/&-commutation, fails to be local because it duplicates an entire proof tree Π:
+
+Π...
+
+B, ∆,C
+
+B, ∆,D &
+
+Γ, A B ∆ C&D ⊗
+
+Γ, A⊗B, ∆, C&D
+
+→
+
+Π... Π...
+
+⊗ Γ, A B, ∆,C Γ, A B, ∆,D ⊗
+
+Γ, A⊗B, ∆,C Γ, A⊗B, ∆,D
+
+Γ, A⊗B, ∆, C&D
+
+&
+
+Accordingly, we distinguish two canonicity properties for a system of MALL proof nets:
+
+• Local canonicity: invariant under local rule commutations. • Strong canonicity: invariant under all rule commutations.
+
+The slice nets of Hughes and van Glabbeek [25, 26] are strongly canonical, but not efﬁcient. Conﬂict nets, summarized below, are locally canonical and efﬁcient.
+
+1.2 Conﬂict nets: a whirlwind tour
+This subsection is intended as a quick impressionistic overview of conﬂict nets, omitting details.
+A conﬂict net is an axiom linking with a cotree alternating between conﬂict and concord nodes, e.g.
+
+a
+
+b c
+
+P P⊗(Q&Q) `(Q⊕R)
+
+b a
+
+c
+
+There are three axiom links a b c, between which is an additive
+relationship (akin to a &-rule in a proof) and is a multiplicative relationship (akin to a ⊗-rule).
+
+1.2.1 Efﬁcient translation Translation is simple and efﬁcient (linear time):
+• axiom rules descend to axiom links (just like MLL and ALL) • ⊗/& rules join the two cotrees at a new root / , respectively.1
+For example, here is a rule-by-rule translation of a MALL proof to the conﬂict net displayed above:
+
+1 Adjacent s or s that result are collapsed, to recover / alternation.
+
+a
+PP
+
+b
+QQ
+b
+Q Q⊕R
+
+⊕1
+
+c
+QQ
+c
+Q Q⊕R
+
+bc
+
+b
+
+Q&Q Q⊕R
+
+c
+
+a bc
+P P⊗(Q&Q) Q⊕R
+
+b a
+
+c
+
+⊕1 &
+⊗
+
+`
+
+a bc
+P P⊗(Q&Q) `(Q⊕R)
+
+b a
+
+c
+
+1.2.2 Coalescence correctness
+
+Geometric correctness is coalescence, a form of rewriting that can be thought of as abstract, top-down sequentialization, generalizing additive coalescence [18] and multiplicative contractibility [8]. A conﬂict net is correct if it coalesces to a single link on all formula roots. An example is below. Details are in §5; our goal here is only to convey an overall impression:
+
+a bc
+P P⊗(Q&Q) `(Q⊕R)
+
+b a
+
+c
+
+& a bc
+P P⊗(Q&Q) `(Q⊕R)
+
+⊕1 a bc
+P P⊗(Q&Q) `(Q⊕R)
+
+⊗ P
+
+abc
+P⊗(Q&Q) `(Q⊕R)
+
+a bc a bc
+abc
+
+` P
+
+abc
+P⊗(Q&Q) `(Q⊕R)
+
+abc
+
+The conﬂict net is correct because the ﬁnal link touches the roots of both formulas in the sequent, and nothing else.
+
+1.2.3 Faithfulness to MLL and ALL
+Proof nets for MLL [13] and ALL in binary-relation formulation [18, 21, 25, 26] are consummate categorically, representing the free unitfree star-autonomous category [19, 20] and the free binary productcoproduct category [21]. Conﬂict nets remain faithful to both, by including them as sub-systems: an MLL /ALL net is a conﬂict net
+
+⊗ΓA
+
+B
+
+B ∆
+
+∆ Ci C1 ⊕C2
+
+⊕i
+
+Γ A⊗B ∆ C1 ⊕C2
+
+↔
+
+⊗ Γ A B ∆ Ci
+
+Γ
+
+Γ A⊗B A⊗B ∆
+
+∆ Ci C1 ⊕C2
+
+⊕i
+
+Γ Ai B C `
+
+⊕i
+
+Γ
+
+Γ A1 B`C A1 ⊕A2 B`C
+
+↔
+
+⊕i
+
+Γ
+
+Γ Ai B A1 ⊕A2
+
+C B
+
+C
+
+`
+
+Γ A1 ⊕A2 B`C
+
+ΓABC ΓABD
+
+Γ ABC
+
+ΓABD
+
+&`
+
+`
+
+Γ A B C&D
+
+↔ Γ A`B C Γ A`B D
+
+`&
+
+Γ A`B C&D
+
+Γ A`B C&D
+
+Figure 2. The additional local rule commutations of MALL. Each is a local rewrite in a proof tree.
+
+with one / . For example, the MLL net at the beginning of the paper is
+
+abc
+P P⊗Q Q⊗R R
+
+abc
+
+1.2.4 Strongly normalizing cut elimination
+
+Cut elimination extends that of both MLL and ALL and is strongly normalizing. The example below duplicates a cut Q∗Q then tra-
+
+verses the copies:
+
+c
+
+cd
+
+P a P⊗Q b Q∗Q
+
+Q&Q
+
+ab
+
+d
+
+↓
+
+b˙
+P a P⊗Q
+b˜
+
+Q∗Q Q∗Q
+
+c
+Q&Q
+d
+
+b˙ c b˜ d a
+
+P a P⊗Q
+
+↓↓
+b˙c
+Q&Q
+b˜d
+
+b˙c a
+
+b˜d
+
+1.3 The dichotomy: efﬁcient versus strongly canonical
+Deﬁne proof nets as rigid if they do not compress proofs: the size of a net is at least linear in the size of a proof. For example, standard MLL nets and ALL nets described above are rigid: an MLL/ALL proof with n axiom rules becomes a proof net with n axiom links.
+A rigid MALL proof net system cannot be both efﬁcient and strongly canonical: repeatedly raising ⊗ rules up over & rules blows up the size of a proof, so translation to strongly canonical nets must be exponential time.2 Both slice nets [25, 26] and conﬂict nets are rigid. Where slice nets are strongly canonical but not efﬁcient, conﬂict nets are efﬁcient but not strongly canonical.
+1.4 Related work
+Box nets. Girard’s box nets [13] are efﬁcient but not canonical: the two ALL proofs displayed earlier have distinct box nets. Box nets are faithful to MLL nets, but not to ALL nets.
+2 This dichotomy is generally believed to hold even without rigidity. Current research by Mark Bagnol aims to formalize such a result.
+
+(P & P) ⊕ (Q & Q)
+
+(Q⊕(Q⊕R))&P &P
+
+tpP tpP tsqP tsqP
+
+t &p
+
+ts &q
+
+t
+
+⊕ 1
+
+ts
+
+⊕ 1
+
+tq tq tsp tsp tsr tsr
+Qtsr Qtsr
+
+tsr Q
+
+ts &r
+
+tsr Q
+
+tsr
+
+⊕ 1
+
+ts
+
+⊕ 2
+
+tsr
+
+⊕ 1
+
+tsr
+
+⊕ 2
+
+1 (P&P)⊕(Q&Q)
+
+ts Q⊕(Q⊕R) t &s
+
+Pts Pt
+
+1 &t
+
+1 ((Q⊕(Q⊕R))&P)&P
+
+Figure 3. Illustrating the unwieldiness of monomial nets. Above: an ALL net, which is a special case of a conﬂict net (with a single
+node, omitted). Below: the corresponding monomial net.
+
+Monomial nets. Girard’s monomial nets [14, 30] are neither efﬁcient nor locally canonical. Efﬁciency fails because monomials encode all paths through a &-rule tree: see Prop. 16. Local canonicity fails since proof translation is not deterministic. With Girard’s (nonsurjective) deterministic translation [14, p. 7], which never merges monomials, local canonicity also fails: commuting any rule up over a &-rule yields a different monomial net. Monomial nets are faithful to MLL nets but not ALL nets. For a discussion of other issues with monomial nets, see [25, 26]. The lack of ALL faithfulness manifests in a degree of unwieldiness: see Fig. 3.
+
+Slice nets. As discussed in §1.3, slice nets [25, 26] are strongly canonical, so necessarily inefﬁcient (since they are rigid). They are faithful to both MLL and ALL nets.
+
+Complexity trade-off. For MALL proof nets there is a complexity trade-off between proof translation, sequentialization and cutelimination. The following table shows how monomial, slice and conﬂict nets negotiate this trade-off:
+
+Monomial Slice Conﬂict
+
+P-time sequentialization P-time proof translation P-time cut elimination
+
+✗ ?
+
+✗ ✗
+
+Monomial net translation if P-time and sequentialization (retrieving a proof) is exponential (Prop. 18, §7). Slice nets attain strong canon-
+
+icity by sacriﬁcing P-time translation3; cut elimination and sequentialization are P-time. Conﬂict nets reﬂect sequent calculus: proof translation and sequentialization are P-time, and the cost of computation resides in cut-elimination, which is exponential (see [32], and also Prop. 17, §7, for the complexity of MALL cut-elimination).
+Other related work. There is an established tradition in mathematics, computer science and proof theory of using graphs to abstract syntax, exempliﬁed by Kelly–Mac Lane graphs for coherence in monoidal closed categories [28], connections/matings in classical logic [2, 5], string diagrams to represent maps in braided categories [27], and Girard’s programme of ﬁnding proof nets for linear logic [13].
+Semantically canonical proof nets have been described for several fragments of linear logic, starting with MLL [13]. For ALL, canonical representations appeared in various guises: coherence spaces [21], the connections method in proof search [12], coherence for categories with sums and products [10], and in the style of string diagrams [1]. Canonical proof nets further appeared for the additive fragment with units (ALLU) [16]; for polarised linear logic [29] and tensorial logic [33]; and for the multiplicativeadditive fragment without units (MALL) [25, 26]. Canonical forms for MALL can be obtained in the sequent calculus via focussing [6]. Other MALL nets include contractible proof nets [31] and ludics nets [7, 11].
+Conﬂict nets are a variant of combinatorial proofs for classical logic [22, 23]: each conﬂict net can be viewed [24] as a maximal map (homomorphism) of contractible coherence spaces (P4-free graphs), from axioms to sequent. The crude draft [24] on conﬂict nets had the data structure of a conﬂict net, but lacked both a clean correctness criterion (here coalescence) and cut elimination.
+Recent work has emphasised the interplay between canonicity and complexity. Correctness of MLL proof nets is linear-time [15], as is correctness for ALLU proof nets [18], while the problem is NLcomplete for strongly canonical MALL proof nets [9]. The interplay is particularly strong for proof equivalence problems, which may be decided by via translation to canonical proof nets: for MLL with units the problem is PSPACE-complete [17], effectively ruling out canonical proof nets, while for MALL it is LOGSPACE-complete [3].
+
+2. MALL
+Formulas A, B, . . . are built from literals (propositional variables P, Q, . . . and their duals P, Q, . . . ) by tensor A⊗B, par A`B, with A & B and plus A ⊕ B. Duality extends to formulas by A⊗B = B`A, A`B = B⊗A, A&B = B⊕ A and A⊕B = B&A.4 We identify a formula with its parse tree, labelled with literals on leaves and connectives on internal vertices. A sequent Γ or ∆ is a disjoint union of formulas (a labelled forest), using comma ( ) for disjoint union. For example P&Q (P⊗P)`(R⊗R) Q is the labelled forest
+P Q PPRR Q
+
+& ⊗⊗ `
+Proofs are built via the following rules [13]:
+
+ΓAB `
+
+ΓA B∆⊗
+
+PP
+
+Γ A`B
+
+Γ A⊗B ∆
+
+ΓA A∆
+cut
+Γ∆
+
+Γ
+
+Γ Ai A1⊕A2
+
+⊕i
+
+ΓA ΓB& Γ A&B
+
+3 Multi-focussing yields strongly canonical forms within sequent calculus [6], inducing the same exponential blow-up.
+4 We deﬁne the dual of A⊗ B as B `A, rather than A `B, to preserve planarity during cut elimination, making examples easier to draw.
+
+3. Cotrees and axiom linkings
+
+A link on a sequent Γ , or Γ-link, is a subsequent of Γ , i.e., a subgraph which is a well-formed sequent. For example, if ∆ is the sequent
+P`Q (S⊕T )⊗(Q⊗R) T &S
+
+then here is a link Λ on ∆:
+
+PQ
+
+Q⊗R
+
+We usually draw a link graphically as a horizontal line with vertical line segments picking out the root vertices of the subformulas inside the sequent. For example, we draw the link Λ above as:
+
+P`Q (S⊕T )⊗(Q⊗R) T &S
+
+We write the union of disjoint links Λ and Ω as juxtaposition Λ Ω. A cotree T on Γ is a tree of conﬂict and concord nodes
+with a Γ -link at each leaf:
+T ····= Λ | (F) | (F)
+where Λ is any Γ-link and F is a ﬁnite non-empty multiset of cotrees, each an argument of the node. A coforest is a multiset of cotrees, and F G denotes the disjoint union of coforests F and G. For example, if Γ is the sequent
+
+P&Q Q⊗R R⊕S
+
+then here is a cotree T on Γ :
+
+P Q⊗R R⊕S (QQ RR) Q Q⊗R S
+
+The node has two arguments (the links QQ and RR ) and the node has three arguments (the link P Q⊗R R⊕S , the cotree (QQ RR) , and the link Q Q⊗R S ). We generally draw both
+the links and the cotree in graphical form. For example, the above
+cotree T becomes:
+
+a b
+
+c
+
+P&Q Q⊗R R⊕S
+
+d
+
+bc ad
+
+A node is unary if it has a single argument. A cotree alternates if no node is unary, no nodes are adjacent, and no nodes are adjacent.
+
+For example, the cotree T1 = a b ( (c d) e f) below-left
+
+alternates but T2 =
+
+( (a)) b
+
+( (c d)) (e f)
+
+below-right does not: cd ef
+ab
+
+a cd ef
+b
+
+T1 = ⌊T2⌋
+
+T2
+
+The alternating form ⌊T⌋ of a cotree T is the canonical alternating cotree associated with T: collapse unary nodes, adjacent nodes,
+and adjacent nodes. For example, the tree T1 above-left is the alternating form ⌊T2⌋ of the cotree T2 above-right. Formally, the alternating form of a cotree is the result of exhaustively applying
+the following rewrites on subcotrees, where T is any cotree and F
+and G are coforests:
+
+(T) → T
+
+(F) G → (F G)
+
+(T) → T
+
+(F) G → (F G)
+
+a
+Z1 ··· Zk X⊕Y
+⊕1
+a
+Z1 ··· Zk X⊕Y
+
+b
+Z1 ··· Zk X⊕Y
+⊕2
+b
+Z1 ··· Zk X⊕Y
+
+c
+Z1 ··· Zk X`Y
+`
+c
+Z1 ··· Zk X`Y
+
+ab
+X1 ··· Xk X⊗Y Y1 ··· Yn
+⊗
+c
+X1 ··· Xk X⊗Y Y1 ··· Yn
+
+ab c
+
+aa
+11 aa
+
+a
+Z1 ··· Zk X&Y
+b
+
+a
+
+b
+
+&
+
+c
+Z1 ··· Zk X&Y
+
+c
+
+··· am ··· a2 ··· a1
+
+··· ··· X&Y
+
+bn ··· b2 ··· b1 ···
+
+a1 am bn b1
+
+··· am ··· a2 ··· a1
+
+··· ··· X&Y
+
+bn ··· b2 ··· b1 ···
+
+a1 am
+
+bn b1
+
+Figure 4. Coalescence steps. In the 1-steps a is a link whose subsequent is not displayed. In all steps but -coalescence, the links target the (roots of the) subformulas shown. In the -coalescence step, the full horizontal extent of the formulas X and Y are shown as boxes, and the links target (roots of) subformulas of X and Y.
+
+3.1 Axiom linkings
+An axiom link is a link of the form PP for some literal P. A cotree is axiomatic if every link is an axiom link. An axiom linking is an axiomatic, alternating cotree. For example, here is an axiom linking on the sequent P&P P⊗R R&R :
+
+a
+
+c b
+
+P&P P⊗R R&R
+
+de fg
+
+bc a de
+
+fg
+
+Note that d and f are instances of the same axiom link, as are b and e, and c and g.
+
+3.2 Notation conventions
+We employ the following conventions for variables and disjoint union throughout the paper:
+
+Sequents
+Formulas A B C D Sequents Γ ∆ Σ Γ A⊗B ∆
+
+Links
+Formulas X Y Links Λ Ω Λ X⊗Y Ω
+
+Coforests
+Cotrees T U Coforests F G
+FTG
+
+4. Translating a proof to an axiom linking
+
+When we add a node between alternating cotrees T and U to form (T U) or (T U) the resulting cotree need not alternate. We
+obtain binary operations ˙ and ˙ which preserve alternation by collapsing to alternating form:
+
+T ˙ U = ⌊ (T U)⌋
+
+T ˙ U = ⌊ (T U)⌋
+
+For example (T1 ˙ T2) ˙ ((U1 ˙ U2) ˙ U3) = (T1 T2 (U1 U2 U3)). Both operations are associative and commutative, so we can write the same cotree as T1 ˙ (U3 ˙ U1 ˙ U2) ˙ T2 .
+
+Deﬁnition 1. A cut-free MALL proof Π of Γ translates to the axiom linking Π on Γ, deﬁned by:
+P P = PP
+
+Π ΓAB
+Γ A`B
+
+=Π
+
+Π1 Π2 ΓA B∆
+Γ A⊗B ∆
+
+= Π1 ˙ Π2
+
+Π Γ Ai Γ A1⊕A2
+
+=Π
+
+Π1 Π2 ΓA ΓB
+Γ A&B
+
+= Π1 ˙ Π2
+
+An example of step-by-step translation from a proof to an axiom linking was shown in §1.2.1.
+
+5. Conﬂict nets and coalescence
+
+Fix a sequent Γ . The coalescence relation ( ) is the rewrite rela-
+tion on cotrees on Γ generated by the following rewrites, illustrated graphically in Fig. 4, where T T ′ generates a coalescence step U U′ if U yields U′ by replacing a subtree T with T ′.
+
+Λ X Y Λ X`Y
+
+(`)
+
+Λ Xi ( F ΛX YΩ)
+
+Λ X1⊕X2 ( F Λ X⊗Y Ω)
+
+(⊕i) (⊗)
+
+(ΛX ΛY ) Λ X&Y
+
+(&)
+
+(Λ) Λ (Λ) Λ
+
+(FX FY )
+
+(FX) (FY)
+
+where the ( ) rewrite has the following conditions:
+
+(1) ()
+
+a
+
+c b
+
+P&P P⊗R R&R
+
+d f
+
+e g
+
+&
+
+a bc
+
+P&P P⊗R R&R
+
+d f
+
+eg
+
+⊗
+
+abc
+
+P&P P⊗R R&R
+
+d f
+
+eg
+
+1
+
+abc
+
+P&P P⊗R R&R
+
+⊗
+
+d f
+
+eg
+
+1 abc P&P P⊗R R&R
+⊗ d e fg
+
+1 abc
+P&P P⊗R
+de
+
+R&R
+fg
+
+bc a de
+a bc d e
+abc d e
+de abc
+de abc
+abc de
+
+fg fg fg fg
+fg fg
+
+abc
+P&P P⊗R
+de
+1
+
+R&R
+fg
+
+abc
+P&P P⊗R
+de
+&
+
+R&R
+fg
+
+abc
+P&P P⊗R R&R
+defg
+&
+abcdefg
+P&P P⊗R R&R
+
+abc de fg
+de fg abc abc defg
+abcdefg
+
+Figure 5. Verifying a conﬂict net via coalescence.
+
+• FX and FY are non-empty multisets of links.
+• FX FY contains three or more links.
+• Γ contains a subformula X&Y such that:
+- every link in FX chooses X
+- every link in FY chooses Y
+where a link chooses X if it intersects X but not Y, and vice versa.
+A cotree T coalesces to T ′ if T ∗ T ′ (where ∗ is the reﬂexivetransitive closure of ), and it coalesces if it coalesces to Γ (the cotree comprising a single link Γ ). Figure 5 shows an axiom linking coalescing, involving (⊗), (&), (1) and ( ) rewrites. Section §1.2.2 includes an example involving (`), (⊕), (⊗) and (&) rewrites (leaving two (1) steps implicit).
+
+A pre-net T : : Γ is a sequent Γ and a cotree T on Γ.
+Deﬁnition 2. A conﬂict net is a pre-net whose cotree is an axiom linking which coalesces.
+
+5.1 Sequentialization
+Coalescence is essentially top-down sequentialization: each axiom link in a conﬂict net corresponds to an axiom rule in a proof and each coalescence step introduces a rule. To record the proof produced by coalescence, a version of conﬂict nets is introduced where leaves carry proofs, rather than merely sequents.
+A deductive cotree on Γ is the generalization of a cotree on Γ in which each leaf is a MALL proof of a subsequent of Γ, rather than just a subsequent. A deductive cotree on Γ projects to an ordinary cotree by replacing each proof by its concluding subsequent of Γ . Conversely, an axiomatic cotree may be considered a deductive cotree by taking each link P P to be the corresponding axiom rule. Coalescence extends to deductive cotrees by combining each of the four rewrite steps (`), (⊕), (⊗), and (&) with its corresponding MALL rule: apply the rule to the proofs in the redex to form a proof of the sequent in the contractum. For example, in (⊗) a proof of Λ Ω X⊗Y is formed by applying the ⊗-rule to the proofs of Λ X and Ω Y in the redex. The rewrites (1) and ( ) leave proofs intact.
+Deﬁnition 3. A deductive conﬂict net T : : Γ sequentializes to a proof Π with conclusion Γ if it coalesces to Π : : Γ .
+Sequentialization is the inverse of proof translation:
+Theorem 4. A conﬂict net T : : Γ sequentializes to a MALL proof Π if and only if Π = T and Π has conclusion Γ .
+
+Proof. Suppose T : : Γ sequentializes to Π : : Γ . Deﬁne cotree equivalence by T ∼ U if and only if ⌊T⌋ = ⌊U⌋, i.e., the cotrees have the same alternating form. In each deductive coalescence step, the
+redex and contractum translate to equivalent pre-nets (i.e., pre-nets
+with equivalent cotrees). For sequentializing T : : Γ to Π : : Γ this means Π translates to a conﬂict net T ′ : : Γ with T ∼ T ′. Since T ′ and T are both alternating, Π translates to T : : Γ .
+Conversely, suppose Π = T. We show by induction on Π that every subtree of T sequentializes to a subproof of Π, whence T : : Γ sequentializes to Π. The base case with Π an axiom rule is immediate. Observe that if T : : Γ T ′ : : Γ for Γ a subsequent of Γ ′ then T : : Γ ′ T ′ : : Γ ′. There are four cases [`] [⊕] [⊗] [&] according to the structure of Π, respectively:
+
+Π′ ΛXY
+Λ X`Y
+
+Π′ Λ Xi Λ X1 ⊕X2
+
+Π1 Π2 ΛX YΩ
+Λ X⊗Y Ω
+
+Π1 Π2 ΛX ΛY
+Λ X&Y
+
+Case [`]. Π = Π′ and by induction Π′ : : Λ X Y sequen-
+
+tializes to Π′. By the observation above Π′ : : Λ X`Y coalesces to
+
+Π′ : : Λ X`Y which coalesces in one step to Π : : Λ X`Y.
+
+Case [⊕] is like [`].
+
+Case [⊗]. Π = Π1 ˙ Π2 . There are four cases, depending
+
+on whether the root of each Πi is or not; without loss of
+
+generality let Π1 = (F) with Π2 not -rooted, so Π =
+
+(F Π2 ). By induction Π1 : : Λ X sequentializes to Π1, and Π2 : : Y Ω to Π2. Then Π on the sequent Λ X⊗Y Ω coalesces
+
+via (F, Π2 ) ∗ (Π1, Π2)
+
+(Π) Π.
+
+Case [&]. Π = Π1 ˙ Π2 . There are again four cases; with-
+
+out loss of generality let Π1 = (F) with Π2 not -rooted, so
+
+Π = (F, Π2 ) where F = T1, . . . , Tm. By induction and prior
+
+observations Π1 and Π2 over Λ X&Y coalesce to Π1 and Π2. We
+
+construct a coalescence sequence over Λ X&Y :
+
+(F, Π2 ) ∗ (Σ1 . . . Σm Π2) ( (Σ1 . . . Σm) (Π2)) ∗ (Π1 Π2)
+
+Π
+
+The stronger induction hypothesis ensures each Ti coalesces to a subproof Θi of Π1. The above sequence works if the side conditions of the ( ) rewrite hold: we must show that the conclusion of each Θi intersects X. This follows by induction on Π1. Since a ⊗-rule would create a -rooted cotree, Π is constructed from the subproofs Θi using only `, ⊕ and & rules. The conclusion of Π1 is Λ X, so the conclusion of each Θi must intersect X. Thus Π : : Λ X&Y sequentializes to Π via the above coalescence sequence.
+
+5.2 Local canonicity
+Two proofs are homeomorphic, denoted Π ≃ Π′, if Π yields Π′ by a sequence of (0 or more) local rule commutations (displayed in Figures 1 and 2).
+Theorem 5 (Local Canonicity). Homeomorphic proofs translate to the same conﬂict net: Π ≃ Π′ implies Π = Π′ .
+Proof. A routine induction on the size of the proof.
+
+5.3 Conﬂuence of coalescence
+For coalescence to be a reasonable correctness criterion and sequentialization procedure we require:
+
+• If one coalescence path succeeds, all paths eventually succeed. • Two sequentializations of the same net must be homeomorphic.
+
+The former means that testing any one coalescence path is sufﬁcient to determine correctness, as opposed to testing all possible paths. This is essential for coalescence to be tractable.
+The two properties can be summarised as saying that sequentialization for conﬂict nets should be conﬂuent modulo local rule commutations: Theorem 6 below. Note, however, a subtlety: coalescence is conﬂuent for conﬂict nets, but not necessarily for pre-nets; if coalescence fails, it can fail in many different ways.
+
+Theorem 6. If T : : Γ sequentializes to Π : : Γ and T coalesces to T ′ then T ′ sequentializes to some Π′ : : Γ with Π′ ≃ Π .
+
+Proof. We show that critical pairs of coalescence on deductive
+
+conﬂict nets converge modulo homeomorphism ` ⊕ ⊗ & 1
+
+of the proofs at each link. The table shown right, 4 4 · · · 5
+
+pairing coalescence rewrites against each other, 1 · · · · ·
+
+gives an overview: a number refers to a case & 3 3 · ·
+
+considered in the proof, while a dot · indicates ⊗ 2 2 2
+
+that rewrites do not form a critical pair. We do ⊕ 1 1
+
+not for example consider
+
+`1
+
+ΛX (ΛX) (Λ X⊕Y)
+
+a critical pair, as the (1) step leaves the link ΛX intact.
+
+Case 1. A critical pair of (`) and (⊕) steps converges by:
+
+ΛXYZ
+
+Λ X Y Z⊕W
+
+Λ X`Y Z Λ X`Y Z⊕W
+
+The induced proofs differ by `/⊕ commutation. The critical pairs for two (`) steps or two (⊕) steps converge similarly.
+
+Case 2. A critical pair of (⊗) and (`) steps converges by:
+
+(F Λ X Ω Y Z W)
+
+(F Λ X Ω Y Z`W)
+
+(F Λ Ω X⊗Y Z W)
+
+(F Λ Ω X⊗Y Z`W)
+
+The induced proofs differ by a ⊗/` commutation. The critical pairs of the (⊗) step with the (⊕) or (⊗) step converge similarly.
+
+Case 3. For the (&) step, the critical pair with the (⊕) step converges as follows.
+
+(Λ X Z Λ Y Z)
+
+Λ X&Y Z
+
+(Λ X Z⊕W Λ Y Z)
+
+(Λ X Z⊕W Λ Y Z⊕W) Λ X&Y Z⊕W
+The induced proofs differ by a &/⊕ commutation. The critical pair with the (`) step converges similarly, and there is no critical pair with the (⊗) step. The (&) step cannot form a critical pair with itself since its node must be binary.
+
+Case 4. For the ( ) step, the critical pair with the (⊕) step converges as follows.
+
+(FX FY Λ Z)
+
+(FX FY Λ Z⊕W)
+
+( (FX) (FY Λ Z))
+
+( (FX) (FY Λ Z⊕W))
+
+The side-condition to the initial ( ) step above is that some formula
+
+in ΛZ must be a subformula of Y in X&Y in the sequent Γ over
+
+which the cotrees are formed. This condition remains valid for
+
+Λ Z⊕W: since Z occurs in Z⊕W and Y in X&Y, Z = Y; then
+
+if Z is a subformula of Y, so is Z⊕W. The critical pair with the (`)
+
+step converges similarly, and no critical pairs are formed with the
+
+(⊗), (&), and (1) steps.
+
+Case 5. The critical pair of the ( ) step with itself is
+
+T = (FXZ FXW FYZ FYW )
+
+( (FXZ FXW ) (FYZ FYW ))
+
+( (FXZ FYZ) (FXW FYW ))
+where the sequent Γ on which the cotrees are formed has subformulas X&Y and Z&W such that each of the links in FXZ contains subformulas of X and Z, and similarly for FXW, FYZ, and FYW . We show by induction on the width of T that both sides sequentialize to homeomorphic proofs.
+By assumption, T sequentializes, starting with (without loss of generality) the rightward step above. Since both the rightward and downward steps apply, no link intersects both X and Y, or both Z and W.
+First we show that no Fi can be empty. Suppose FXZ is empty; since the downward step from T applies, FYZ is non-empty. Then
+(FXZ FXW) may coalesce to a link containing W, but not Z&W, while (FYZ FXW) may coalesce to a link containing Z&W (or Z), but not only W. This contradicts the assumption that T coalesces via the rightward step above.
+Next, consider the case where each Fi is unary; then Fi is a proof link Πi with conclusion Λi. Permuting (`) steps and (⊕) steps above (&) steps (case 3. above) and ( ) steps (case 4. above), we may assume the conclusions Λi are Λ X Z, Λ X W, ΛY Z, and ΛY W respectively. The critical pair from T converges as follows.
+
+(ΛXZ ΛXW ΛYZ ΛYW )
+
+( (ΛXZ ΛXW ) (ΛYZ ΛYW ))
+
+( (ΛXZ ΛYZ) (ΛXW ΛYW ))
+
+(Λ X Z&W Λ Y Z&W))
+
+(Λ X&Y Z Λ X&Y W)
+
+Λ X&Y Z&W
+
+For the inductive step, we will show that if Fi is not unary, then (Fi) coalesces to Λi; whence the case is as above. We will only need to consider (FXZ FXW) as the case for (FYZ FYW ) follows by symmetry.
+Using the assumption that (FXZ FXW) coalesces (since T coalesces via the rightward step above), and ignoring (⊕) and (`)
+steps as previously, consider the ﬁrst ( ) step. If this applies to the
+subformula Z&W, coalescence must be via a sequence
+
+(FXZ FXW )
+
+( (FXZ) (FXW )) ∗ (ΛXZ ΛXW )
+
+Then each (Fi) coalesces to Λi, and the critical pair from T converges as above.
+Otherwise, the ﬁrst ( ) step on (FXZ FXW) is on a subformula U&V. Let it be the step
+
+(FXZ FXW )
+
+( (FXZU FXWU) (FXZV FXWV )) .
+
+By the same reasoning as above, none of the Fi can be empty. Then the following ( ) step for Z&W also applies:
+
+(FXZ FXW )
+
+( (FXZU FXZV ) (FXWU FXWV )) .
+
+By induction hypothesis, these two steps converge (modulo homeomorphism), which means there must be a sequence
+
+( (FXZU FXZV ) (FXWU FXWV )) ∗ (ΛXZ ΛXW ) .
+Then (FXZ) and (FXW) coalesce to ΛXZ and ΛXW respectively, and similarly for FYZ and FYW , and the critical pair from T converges as above.
+
+5.4 Complexity of coalescence
+Conﬂuence is essential for coalescence to be tractable, since it becomes sufﬁcient to verify just one coalescence sequence, instead of having to try every possibility. To establish that coalescence is P-time (polynomial-time decidable), we will look at:
+A. the maximal length of a coalescence sequence, and
+B. the cost of ﬁnding and executing the next step.
+We will take the size of a conﬂict net to be the size of the cotree plus the size of the sequent. In what follows we are not aiming to give an efﬁcient algorithm; we aim purely for a straightforward and accessible demonstration that coalescence is a reasonable correctness condition.
+For A observe that the number of (1) and ( ) steps is bounded linearly by the number of other steps: there is at most one (1) step created by each (⊗) and ( ) step, and at most one ( ) step for each (&) step. The other coalescence rewrites, (⊗), (`), (&), and (⊕), are limited to one application per connective per link. This gives a quadratic bound to the length of any coalescence path.
+For B, each step other than ( ) involves only local patternmatching and rewriting, which means a single traversal of the conﬂict net can ﬁnd and execute such a step. A ( ) redex in a prenet T : : Γ can be found and coalesced as follows.
+1. Find a node (Λ1 . . . Λn) whose children have all been coalesced to links Λi. This is linear-time.
+2. For each Λi, for every subformula X&Y of Γ , mark X or Y when Λi intersects it. This is a simple walk from the formulas in Λi towards the roots of Γ ; at most linear-time for Λi, and quadratic for (Λ1 . . . Λn).
+3. Find a subformula X&Y with X and Y both marked, and either X or Y marked for every i n; then partition (Λ1 . . . Λn) accordingly. This is linear-time.
+
+Together, these algorithms for A and B give a time complexity of O(n4), which justiﬁes the following proposition:
+Proposition 7. Conﬂict net correctness is P-time.
+It is likely that more efﬁcient algorithms are possible. Correctness of MLL proof nets is linear-time [15], and this likely extends to coalescing a subtree (Λ1 . . . Λn), which additionally involves only (⊕) rewrite steps.
+
+5.5 ALL coalescence
+Coalescence for MALL departs from coalescence in purely additive linear logic [18]. Conﬂict nets restricted to ALL coincide with ALL proof nets, with a single node covering the axiom links. However,
+
+coalescence for ALL has the following rewrite in place of the two rewrites ( ) and (&).
+
+(F Λ X Λ Y)
+
+(F Λ X&Y)
+
+(A)
+
+The difference between (A) and (&) is that the former allows a context F, while the latter only applies to binary nodes. The rewrite (A) is analogous to the (⊗) rewrite.
+For ALL, where sequents consist of exactly two formulas, (A) is conﬂuent [18] in the manner of Theorem 6: if one path succeeds, all paths do. But for sequents of three formulas or more, as occurs in MALL, it is not conﬂuent. Consider the sequent
+
+P&P Q&Q R&R
+
+and the ﬂat cotree T that takes all eight slices as links,
+
+T = (PQR PQR PQR PQR PQR PQR PQR PQR)
+
+This coalesces via (A) if the &-formulas are treated in order, ﬁrst P&P, then Q&Q, then R&R. However, coalescing one instance of P&P, one of Q&Q, and one of R&R produces a deadlock:
+
+T
+
+∗ A
+
+(PQR P&P Q R P Q&Q R P Q R&R PQR)
+
+No further (A) steps are possible, breaking conﬂuence. For MALL coalescence, replacing rule (A) with ( ) and (&)
+solves this issue, yielding conﬂuence (Theorem 6). Where MLL contractibility (⊗) and (`), and ALL coalescence
+(⊕) and (A), are top-down, the example above suggests top-down coalescence is impossible for MALL. Our coalescence combines
+one bottom-up rule ( ) with an otherwise top-down procedure.
+
+6. Cut elimination
+
+In this section we extend the syntax of formulas and sequents with a binary cut connective ∗, restricted to occur in outermost position between dual formulas. Thus every cut formula has the form A∗A with A cut-free.
+
+Deﬁnition 8. A conﬂict net with cut is a conﬂict net with coalescence extended by
+
+(F Λ A A Ω) : : Γ A∗A
+
+(F Λ Ω) : : Γ (∗)
+
+This step deletes a cut formula A∗A reached during coalescence. Thus successful coalescence results in a cut-free sequent, and a cut formula is never contracted in the context of a (&) step. The latter means cut formulas are not shared between slices. This is important for cut-elimination, which will manipulate cut formulas.
+For sequentialization, the deductive variant of the above coalescence step combines the two subproofs with a cut rule. For proof translation, the cut rule translates to the same cotree as a ⊗ rule,
+
+Π1 Π2 Λ, A A, Ω
+Λ, Ω
+
+= Π1 ˙ Π2
+
+but the sequent over which the tree is formed is extended with A∗A.
+Thus, a proof Π of Γ with cuts translates to Π : : Γ C1 . . . Cn where the formulas Ci = Ai ∗Ai are the cut formulas of Π.
+Since the (∗) rewrite is similar to the (⊗) rewrite, Theorem 6
+extends straightforwardly to conﬂict nets with cut:
+
+Theorem 9. Sequentialization for conﬂict nets with cut is conﬂuent modulo homeomorphism.
+
+6.1 Cut elimination
+Cut elimination comprises four rewrite steps, three removing a cut (atomic, ⊗/`, and &/⊕), and a duplication step. Duplication corresponds to raising a cut rule over a & rule in sequent calculus, which duplicates the cut and its subproof:
+
+ΠΠ
+
+Π
+
+A, ∆, B
+
+A, ∆, C &
+
+Γ, A A, ∆, B Γ, A A, ∆, C
+cut cut
+
+Γ, A A ∆ B&C
+cut
+
+→
+
+Γ, ∆, B
+
+Γ, ∆, C &
+
+Γ, ∆, B&C
+
+Γ, ∆, B&C
+
+For the corresponding duplication in conﬂict nets, the question is what to duplicate. The notion of subproof is not directly applicable to conﬂict nets, but it is accessible via coalescence: since any coalescence sequence (eventually) produces a sequentialization, any subtree or subforest that coalesces to a single link corresponds to a subproof in some sequentialization. Among subproofs suitable for duplication, we choose the smallest:
+
+Deﬁnition 10. In a net (F) : : Γ the kingdom of a subformula A of
+Γ , if it exists, is the smallest subforest KA of F such that (KA) : : Γ coalesces to a link ∆ A : : Γ .
+
+As in the MLL case, the kingdom of A corresponds to the smallest
+subproof with A in the conclusion in any sequentialization: see
+[4] for details. The kingdom of A may not exist, for example if A occurs in a formula A&B generated by a -rooted cotree in F.5
+The following notions provide the local structure needed for cut-
+elimination. A coforest F touches a formula A if a link in F inter-
+sects A. Non-empty coforests FX and FY separate a subformula X⊗Y, X&Y, or X⊕Y if every tree in FX touches X but not Y and every tree in FY touches Y but not X. A cotree generates a subformula Z if two immediate subtrees separate Z.
+For example, if a cotree (F) generates a subformula X ⊗ Y, then the root of (F) represents a sequent rule introducing the ⊗
+between X and Y.
+
+Deﬁnition 11 (Cut reduction). A pre-net T : : Γ A ∗ A where T generates the cut A∗A reduces as follows. In each case, alternation may need to be restored.
+
+Atomic step:
+
+(F P P P P) : : Γ P ∗P →
+
+vw xy
+
+wx
+
+(F P P) : : Γ vy
+
+where vertices vwxy are underset, to avoid ambiguity.
+
+Multiplicative step:
+
+T : : Γ (A⊗B)∗(B`A) → T : : Γ A∗A B∗B
+
+if T generates both A⊗B and (A⊗B) ∗ (B`A). This step applies analogously to the symmetric cut (B`A) ∗ (A⊗B).
+
+Additive step: ( (FA FB) F) : : Γ (A&B)∗(B⊕A) ↓
+
+( (FA) F) : : Γ A∗A
+
+if FA and FB separate A &B and F does not touch B. This step applies analogously to the symmetric cut (B⊕A) ∗ (A&B).
+
+Duplication step:
+
+(F KA (FB FC)) : : Γ , Σ, A∗A
+
+↓
+
+(F ( (KA (FB)) (KA (FC)))) : : Γ , Σ, A∗A, Σ, A∗A
+
+if
+
+• F KA does not touch A, • FB and FC separate a formula B&C not a subformula of A,
+and where
+
+• KA is the kingdom of A and Σ are the cuts it dominates (deﬁned below), and
+
+5 One can adjust the deﬁnition of kingdom to always exist; we have no need.
+
+• the left copy of Σ, A∗A is associated with FB and the left copy of KA; the right copy with FC and the right copy of KA.
+A simple example of cut duplication was shown in §1.2.4. Figure 6 shows an example with a larger duplicated kingdom. The domination order on a pre-net T : : Γ is generated by:
+• the subformula ordering over Γ ,
+• the subtree ordering over T,
+• a link Λ in T dominates its Γ -subformulas,
+• a subtree T ′ dominates a formula C if T ′ generates C.
+Theorem 12. Cut reduction on conﬂict nets preserves sequentialization modulo cut reduction and homeomorphism.
+Proof sketch. For each of the four steps T : : Γ → T ′ : : Γ we show that if T : : Γ sequentializes there are coalescence paths for T and T ′ that generate respective sequentializations Π and Π′ such that Π cut-reduces to Π′ modulo homeomorphism.
+Proposition 13. A cut in a conﬂict net can always reduce.
+Proof sketch. The net coalesces, so a cut A∗A must coalesce by a (∗) step (F ΛA AΩ) (F ΛΩ). Case distinctions are needed based on which coalescence steps produce ΛA and AΩ.
+
+6.2 Strong normalization
+
+The idea that the additive connectives represent a choice for either
+
+their left or their right component is naturally captured by the (stan-
+
+dard) notion of slice: what remains of a proof net after removing
+
+one branch for each additive connective. For conﬂict nets, a natural
+
+notion of slice is one that chooses on nodes. While we will not
+
+formalize such a notion, as we have no direct need for it, we will
+
+deﬁne a measure to count slices in this manner. Deﬁne the weight
+
+T of a cotree by:
+
+Λ =1
+
+(T1 . . . Tn) = (T1 . . . Tn) =
+
+i Ti i Ti .
+
+This measure will be used to establish that cut reduction is terminating. The idea is that upon duplication, the copies of a cut are pushed into separate collections of slices. In other words, the duplicated cuts are each shared amongst fewer slices than the original, giving a natural measure for termination.
+
+Deﬁnition 14. In a conﬂict net the weight of a cut A ∗ A is the weight TA of the subtree TA that generates it, and its size is the size sz(A) of A. The weight of a net is the multiset comprising the
+pair ( TA , sz(A)) for each cut.
+
+Theorem 15. Conﬂict net cut elimination is strongly normalizing.
+
+Proof. By Prop. 13 any cuts present in a net can be reduced. The weight of a net decreases upon cut reduction. Any reduction path may be completed to cut-free normal form.
+
+7. Complexity results
+The following examples support the comparison table in §1.4.
+Proposition 16. Monomial nets are not efﬁcient: proof translation has super-linear complexity.
+Proof sketch. Let Ai = Pi &Pi, Tk = A1 ⊗(. . .⊗(Ak−1 ⊗Ak) . . .) and Γk = A1 . . . Ak Tk. One can construct a cut-free proof Πk of Γk with all &-rules at the bottom and n = 2k.k axiom rules whose monomial net θk must have n axiom links, each carrying a monomial with k distinct eigenvariables. Thus θk is a factor k larger than Πk.
+Proposition 17. MALL cut elimination is EXPTIME.
+
+ac
+Q Q⊗(R⊗S)
+
+b d
+S∗S S⊗P
+
+eg
+(P ` R) ∗ (R ⊗ P)
+h
+
+f
+P⊕P
+i
+
+R&R
+
+fg hi ab c d e
+
+c˙ a
+Q Q⊗(R⊗S)
+c˜
+
+b˙ d˙
+S∗S S⊗P
+S∗S d˜
+b˜
+
+e˙ g
+(P ` R) ∗ (R ⊗ P)
+(P ` R) ∗ (R ⊗ P)
+e˜ h
+
+f
+P⊕P
+i
+
+R&R
+
+b˙ c˙ d˙ e˙ f g b˜ c˜ d˜ e˜ h i a
+
+Figure 6. Illustrating cut duplication. Pattern-matching the deﬁnition of the duplication step: in the redex (the upper conﬂict net) A is P`R, its kingdom KA is bcde, FB is the cotree f g, FC is the cotree h i, F is the cotree a (a single link), Γ is Q Q⊗(R⊗S) S⊗P P⊕P R&R, and Σ is S∗S. The kingdom bcde is duplicated, once as b˙ c˙d˙ e˙ (next to f g) and once as b˜ c˜d˜ e˜ (next to h i).
+
+Proof. Let Ai = Qi⊗ (Pi⊗Pi+1)`Qi+1 and Γn = P1 Q1 A1&A1 . . . An&An Qn+1 ⊗ Pn+1. The ⊗s force a cut-free proof of Γn to stack n &-rules, introducing A1&A1, . . . , An&An bottom-up, for 6×2n – 4 axioms, exponential in n. Using cut, Γn has a 10n+2 axiom proof, a cut-free proof of P1 Q1 A1 . . . An Qn+1 ⊗ Pn+1 cut with n proofs of Ai Ai&Ai.
+Proposition 18. Monomial net sequentialization is EXPTIME.
+Proof sketch. Monomial nets θn on Γn deﬁned above grow linearly in n; cut-free MALL proofs of Γn grow exponentially.
+Acknowledgements. Roberto Maieli for pointers on monomial and box nets. Referees for constructive feedback. EPSRC Project EP/K018868/1 Efﬁcient and Natural Proof Systems. Wes Holliday for hosting Dominic at UC Berkeley.
+References
+[1] J. B. Almeida, J. S. Pinto, and M. Vilaça. A local graph-rewriting system for deciding equality in sum-product theories. ENTCS, 2007.
+[2] P. B. Andrews. Refutations by matings. Trans. Comp., 25(8), 1976.
+[3] M. Bagnol. MALL proof equivalence is Logspace-complete, via binary decision diagrams. TLCA, 2015.
+[4] G. Bellin and J. van de Wiele. Subnets of proof-nets in MLL−. In Advances in Linear Logic, 1995.
+[5] W. Bibel. An approach to a systematic theorem proving procedure in ﬁrst-order logic. Computing, 12(1), 1974.
+[6] K. Chaudhuri, D. Miller, and A. Saurin. Canonical sequent proofs via multi-focusing. In IFIP, 2008.
+[7] P.-L. Curien and C. Faggian. An approach to innocent strategies as graphs. Information and Computation, 2012.
+[8] V. Danos. La Logique Linéaire appliquée à l’étude de divers processus de normalisation. PhD thesis, Université Paris 7, 1990.
+[9] P. J. De Naurois and V. Mogbil. Correctness of multiplicative additive proof structures is NL-complete. In LICS, 2008.
+[10] K. Dosen and Z. Petric. Bicartesian coherence. Studia Logica, 71(3), 2002.
+[11] C. Faggian and F. Maurel. Ludics nets, a game model of concurrent interaction. In LICS, 2005.
+[12] D. Galmiche. Connection methods in linear logic and proof nets construction. Theoretical Computer Science, 232, 2000.
+[13] J.-Y. Girard. Linear logic. Theor. Comput. Sci., 50(1), 1987.
+[14] J.-Y. Girard. Proof-nets: the parallel syntax for proof-theory. Logic and Algebra, 1996.
+
+[15] S. Guerrini. Correctness of multiplicative proof nets is linear. In LICS, 1999.
+[16] W. Heijltjes. Proof nets for additive linear logic with units. In LICS, 2011.
+[17] W. Heijltjes and R. Houston. No proof nets for MLL with units: Proof equivalence in MLL is PSPACE-complete. In CSL-LICS, 2014.
+[18] W. Heijltjes and D. J. D. Hughes. Complexity bounds for sum–product logic via additive proof nets and Petri nets. In LICS, 2015.
+[19] W. Heijltjes and L. Strassburger. Proof nets and semi-star-autonomous categories. MSCS, 2014.
+[20] R. Houston. Modelling linear logic without units. PhD thesis, University of Manchester, 2008.
+[21] H. Hu. Contractible coherence spaces and maximal maps. Electronic Notes in Theoretical Computer Science, 20, 1999.
+[22] D. J. D. Hughes. Proofs Without Syntax. Annals of Math., 143, 2006. [23] D. J. D. Hughes. Towards Hilbert’s 24th Problem: Combinatorial Proof
+Invariants. In Proc. WOLLiC’06, volume 165 of LNCS, 2006.
+[24] D. J. D. Hughes. Abstract p-time proof nets for MALL: Conﬂict nets. http://arxiv.org/abs/0801.2421, 2008.
+[25] D. J. D. Hughes and R. J. van Glabbeek. Proof nets for unit-free multiplicative-additive linear logic (extended abstract). In LICS, 2003.
+[26] D. J. D. Hughes and R. J. van Glabbeek. Proof nets for unit-free multiplicative-additive linear logic. TOCL, 6(4), 2005.
+[27] A. Joyal and R. Street. The geometry of tensor calculus, I. Advances in Mathematics, 88, 1991.
+[28] G. Kelly and S. Mac Lane. Coherence in closed categories. Journal of Pure and Applied Algebra, 1, 1971.
+[29] O. Laurent. Polarized proof-nets: Proof-nets for LC. In TLCA, 1999.
+[30] O. Laurent and R. Maieli. Cut elimination for monomial MALL proof nets. In LICS, 2008.
+[31] R. Maieli. Retractile proof nets of the purely multiplicative and additive fragment of linear logic. In LPAR, 2007.
+[32] H. G. Mairson and K. Terui. On the Computational Complexity of Cut-Elimination in Linear logic. In ICTCS, 2003.
+[33] P.-A. Melliès. Game semantics in string diagrams. In LICS, 2012.
+
+

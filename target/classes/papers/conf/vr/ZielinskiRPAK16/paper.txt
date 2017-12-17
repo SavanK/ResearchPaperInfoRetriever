@@ -1,0 +1,104 @@
+Evaluating the Effects of Image Persistence on Dynamic Target Acquisition in Low Frame Rate Virtual Environments
+
+David J. Zielinski
+Duke University
+
+Hrishikesh Rao 
+Duke University
+
+Nick Potter
+Duke University
+
+Lawrence G. Appelbaum§
+Duke University
+
+Regis Kopper¶
+Duke University
+
+ABSTRACT
+Here we explore a visual display technique for low frame rate virtual environments called low persistence (LP). This involves displaying the rendered frame for a single display frame and blanking the screen while waiting for the next frame to be generated. To gain greater knowledge about the LP technique, we have conducted a user study to evaluate user performance and learning during a dynamic target acquisition task. The task involved the acquisition of targets moving along several different trajectories, modeled after a shotgun trap shooting task. The results of our study indicate the LP condition approaches high frame rate performance within certain classes of target trajectories. Interestingly we also see that learning is consistent across conditions, indicating that it may not always be necessary to train under a visually high frame rate system.
+Index Terms: H.5.1 [Information Interfaces and Presentation]: Multimedia Information Systems--Artificial, augmented, and virtual realities
+1 INTRODUCTION
+In an ideal world, all virtual reality (VR) applications would run at the maximum frame rate of our display system (often 50hz and up). However, there are several conditions that may make it necessary to display at low frame rates. For example, the low update rate of a tracking system (e.g. GPS), heavy CPU load (e.g. physics calculations), heavy GPU load (e.g. too many polygons), and network transport issues (e.g. real-time streaming of data or images).
+In a traditional low frame rate situation, we get one frame of "fresh" content, and repeat that frame until we get a new frame. This condition will be referred to as high persistence (HP). The HP technique introduces interesting visual artifacts, such as a phenomenon called phantom objects [2] or visually perceiving multiple copies of the original object. With the low persistence (LP) technique [5], we get and display the original fresh frame of content, and then show black frames while waiting for the next frame. While we no longer observe phantom artifacts, a visual strobing effect and decreased brightness are introduced. Both HP and LP are in contrast to the system's high frame rate (HFR) condition. See Figure 1 for a comparison of the different techniques.
+2 RELATED WORK
+The work presented here follows up on work by Zielinski et al. 2015 [5], which utilized a static selection task and found no significant differences in performance between HP and LP, but did find that HFR was significantly better. We hypotheize that static tar-
+e-mail:djziein@duke.edu e-mail:hrishikesh.rao@duke.edu e-mail:npotter@duaa.duke.edu §e-mail:lawrence.appelbaum@duke.edu ¶e-mail:regis.kopper@duke.edu
+IEEE Virtual Reality Conference 2016 19­23 March, Greenville, SC, USA 978-1-5090-0836-0/16/$31.00 ©2016 IEEE
+
+   
+
+
+
+
+
+
+
+
+
+
+
+Figure 1: Comparison of rendering two frames (dark orange and then light orange) of content for the different experimental conditions. HFR displayed content at 60 fps, HP and LP displayed content at 10 fps.
+
+gets may have minimized the HP motion artifacts, as the only thing moving during the selection task was the selection ray.
+One alternative way to address the low frame rate issue is to consider interpolating between the frames of rendered content. VR researchers have investigated predictive methods for frame interpolation [4]. However, such techniques have some issues with display artifacts and specific issues with occlusion.
+While we are not directly manipulating input latency, by changing visual update rate (60fps vs 10fps) we are affecting the end-toend latency the user experiences (from button press to seeing the visual result). Previous work has shown that increasing input latency lowers task performance [1], so we may expect LP and HP to have worse performance than HFR.
+3 USER STUDY
+We used a six-sided CAVE-type system to perform the experiment. We utilized a between-subjects design and recruited 30 volunteers. Each participant was assigned one training method (HFR, HP, or LP). Each participant completed a total of 7 blocks. Each block consisted of 50 trials, for a total of 350 trials per participant. The structure was a HFR block, 5 training blocks, and a final HFR block.
+In an effort to create a quantifiable task that relied heavily on visual ability and provided existing logistical parameters we modeled our dynamic target acquisition task on the International Sport
+
+Figure 2: Virtual Environment utilized in the task. Note the red ray casting wand, the green target launcher, and the orange target sphere traveling away from the user.
+
+319
+
+
+
+
+
+Shooting Trap game as well as previous virtual reality distal pointing tasks [3]. The targets were launched from the ground plane behind a green trap house. The target could take one of 10 paths (5 horizontal x 2 elevations). After the target was launched, the user would position the hand controller to intercept the red ray with the launched target sphere. Then the under button on the IS-900 wand (resembling a trigger), was pressed with the index finger. If successful (i.e. the ray was intersecting the target at the time of the trigger press), a sound was played and the target visually exploded.
+4 RESULTS A 4-way mixed-design factorial analysis of variance (ANOVA) with three within-subjects factors (block, elevation, horizon) and one between-subjects factor (visual condition) was used. We analyzed the distance from the intersection of the ray with the target plane to the target center when the trigger button was pressed. We refer to this metric of performance as "closeness". Pairwise comparisons of the 5 horizontal directions in the task showed that no significant differences were found between the two most eccentric trajectories or between the two near trajectories. Thus we collapsed the directions across the midline to yield 3 directions which refer to as Center, Near, and Far.
+
+
+  
+
+     
+
+Figure 3: Angular closeness during the training blocks for the three visual conditions. Lower closeness scores are better.
+4.1 Training Blocks Looking at the training blocks (2-6), (figure 3), there was a significant main effect of visual condition (p < 0.001). A posthoc Tukey HSD test showed that participants performed better with HFR as compared to HP (p < 0.001) and LP (p < 0.05). There was no significant difference between HP and LP (p = .93).
+There was a main effect of target direction (p < 0.005) and also an significant interaction between direction and visual condition (p < 0.05). HFR had the best performance followed by LP and lastly, HP. In the Far direction, HFR was significantly better than both HP (p < 0.005) and LP (p < 0.005). In the Near direction, the same was true for HFR when compared to HP (p < 0.005) and to LP (p < 0.05). In the Center condition, HFR was not significantly different than LP (p = 0.384) but it was better than HP (p < 0.05). There was no significant difference between LP and HP (p = 0.748).
+There was a main effect of elevation (p < 0.005). Participants had significantly higher performance in the upper elevation (see figure 4) as compared to the lower elevation (p < 0.005). Additionally, there was an interaction between elevation and visual condition (p = 0.031). In the lower elevation, HFR performed significantly
+
+ 
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+Figure 4: Angular closeness for the three visual conditions separated by the two target elevations. Lower closeness scores are better.
+
+better than HP (p < 0.005) and LP (p < 0.005) and there was no difference between HP and LP (p = .934). However, in the upper elevation, there was no significant difference between the performance in HFR as compared to LP (p = 0.104) but the performance in HFR was better than that in HP (p < 0.05). There was also no significant difference between LP and HP (p = 1.000).
+4.2 Learning
+In both the first and last blocks (1 and 7) participants utilized HFR. We examined the possible effect of training under the different visual conditions in blocks 2-6. Results show a main effect of block ( f1,27 = 30.05, p < 0.001) but not of visual condition (p = .149).
+4.3 Simulator Sickness
+We found no significant effects for total SSQ score or any of the sub-scores. While not significant, the means do show a trend in total sickness and all sub-scores: HFR < HP < LP. Higher scores are worse.
+5 CONCLUSION
+We have presented a user study evaluating the effects of image persistence on a dyanamic target acquisition task. Results found that learning occurs consistently regardless of the visual condition used for training. This indicates that training of dynamic target acquisition under degraded visual conditions transfers well to performance under a baseline high frame rate task.
+While the low persistence display technique was found to perform no different than the traditional low frame rate high persistence technique, under some circumstances low persistence approached the baseline high-frame rate condition. Specifically, we observed that when tasks are not too difficult (high elevation, center horizon), it may be beneficial to use a low persistence adjustment.
+REFERENCES
+[1] S. R. Ellis, F. Bre´ant, B. Manges, R. Jacoby, and B. D. Adelstein. Factors influencing operator interaction with virtual objects viewed via head-mounted see-through displays: viewing conditions and rendering latency. In Virtual Reality Annual International Symposium, pages 138­ 145. IEEE, 1997.
+[2] W. A. Hershberger and J. S. Jordan. The phantom array: a perisaccadic illusion of visual direction. The Psychological Record, 48(1):2, 2012.
+[3] R. Kopper, D. A. Bowman, M. G. Silva, and R. P. McMahan. A human motor behavior model for distal pointing tasks. International journal of human-computer studies, 68(10):603­615, 2010.
+[4] F. A. Smit, R. Van Liere, and B. Froehlich. A programmable display layer for virtual reality system architectures. Visualization and Computer Graphics, IEEE Transactions on, 16(1):28­42, 2010.
+[5] D. Zielinski, H. Rao, M. Sommer, and R. Kopper. Exploring the effects of image persistence in low frame rate virtual environments. In Virtual Reality Conference Proceedings, pages 19­26. IEEE, 2015.
+
+320
+
+

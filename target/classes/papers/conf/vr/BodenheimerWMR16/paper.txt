@@ -1,0 +1,89 @@
+Induction of Linear and Circular Vection in Real and Virtual Worlds
+
+Bobby Bodenheimer∗
+Vanderbilt University
+
+Yiming Wang†
+Vanderbilt University
+
+Divine Maloney‡
+University of the South
+
+John Rieser§
+Vanderbilt University
+
+1 INTRODUCTION
+Vection is the illusion of self-motion, usually induced by a visual stimulus. It is important in virtual reality because inducing it in motion simulations can lead to improved experiences. We examine linear and circular vection in commodity level head-mounted displays. We compare the experience of circular vection induced through a real world stimulus, an optokinetic drum, with that experienced through a virtual stimulus. With virtual stimuli, we also compare circular vection with linear horizontal and linear vertical vection. Finally, we examine circular and linear vection in more naturalistic virtual environments. Linear vection was induced more rapidly than any other type, but circular vection occurs more rapidly with a real world stimulus than a virtual one. Our results have practical application and can inform virtual reality design that uses head-mounted display technology and wishes to establish vection.
+Circular vection can be induced easily and rapidly through visual mechanisms that have been known since Mach [1]. We have an optokinetic drum that is capable of inducing compelling circular vection that works in almost all people we have tested in it. The goal of this project is thus twofold: (1) to see how well and how reliably vection can be induced in virtual reality with commoditylevel HMDs as compared to real-world stimuli, and (2) to see if compelling vection could be comparably induced when the stimuli are complex naturalistic scenes, not abstract optic ﬂow patterns.
+2 EXPERIMENT 1: INDUCING VECTION IN REAL AND VIRTUAL REALITY
+Twelve students at our institution (six male, six female) participated in this experiment. They ranged in age from 24 to 36 years old (M = 27.1, SD = 3.9). We employed a within-subjects design, so participants experienced all conditions, blocked by the type of stimulus they received: either real world or virtual environment. One half of the subjects (three male, three female) experienced the real world conditions ﬁrst, the other half experienced the virtual environment condition ﬁrst.
+The virtual environment condition was experienced within an Oculus Rift Developer Kit 1 (DK1) head-mounted display. Subjects wore a small head cap with reﬂective markers. The position and orientation of the subject’s head were obtained by tracking the markers using eight Vicon (Los Angeles, CA) MX-F40 cameras and Vicon Tracker software. The real world environment was experienced inside an optokinetic drum. Since the Rift DK1 does not have a ﬁeld of view equivalent to the ﬁeld of view of normal, unobstructed human vision, we also employed a pair of goggles with a constructed ﬁeld of view equivalent to that of the the DK1. In both the real world and virtual conditions, subjects interact with the stimuli through a wireless joystick (Logitech Freedom 2.4 GHz).
+Subjects experienced three different virtual environments when the stimulus was presented through an HMD, rendered using Vizard
+∗e-mail:bobby.bodenheimer@vanderbilt.edu †yiming.wang@vanderbilt.edu ‡malond0@sewanee.edu §j.rieser@vanderbilt.edu
+IEEE Virtual Reality Conference 2016 19–23 March, Greenville, SC, USA 978-1-5090-0836-0/16/$31.00 ©2016 IEEE
+
+(Worldviz, Santa Barbara, CA) and rendered at 60 frames per second. The three virtual environments were a circular environment, a horizontal environment, and a vertical environment.
+2.0.1 Procedure
+The experiments was a within-subjects design, with each participant completing ﬁve conditions (two with real-world stimuli and three with virtual stimuli). For the real-world stimuli, participants stood inside the optokinetic drum and experienced a full FOV condition in which their vision was unoccluded. They also experienced a limited FOV condition in which they wore the limited FOV goggles discussed previously. In the virtual world, participants experienced the three different optic ﬂow stimuli as discussed previously, circular, horizontal linear, and vertical linear. The experiment was ordered in blocks corresponding to a real-world stimulus or virtual stimulus. That is, a participant was either exposed to both the full and limited FOV in the optokinetic drum before experiencing any virtual stimuli, or they experienced all the virtual stimuli before experiencing the real-world ones. Within these blocks, the order of stimuli was counterbalanced.
+The experimental procedure was modeled on that of Riecke et al. [2]. Each participant experienced four trials in each of the experimental conditions, for a total of 20 trials. Each trial lasted 45s, with a short break between each trial where two questions were asked to obtain a subjective evaluation of how convincing and intense the experience of vection was. Each practice trial was 45s. All participants experienced vection in the practice sessions. Note that in all conditions, subjects were standing, either in the optokinetic drum or while wearing a head-mounted display.
+After each trial, each participant was asked to answer the following two questions by rating their experience of vection on a nine-point Likert scale. The ﬁrst question was “How intense was your sensation of self-motion?” and the second was “How convincing was your sensation of actually moving?”. Subjects were asked to rate these on scale where one represented having no feeling of motion at all and nine represented they believed they were actually moving.
+2.1 Results and Discussion
+Vection onset latencies showed a large variability across subjects. The minimum onset latency for a virtual stimulus (vertical) was 1s, and the maximum was 45s (for circular). For the real-world stimuli, the minimum onset latency was 3.4s (full FOV) and the maximum was 44s (full FOV). Onset latency was analyzed in a mixed ANOVA with stimulus (experimental condition) and trial as within-subjects factor, and gender as a between-groups factor. Note that, for analysis purposes, the experimental condition consists of ﬁve distinct categories that cannot be reduced further: the circular vection with full FOV has no corresponding virtual analog, and we are unable to achieve linear vection with real-world stimuli. Thus we employ the experimental condition as we have done.
+The main effect of condition was signiﬁcant, F(2, 20) = 3.91, p = 0.037. Figure 1 shows mean onset latency across the conditions of the experiment. No other effects or interactions were signiﬁcant. As described previously, our interest was comparing the real-world conditions to one another, the virtual environment stimuli to one another, and the limited FOV real-world stimulus to virtual circular vection. We performed a series of paired-sampled t-tests to examine
+
+153
+
+10 15 20 25
+
+20
+
+15
+
+Onset Time (s)
+
+Mean Onset Time (s)
+
+10
+
+5
+
+5
+
+0
+
+VE Hor.
+
+VE Vert.
+
+VE Circ.
+
+RW Full FOV RW Limited FOV
+
+Figure 1: Mean reported time for onset of vection in Experiment 1 across conditions. Error bars show standard errors of the mean.
+
+these conditions, controlling for experimental error rates using false discovery control. The results of this series of t-tests showed that the mean onset latency with the limited FOV real-world stimulus was signiﬁcantly shorter than with the real-world full FOV stimulus, t(47) = 2.2, p = 0.03. onset latency with limited FOV realworld stimulus was signiﬁcantly shorter than that for the virtual circular stimulus, t(47) = −2.3, p = 0.026. For the remaining virtual stimuli comparisons, onset latency for the virtual vertical stimulus was signiﬁcantly shorter than for both the virtual horizontal stimulus, t(47) = 2.12, p < 0.04, and the virtual circular stimulus, t(47) = −4.76, p < 0.001. onset latency for the virtual horizontal stimulus was also signiﬁcantly shorter than for the virtual circular stimulus, t(47) = −4.01, p < 0.001.
+We performed a similar mixed ANOVA analysis for the ratings of how convincing and how intense the vection in each condition was. For both of these ratings, we found a main effect of trial: for the ratings of convincingness, F(2, 20) = 11.8, p < 0.01, and for the intensity ratings, F(2, 20) = 11.7, p < 0.01. No other effects or interactions were signiﬁcant. We explored the effect of trial on these ratings. Linear regressions were calculated to predict these variables based on trial. Signiﬁcant regression equations were found for the ratings of convincingness and intensity: for the convincing rating, F(1, 238) = 9.934, p < 0.002 with R2 = 0.04; for the intensity rating, F(1, 238) = 7.141, p < 0.01 with R2 = 0.03. The linear regression indicates that the ratings of convincingness and intensity increased 0.3 for each trial of vection experienced.
+3 EXPERIMENT 2: INDUCING VECTION IN NATURALISTIC VIRTUAL ENVIRONMENTS
+Again twelve subjects (six male, six female) participated in this experiment. Subjects were students at our institution and ranged in age from 19 to 33 years old (M = 21.9, SD = 3.8). None of these subjects participated in Experiment 1. In this experiment, we employed the Oculus Rift DK2 head-mounted display. Reﬂective markers were placed on the DK2 and the same Vicon system and software were used to track position and orientation as in Experiment 1. The same wireless joystick was also used for interaction, and subjects again stood throughout the experiment. Three virtual scenarios were constructed using an in-house model of a city and rendered using Worldviz Vizard at 75 frames per second. The procedure in this experiment was similar to that in Experiment 1.
+
+0 1
+
+23 Trial
+
+4
+
+Figure 2: Mean time reported for the onset of vection by experimental trial in Experiment 2. The red lines show the mean onset latency for that trial and the dashed line is least-squares ﬁt. Error bars show standard errors of the mean.
+
+3.1 Results and Discussion
+All subjects experienced vection in all trials for this experiment. The minimum onset time for any of the conditions was 0.5s (circular) and the maximum was 46s (horizontal). We again performed a mixed ANOVA analysis for onset latency, and ratings of convincingness and intensity. For onset latency, the effect of trial approached signiﬁcance, F(1, 133) = 3.69, p = 0.057. To understand this better, we calculated a linear regression of onset latency to predict its effect based on trial. A signiﬁcant regression equation was found, F(1, 142) = 6.67, p = 0.01 with R2 = 0.04; onset latency increased by 2.6s for each trial experienced (see Figure 2). For the convincingness rating, we found a main effect of gender, F(1, 133) = 15.1, p < 0.001. Men had a signiﬁcantly lower rating for convincingness (M = 6.13, SE = 0.56) than women (M = 7.49, SE = 0.48). No other effects or interactions were signiﬁcant.
+4 GENERAL DISCUSSION
+The purpose of the studies in this paper was to determine how well modern commodity-level head-mounted displays can affect the illusion of self-motion, and compare the ﬁdelity of that illusion to that induced by real-world stimuli. We have demonstrated that both linear and circular vection can be readily induced with head-mounted displays, with both patterns of optic ﬂow and with more customary VR environments. The onset latencies for these types of vection are in the range 10-20s. The onset of circular vection using real-world stimuli was also in this range.
+ACKNOWLEDGMENTS
+The authors thank Richard Paris and Gayathri Narasimham for help during the project. This material is based upon work supported by the National Science Foundation under grant 1116988.
+REFERENCES
+[1] E. Mach. Fundamentals of the Theory of Movement Perception. Kluwer/Plenum, 1875. Translated into English by L. R. Young, V. Henn and H. Scherberger (2001).
+[2] B. E. Riecke, J. B. Freiberg, and T. Y. Grechkin. Can walking motions improve visually induced rotational self-motion illusions in virtual reality? Journal of Vision, 15(2):3, 2015.
+
+154
+
+

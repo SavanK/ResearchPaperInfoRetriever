@@ -1,0 +1,40 @@
+National Science Foundation
+NSF
+Natural Science Foundation of China
+National Natural Science Foundation of China
+NSFC
+DARPA
+Defense Advanced Research Projects Agency
+European Research Council
+European Commission
+Office of Naval Research
+ONR
+National Science Center
+NSC
+Swedish Research Council
+German Research Foundation
+DFG
+Air Force
+AFRL
+ARMY
+Army
+DOE
+Navy
+NAVY
+ARL
+ARO
+ONR
+NIH
+USAF
+AFOSR
+DOD
+DGA
+CINECA
+Air Force Research Laboratory
+Army Research Lab
+Army Research Office
+Department of Energy
+Office of Naval Research
+National Institutes of Health
+Air Force Office of Scientific Research
+Department of Defense

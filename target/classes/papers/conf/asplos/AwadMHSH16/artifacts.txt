@@ -1,0 +1,17 @@
+http://dx.doi.org/10.1145/2872362.2872377
+http://newsroom.intel.com/
+http://www.freebsd.org/doc/en_
+http://www.hpl.hp.com/research/systemsresearch/themachine/
+http://www.spec.org/
+http://doi.acm.org/10.1145/2024716.2024718
+http://doi.acm.org/10.1145/
+http://dl.acm.org/citation.cfm?id=
+http://doi.acm.org/10.1145/1250662.1250665
+http://dl.acm.org/citation.cfm?id=2387880
+http://dx.doi.org/10.1109/PACT
+http://dx.doi.org/10.1109/MICRO.2007.44
+http://doi.acm.org/10.1145/
+http://doi.acm.org/10.1145/2048066
+http://doi.acm.org/10.1145/2694344
+http://socialcomputing.asu.edu
+http://doi.acm.org/10.1145/

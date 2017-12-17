@@ -1,0 +1,959 @@
+Generation and Use of Statistical Timing Macro-models considering Slew and Load Variability
+
+Debjit Sinha, Vladimir Zolotov1, Jin Hu, Sheshashayee K. Raghunathan2,
+Adil Bhanji and Christine M. Casey
+IBM Systems, Poughkeepsie, USA [Bangalore, India2] 1IBM T J Watson Research, Yorktown Heights, USA
+
+ABSTRACT
+Timing macro-modeling captures the timing characteristics of a circuit in a compact form for use in a hierarchical timing environment. At the same time, statistical timing provides coverage of the impact from variability sources with the goal of enabling higher chip yield. This paper presents an eﬃcient and accurate method for generation and use of statistical timing macro-models. Results in a commercial timing analysis framework with non-separable statistical timing models demonstrate average performance improvements of 10× when using the model with less than 0.3 picosecond average and 5.5 picosecond maximum accuracy loss, respectively.
+Categories and Subject Descriptors
+B.8.2 [Hardware]: Performance and Reliability— Performance Analysis and Design Aids
+General Terms
+Algorithms, Performance
+Keywords
+Statistical timing, timing macro-modeling, variability
+1. INTRODUCTION
+Advances in semiconductor technologies and a continued expansion of desired features in modern sub-45 nanometer Very Large Scale Integrated (VLSI) circuit chip designs have resulted in signiﬁcantly larger and more complex designs in comparison to prior technology generations. In recent years, modern Application Speciﬁc Integrated Circuit (ASIC) designs contain several to tens of millions of gates, and the transistor count in microprocessor chips have surpassed the two billion mark. This design scale has forced a paradigm shift from the traditional ﬂattened to a hierarchical static timing analysis (STA) and optimization approach for these chips throughout their design life-cycle.
+Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for proﬁt or commercial advantage and that copies bear this notice and the full citation on the ﬁrst page. Copyrights for components of this work owned by others than ACM must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior speciﬁc permission and/or a fee. Request permissions from Permissions@acm.org. ICCAD’16, November 07-10, 2016, Austin, TX, USA c 2016 ACM. ISBN 978-1-4503-4466-1/16/11...$15.00 DOI: http://dx.doi.org/10.1145/2966986.2967043
+
+Given partitions of a large design, a hierarchical timing ﬂow performs STA and optimization on each partition (component) separately. Once a component is timing-closed, a timing macro-model is generated for the component [1–4]. The macro-model captures the timing characteristics for that component in a compact form, and is used at the parent or next higher level of hierarchy. This ﬂow has three advantages: (i) it facilitates parallel chip design, wherein several components are designed and optimized at the same time, (ii) it enables faster timing at the parent level(s) of hierarchy by employing the simpliﬁed timing macro-models, and (iii) it facilitates usage of a single macro-model for multiple instantiations of the same component at the parent level(s) of hierarchy.
+The ability to perform timing closure on a component and generate a macro-model that could be used seamlessly across multiple instances is attractive as it eliminates the overheads of storing a model for each instance of a component. An instance speciﬁc model also involves the risk of an instance being “out-of-sync” or obsolete. Furthermore, using a macro-model reduces the overall turnaround time and memory footprint.
+With technology scaling, STA tools must account for a multitude of diﬀerent voltage, temperature, and process (frontand back-end of line) variability eﬀects on timing while being computationally eﬃcient. Statistical static timing analysis (SSTA) captures the impact of variability on timing in a single or few run(s) by encapsulating timing values (e.g., delays, slews, slacks) in a parameterized form, where the impact of each source of variation is quantiﬁed as a sensitivity [5–9]. There is naturally a need for statistical timing macro-models in a hierarchical statistical static timing analysis (SSTA) ﬂow. Prior work on statistical macro-modeling [3, 4] extends deterministic macro-modeling, but does not describe the use of these models in the presence of statistical input slews and loads. Goyal et al. present a chain rule-based approach to consider the variability in slew and load for only linear statistical models in [10].
+This paper presents a method for the generation and usage of statistical timing macro-models. Speciﬁcally, three methods of incorporating the variability in the input slew and output load when using a statistical macro-model are presented and compared, where the model is characterized as a function of deterministic input slew and load. The preferred method employs eﬃcient ﬁnite diﬀerencing that is O(N 2) faster than traditional ﬁnite diﬀerencing, for N sources of variation. The methods also apply to the usage of variation aware extensions of industry standard timing models (e.g. CCS, ECSM). Experimental results in a commercial SSTA framework demonstrate average performance improvements of 10× with less than 0.3 picosecond average and 5.5 picosecond maximum accuracy loss, respectively, and signiﬁcant accuracy improvements over prior art methods.
+
+2. STATISTICAL TIMING
+
+2.1 Statistical modeling
+A set of global parameters or sources of variation are denoted as: X1, X2, . . . , XN . A non-separable statistical timing model is used in this work that is a generalization of the model proposed by Zolotov et al. [11]. In this model, a statistical timing value T (e.g. delay, slew, arrival-time, slack) is represented as:
+
+XN XN XN
+
+T = a0 + aiXi +
+
+aij XiXj ,
+
+i=1
+
+i=1 j=i+1
+
+(1)
+
+where, a0 is the mean of the timing value T and denotes the nominal value of T in the absence of variability, ai denotes the sensitivity of T to a parameter Xi in the absence of any other parametric variability, and aij denotes a cross-term sensitivity of T to a set of parameters Xi and Xj . Conceptually, aij denotes the sensitivity of ai to Xj (or vice-versa). Without loss of generality, it is assumed that all parameters have 0 mean, and a subset of the parameters are modeled as Gaussian (Normal) variables with unit variance (although some parameters like voltage are treated as non-statistical random variables since they do not have a distribution and may be set adaptively during chip operation).
+During SSTA, statistical timing modeling of each gate or wire is typically performed via ﬁnite diﬀerencing [12]. In the presence of multi-corner gate and interconnect models, multiple (corner-based) deterministic gate or wire timing computations are performed, and the results ﬁtted to a statistical model. A corner denotes a vector of deterministic (known) conditions for each parameter. For illustration, given extreme values (base and opposite) for a parameter Xk as (Bk, Ok), corners are mathematically represented as follows:
+
+C∗ =Δ [X1 → B1, . . . , XN → BN ]
+
+(2)
+
+(all parameters at base values);
+
+Ck =Δ [X1 → B1, . . . , Xk → Ok, . . . , XN → BN ] (3)
+
+(parameter Xk at opposite value,
+
+all other parameters at base values); and
+
+Ckl =Δ [X1 → B1, . . . , Xk → Ok, . . . , Xl → Ol, . . .] (4)
+
+(parameters Xk and Xl at opposite values,
+
+all other parameters at base values).
+
+In the simplest form, the cross-term sensitivity aij of a statistical timing value T (e.g. delay) to parameters Xi and Xj (i + 1 ≤ j ≤ N ) is obtained by computing a linear sensitivity to one of the parameters at diﬀerent values of the other parameter, and subsequently, calculating a sensitivity of the computed linear sensitivity to the latter parameter. Mathematically:
+
+ai,C∗
+
+=Δ
+
+ti Oi
+
+− −
+
+t∗ Bi
+
+,
+
+ai,Cj
+
+=Δ
+
+tij Oi
+
+− −
+
+tj Bi
+
+,
+
+aij
+
+=
+
+ai,Cj Oj
+
+− −
+
+ai,C∗ Bj
+
+,
+
+(5) (6) (7)
+
+where, tk denotes a deterministic timing value for T evaluated
+at corner Ck; and ai,C∗ and ai,Cj denote linear sensitivity of T to Xi, computed at values Bj and Oj of Xj, respectively. The
+
+sensitivity ai,C∗ does not change for diﬀerent j ∈ [i + 1, N ], and is computed once, while ai,Cj is computed for each j.
+Since ai denotes the sensitivity of T to Xi at the nominal
+or 0 value of all other parameters, it is computed as:
+
+XN
+
+ai = ai,C∗ −
+
+aij Bj .
+
+j=i+1
+
+The mean value of T is next computed as:
+
+(8)
+
+XN XN XN
+
+a0 = t∗ − aiBi −
+
+aij BiBj ,
+
+i=1
+
+i=1 j=i+1
+
+(9)
+
+where, t∗ denotes a deterministic timing value for T evaluated at corner C∗.
+
+2.2 Statistical timing projection
+
+A statistical timing value T may be projected to a given corner Ck by setting each parameter to a deterministic value corresponding to that corner. This yields a deterministic (pro-
+jected) value tk. Ideally, this value is identical to the deterministic timing value at corner Ck used during ﬁnite diﬀerencing to obtain T . For clarity of notation, statistical and deterministic values are denoted in upper case (e.g., T ) and lower case (e.g., tk) notation, respectively. Mathematically, the projected values are computed as:
+
+XN XN XN
+
+t∗ = a0 + aiBi +
+
+aij BiBj ,
+
+i=1
+
+i=1 j=i+1
+
+XN
+
+tk = a0 + akOk +
+
+akj OkBj
+
+j=k+1
+
+XN XN XN
+
++ aiBi +
+
+aij BiBj ,
+
+i=1,i=k
+
+i=1,i=k j=i+1
+
+XN
+
+tkl = a0 + akOk + alOl +
+
+aiBi
+
+i=1,i={k,l}
+
+XN XN + akj OkBj + alj OlBj
+
+j=k+1
+
+j=l+1
+
+XN +
+
+XN aij BiBj .
+
+i=1,i={k,l} j=i+1
+
+(10) (11)
+(12)
+
+2.3 Statistical-slew and -load
+Circuit (gate or wire) delays and output-slews are typically computed as a function of input slew and output load. During statistical modeling, each (deterministic) corner speciﬁc timing calculation t is performed using the input slew (or waveform) and output load at that corner. Speciﬁcally, an input statistical slew and output statistical load are projected or evaluated at the given corner to deterministic values, and used for the corner speciﬁc deterministic timing of the gate or wire. Loads have traditionally not been considered statistical, but back end of line (metal) variation makes the load statistical. In addition, the gate input pin capacitances at the sink(s) of an interconnect are susceptible to process, voltage, and temperature variability. Consequently, each electrical parasitic (resistance and capacitance) of the interconnect may be considered statistical.
+From Eqn. (5)-(9), a0, ai, and aij are functions of multiple projected values t, which in turn are functions of the statistical
+
+D1 D1 OUT
+
+D2
+
+G0 W0
+
+D2
+
+CK CK
+
+OUT
+
+Figure 1: Timing macro-modeling illustrating pruning and compression.
+
+input slew and output load. It follows that accurate statistical modeling must incorporate the impact of variability in the slew and load. The idea also applies to the statistical modeling of timing test guard-times (margins) which are functions of the input slews at the clock and data ends of the test.
+3. TIMING MACRO-MODELING
+This paper considers a gate style of timing macro-modeling, wherein a component’s timing characteristic is captured as a gate’s timing model (for example, as an industry standard Liberty or ECSM format). In this approach, each gate or wire segment is characterized as a function of input slew s and/or output load l since the potential slew and load at the primary-inputs (PIs) and -outputs (POs), respectively, during use of the model, are unknown at the time of macromodeling. Alternatively, paths may be characterized instead of individual gate or wire segments. In deterministic macromodeling, the timing value tM for each segment or path (e.g. delay and output slew) is stored in the model as tM (s, l) akin to a industry standard gate timing model.
+Timing macro-modeling may employ techniques to reduce the size of the model by performing timing segment pruning and compression. However, multiple internal pins are retained for higher accuracy. Internal register to register paths are often pruned since the slack for these paths are invariants of the non-clock PI arrival times (with clock slew and skew restrictions). Segment compression implies that the model does not retain a segment for each gate or wire in the component, and may instead have segments denoting a path in the original component [1–3]. Figure 1 illustrates timing macromodeling for a component wherein the internal register to register path is pruned. Timing tests like setup and hold for a register (ﬂip-ﬂop) are represented by a test segment (↔) as shown in the ﬁgure. Selective segments are compressed: for example, paths from the non-clock inputs to the register are compressed, while the clock path is left uncompressed for illustration.
+Additional techniques may be employed to reduce the model size and characterization overheads. It is observed that the timing of only the segments for the gate G0 and wire W0 in Figure 1 are dependent on the load at the port OUT. Subsequently, all other segments and paths do not need to be characterized as a function of load. The presented style of macro-modeling thereby diﬀers from industry standard Extracted Timing Models (ETMs) [13], wherein all segments are compressed and the ﬁnal model contains no internal pins.
+3.1 Statistical timing macro-modeling
+Statistical timing macro-modeling is an extension of deterministic macro-modeling, wherein the captured timing characteristic of each segment or path of the component additionally contains the impact of variability. In this model, each statistical timing value TM may be characterized as a function of either “statistical-” slew S and load L as TM (S, L),
+
+or as a function of “deterministic-” slew and load as TM (s, l). While the former approach enables using the model directly given statistical slews and loads, the model size may grow exponentially since S and L are each a function of the parameters. Consequently, statistical timing macro-models capture statistical timing values as a function of deterministic slew and load. Mathematically, each statistical timing value in the model TM (s, l) is represented as:
+
+XN XN XN
+
+α0(s, l) + αi(s, l)Xi +
+
+αij (s, l)XiXj ,
+
+i=1
+
+i=1 j=i+1
+
+(13)
+
+where, the mean value α0(s, l), and each sensitivity and cross-
+
+term sensitivity αi(s, l) and αij(s, l), respectively, are func-
+
+tions of deterministic input slew s and deterministic output
+
+load l. In practice, each of these terms is often stored as a
+
+look-up table.
+
+Two cases are highlighted that necessitate the computation
+
+of the statistical timing value T (S, L) as a function of statis-
+
+tical slew and load: (i) during use of the macro-model in a
+
+parent level hierarchical SSTA ﬂow with statistical slews and
+
+loads, and (ii) during segment compression as part of statis-
+
+tical timing macro-modeling. The second case is illustrated
+
+for a pair of segments in series that need to be compressed.
+
+Each segment’s statistical delay (T 1DM , T 2DM ) and output slew (T 1SM , T 2SM ) are captured as functions of deterministic input
+
+slew as an example. The goal is to compute the statistical de-
+
+lay TMD(s) and output slew TMS (s) of the compressed segment
+
+as: “ ”
+
+TMD(s) = T 1DM (s) + T 2DM T 1SM (s) ,
+
+(14)
+
+“”
+
+TMS (s) = T 2SM T 1SM (s) .
+
+(15)
+
+Since T 1SM (s) is a statistical value, the above illustrates the problem of computing T 2DM and T 2SM as a function of a statistical value, while the model only contains the information as a function of deterministic value (in this case T 2DM (s), T 2SM (s)).
+Problem deﬁnition: Given a statistical model of a seg-
+ment in the macro-model as TM (s, l), a statistical input slew
+S, and a statistical output load L as:
+
+XN XN XN
+
+S = aS0 + aSi Xi +
+
+aSij XiXj ,
+
+i=1
+
+i=1 j=i+1
+
+(16)
+
+XN XN XN
+
+L = aL0 + aLi Xi +
+
+aLij XiXj ,
+
+(17)
+
+i=1
+
+i=1 j=i+1
+
+`´
+
+compute the statistical timing value T (S, L) = f TM (s, l), S, L
+
+as:
+
+XN XN XN
+
+a0 + aiXi +
+
+aij XiXj ,
+
+i=1 i=1 j=i+1
+
+(18)
+
+that is, compute the mean a0 and each sensitivity and crossterm sensitivity ai and aij, respectively.
+
+4. STATISTICAL VALUE COMPUTATION
+WITH STATISTICAL SLEW AND LOAD
+Three approaches to solving the computation problem are presented in this section. The ﬁrst is based on chain ruling, and is an extension of the work in [10] (cross-terms were not considered). This approach is presented for completeness and for quantitative comparisons. The next two approaches are based on a ﬁnite-diﬀerenced method and are more accurate, where the latter, more eﬃcient approach is our preferred technique.
+
+4.1 Chain rule-based computation
+
+Chain ruling may be applied to include the variability in the slew and load as part of timing value computation T . Mathematically:
+
+a0 = α0(aS0 , aL0 ),
+
+ai
+
+=
+
+d dXi
+
+˘ ` ´¯ T S(Xi), L(Xi), Xi
+
+= ∂T dS + ∂T dL + ∂T ∂S dXi ∂L dXi ∂Xi
+
+=
+
+∂T ∂S
+
+aSi
+
++
+
+∂T ∂L
+
+aLi
+
++
+
+αi(sk, lk),
+
+(19) (20)
+
+where,
+
+∂T ∂S
+
+and
+
+∂T ∂L
+
+are the partial derivatives of the timing
+
+value T with respect to input slew and load, respectively; and
+
+αi(sk, lk) is the sensitivity obtained from the macro-model. While the partial derivative calculations may be performed by
+
+ﬁnite diﬀerencing, non-linearity eﬀects introduce inaccuracies.
+
+In addition, it is unclear at which deterministic values of slew
+
+sk and load lk should αi be looked-up from the macro-model. Nominal values are chosen arbitrarily for empirical validation.
+
+Extension to cross-terms involves a second order derivative
+
+of the above sensitivity with respect to Xj . Mathematically:
+
+aij
+
+=
+
+d dXj
+
+j (
+
+d dXi
+`
+
+˘ T
+
+` S
+
+(Xi
+
+, Xj ´
+
+),
+
+L(Xi
+
+,
+
+Xj `
+
+),
+
+Xi
+
+,
+
+Xj
+
+´¯ﬀ ´
+
+=
+
+d
+
+∂T S(Xj ), Xj
+
+dS
+
+∂T +
+
+L(Xj ), Xj
+
+dL
+
+dXj ∂S dXi
+
+∂L dXi
+
+ﬀ
+
++ ∂T ∂Xi
+
+=
+
+∂2T ∂S2
+
+dS dXi
+
+dS dXj
+
++
+
+∂2T ∂S∂Xj
+
+dS dXi
+
++
+
+∂T ∂S
+
+∂2S dXi dXj
+
++
+
+∂2T ∂L2
+
+dL dXi
+
+dL dXj
+
++
+
+∂2T ∂L∂Xj
+
+dL dXi
+
++
+
+∂T ∂2L ∂L dXidXj
+
++
+
+∂2T
+
+∂Xi∂Xj
+
+=
+
+∂2T ∂S2
+
+aSi aSj
+
++
+
+∂2T ∂S∂Xj
+
+aSi
+
++
+
+∂T ∂S
+
+aSij
+
++
+
+∂2T ∂L2
+
+aLi aLj
+
++
+
+∂2T ∂L∂Xj
+
+aLi
+
++
+
+∂T ∂L
+
+aLij
+
++
+
+αij (sk, lk),
+
+(21)
+
+where, multiple partial derivatives of the timing value to slew
+
+and load need to be computed (e.g.
+
+,∂2T ∂2T
+∂S2 ∂S2
+
+∂2T ∂S∂Xj
+
+,
+
+∂T ∂S
+
+);
+
+and
+
+αij (sk, lk) is the cross-sensitivity obtained from the macro-
+
+model. In practice, the second order derivative of T to slew
+
+and load may be ignored, but computing the derivative of T
+
+with respect to slew (or load) and Xj is error-prone. Nominal
+
+values of slew and load are used for sk and lk during empirical
+
+validation, since the choice is arbitrary in the equation.
+
+Algorithm: Mean and sensitivity computation
+
+Input: TM (s, l), S, L Output: T (S, L)
+
+1: s∗, l∗ ← S, L projected to C∗, respectively
+2: t∗ ← TM (s∗, l∗) projected to C∗ 3: foreach i ∈ [1, N ]
+
+4: si, li ← S, L projected to Ci, respectively
+
+5: ti ← TM (si, li) projected to Ci
+
+6:
+
+ai,C∗
+
+←
+
+ti −t∗ Oi−Bi
+
+7: foreach i ∈ [1, N ]
+
+8: foreach j ∈ [i + 1, N ]
+
+9: sij , lij ← S, L projected to Cij , respectively
+
+10: tij ← TM (sij , lij ) projected to Cij
+
+11:
+12: 13: 14: 15:
+
+aT0a(Si←aa,ii←L,jCt)←∗ja←i−←,CaPai∗,O0tCO−iNiijj+=j−−−−P1BPtaBajiiNjji,=NiCB=i∗i1+−a1 iaPXijiNiB=+j1PPNiNj==1iP+1Nja=iij+B1iBaijj XiXj
+
+Figure 2: Finite diﬀerence-based mean and sensitivity calculation in the presence of statistical slew and load.
+
+4.2 Finite difference (FD)-based computation
+Using a traditional ﬁnite diﬀerencing approach, T (S, L) may be obtained via computations described in Eqns. (5)-(7) for each aij, Eqn. (8) for each ai, and Eqn. (9) for the mean a0. This requires corner speciﬁc timing values ti, t∗, tj, and tij . However, corner speciﬁc timing models are not natively available in the statistical timing macro-model TM for the segment. Projections may be used to obtain these values by ﬁrst projecting S and L to each desired corner, and subsequently, projecting TM to the same corner using the projected slew and load. The steps for computing T (S, L) using this approach are outlined in Figure 2.
+The primary overheads in this approach are the computations of TM and its projections, since multiple values of TM need to be evaluated (function of slew and load) as illustrated in lines 2, 5, and 10 of Figure 2. It is observed that the total number of TM computations is O(N 2). Each component of TM , speciﬁcally α0, αi, and αij , is a function of slew and load, and is often stored as a two dimensional look-up table. From Eqn. (13), for every unique slew and load, the total number of table look-ups (involves interpolation) for a TM computation is [1 + N + {(N − 1) + (N − 2) + . . . + 1}] ≈ O(N 2). This implies that the total number of table look-ups involving interpolations for computing T (S, L) is O(N4). In practice, it is observed that this large overhead minimizes the performance advantages of a macro-model over the original design, and motivates the need for an eﬃcient, yet accurate method to compute T (S, L).
+
+4.3 Efﬁcient FD-based computation
+An eﬃcient alternative method is presented wherein base values for parameters are considered to be 0 (sigma units) instead of Bi. Conceptually, it implies that the base values are assumed to be the nominal values. The choice of Bi traditionally stems from the availability of corner speciﬁc deterministic timing models used during ﬁnite diﬀerencing. However, given a statistical macro-model, the choice of corners is conceptually arbitrary and should yield the same sensitivity across any choice of base and opposite values for all parameters. Based on Eqns. (10)-(12), the following is obtained:
+
+Algorithm: Eﬃcient mean and sensitivity computation
+
+Input: TM (s, l), S, L Output: T (S, L)
+
+1: s∗, l∗ ← aS0 , aL0 , respectively 2: a0 = t∗ ← α0(s∗, l∗)
+
+3: foreach i ∈ [1, N ]
+
+4: si, li ← (aS0 + aSi Oi), (aL0 + aLi Oi), respectively
+
+5:
+
+ai
+
+←
+
+α0(si ,li)−α0(s∗,l∗) Oi
+
++ αi(si, li)
+
+6: foreach i ∈ [1, N ]
+
+7: foreach j ∈ [i + 1, N ]
+
+8: sij ← aS0 + aSi Oi + aSj Oj + aSij OiOj
+
+9: lij ← aL0 + aLi Oi + aLj Oj + aLij OiOj
+
+10:
+
+aij
+
+←
+
+α0 (sij ,lij )−α0 (s∗,l∗) OiOj
+
++ αij (sij , lij )
+
+11:
+
+T (S,
+
+L)
+
+←
+
++ a0
+
+αi(sij ,lij )−ai
+
++
+
+PNOj
+i=1
+
+ai
+
+Xi
+
++ +
+
+αj (sij ,lij )−aj
+PN OPi N
+i=1 j=i+1
+
+aij XiXj
+
+Figure 3: Eﬃcient mean and sensitivity calculation in the presence of statistical slew and load.
+
+s∗ = aS0 , (similar for l∗) si = aS0 + aSi Oi, (similar for li) sij = aS0 + aSi Oi + aSj Oj + aSij OiOj ,
+
+(22) (23)
+
+(similar for lij )
+
+(24)
+
+t∗ = α0(s∗, l∗),
+
+(25)
+
+ti − t∗ = {α0(si, li) − α0(s∗, l∗)} + αi(s, l)Oi,
+
+(26)
+
+tij − t∗ = {α0(sij , lij ) − α0(s∗, l∗)} + αij (sij , lij )OiOj
+
++ αi(sij , lij )Oi + αj (sij , lij )Oj .
+
+(27)
+
+Substituting these computed values in Eqn. (9), the mean is obtained as:
+
+a0 = t∗ = α0(s∗, l∗) = α(aS0 , aL0 ).
+
+(28)
+
+Similarly, substituting the above in Eqns. (5) and (8), each sensitivity value is obtained as:
+
+ai
+
+=
+
+ti − t∗ Oi
+
+=
+
+α0(si, li) − α0(s∗, l∗) Oi
+
++ αi(si, li).
+
+(29)
+
+Finally, each cross-term sensitivity is obtained by substituting the computed values in Eqns. (5)-(7) as:
+
+aij
+
+=
+
+(tij − tj) − (ti − t∗) Oi Oj
+
+= (tij − t∗) − (tj − t∗) − (ti − t∗) Oi Oj
+
+= tij − t∗ − aj − ai OiOj Oi Oj
+
+=
+
+α0(sij, lij ) − α0(s∗, l∗) Oi Oj
+
++
+
+αij (sij , lij )
+
++
+
+αi(sij, lij ) − ai + αj (sij, lij ) − aj . Oj Oi
+
+(30)
+
+Figure 3 summarizes the steps for the eﬃcient mean and
+sensitivity calculation method for T (S, L). It is observed that no traditional complete projections are required. More impor-
+tantly, only a single table look-up is required for a0, and two new look-ups are required for the computation of each ai. The computation of each aij requires only four additional table look-ups. The overall complexity is thus reduced by a factor of N 2 from O(N 4) to O(N 2). This signiﬁcantly improves the performance of SSTA using statistical timing macro-models.
+
+4.4 Test guard-time computation
+Timing test (e.g. setup, hold) margins or guard-times are modeled as functions of the input slews at the data and clock ends of the test. Given statistical data- and clock-end slews SD and SC, respectively, and a statistical timing macro-model TM (sD, sC) wherein a test’s guard-time is modeled as a function of deterministic data and clock end slews, the problem is to compute the statistical guard-time considering the statistical slews, that is, T (SD, SC). This problem is conceptually identical to the one solved in Sections 4.1-4.3. As an example, substituting {S, L} with {SD, SC } in the steps shown in Figure 3 provides an eﬃcient method for obtaining T (SD, SC).
+4.5 Handling resistive primary output loads
+The approaches presented in this section are illustrated with a statistical representation of the load L. For a gate segment driving a capacitive interconnect (e.g. short wire), the load may denote the sum of interconnect- and downstream gate input pin-capacitances. Representing the load for a resistive interconnect as a lumped capacitance, however, is well known to be inaccurate. Theoretically, the load may be represented as a set of load variables l1, . . . , lk, wherein each variable denotes a resistance or capacitance value, and the statistical timing macro-model would be a function of each of these deterministic load variables: TM (s, l1, . . . , lk). Given variability in the load values, it is straightforward to extend any of three presented approaches to compute T (S, L1, . . . , Lk).
+In practice, loads are converted to an “eﬀective capacitance” value for gate delay calculation [14]. Considering L a statistical representation of the eﬀective capacitance is another alternative to modeling the load with multiple values.
+The output-slew calculation for a gate driving a resistive wire may not use a single eﬀective capacitance representation of the load, however. An iterative approach is used for the output-slew calculation [14]. If statistical load representations are not available for the inner loop of these iterations, using the presented methods require special handling. Additionally, interconnect timing calculations are not based on an eﬀective capacitance. Fortunately, in a macro-model, only a small subset of segments need to be modeled as a function of load as illustrated in Section 3. An approach to avoiding any special handling of these segments is to defer all calculations to the usage of the macro-model. In this approach, the timing of the gate driving a primary output and the primary output interconnect are not included in the macro-modeled. Instead, the gate and wire are preserved in their detailed form. During the use of the macro-model, ﬁnite diﬀerencing using corner speciﬁc gate models and corner speciﬁc interconnect reduced order models are used for statistical timing modeling of these gates and wires, respectively.
+5. RESULTS
+Statistical timing macro-models are generated for a set of designs mapped to a commercial 14 nanometer technology library. Statistical timing macro-modeling of each design is performed without any pruning or compression. Each macromodel thus contains the same number of segments as the original design, and provides a consistent basis for performance comparisons. Statistical timing and macro-modeling are performed in an industrial timing analysis framework on the original designs consisting of standard-cells. Sources of variability include voltage, temperature, process, metal-layer
+
+Table 1: Design sizes and performance comparison
+
+Design |E| Normalized run-time
+
+RO RM
+
+RG
+
+D1
+
+3K -
+
+-
+
+-
+
+D2
+
+6K -
+
+-
+
+-
+
+D3 28K 100 11
+
+8
+
+D4 52K 100 13
+
+32
+
+D5 73K 100 12
+
+18
+
+D6 97K 100 10
+
+4
+
+D7 80K 100 13
+
+9
+
+D8 421K 100 11
+
+23
+
+Average
+
+100 11
+
+18
+
+and random variations (> 10 parameters) with cross-terms.
+
+Table 1 presents the set of designs and the number of seg-
+
+ments/edges (|E|) in the original design being macro-modeled.
+
+Using normalized values, the table presents the SSTA run-
+
+time of the original design (RO), the SSTA run-time of an
+
+instance of the macro-model (RM ), and the run-time needed
+
+to generate the statistical macro-model (RG) for the larger
+
+designs (with > 10K segments). It is observed that the macro-
+
+models deliver an order of magnitude of performance improve-
+
+ment
+
+for
+
+SSTA
+
+(
+
+RM RO
+
+≈ 11%).
+
+In practice, commercial macro-
+
+models have further reduced sizes due to pruning and com-
+
+pression, and provide additional performance gains. The run-
+
+time for the statistical macro-model generation varies between
+
+4% to 32% of the SSTA run-time for the original design. The
+
+intent of presenting this data is to provide a qualitative es-
+
+timate
+
+of
+
+the
+
+model
+
+generation
+
+overhead
+
+(
+
+RG RO
+
+≈ 18%
+
+on
+
+the
+
+average). In practice, this value depends on factors like prun-
+
+ing, compression, design topology (presence of more or less
+
+latch-to-latch paths), and model accuracy requirements.
+
+Table 2 presents accuracy comparisons of a common sta-
+
+tistical timing macro-model when evaluated using three sta-
+
+tistical value computation approaches: (i) No slew and load
+
+variability is considered and all computations are done using
+
+the mean value of the slew and load, (ii) Chain ruling (CR)
+
+is performed to include the variability in the slew and load,
+
+and (iii) the presented eﬃcient ﬁnite diﬀerence (FD) approach
+
+is used. Absolute mean (Eμ), standard deviation (Eσ), and
+
+maximum (EMax) errors (picoseconds) in the slacks across all primary inputs, outputs and timing tests are shown for each
+
+design. It is observed that ignoring slew variability causes
+
+up to 41.4 picoseconds error (≈ 16% error with respect to a
+
+representative 250 picosecond cycle time). The chain ruling-
+
+based approach produces smaller errors on the average, but
+
+causes up to 18.7 picoseconds error in the worst case. The
+
+presented eﬃcient ﬁnite diﬀerence-based approach is observed
+
+to be most accurate with maximum error of 5.5 picoseconds
+
+(≈ 2.2%).
+
+Table 2: Macro-model usage accuracy comparison
+
+Design
+
+Eμ(ps)
+
+Eσ (ps)
+
+EMax(ps)
+
+No CR FD No CR FD No CR FD
+
+D1 1.4 0.6 0.1 0.7 0.2 0.0 4.3 1.7 0.3
+
+D2 5.2 0.0 0.2 1.1 0.1 0.1 7.3 0.5 0.4
+
+D3 1.5 0.9 0.2 2.5 1.0 0.3 21.3 8.4 3.5
+
+D4 1.6 0.7 0.2 2.1 0.7 0.2 20.5 6.5 2.1
+
+D5 1.7 0.8 0.2 2.8 0.9 0.2 20.4 7.4 1.3
+
+D6 1.5 0.8 0.3 1.8 0.6 0.3 36.6 15.7 4.3
+
+D7 1.0 0.7 0.4 1.3 0.5 0.2 41.4 18.7 5.5
+
+D8 1.2 0.9 0.4 1.1 0.7 0.6 15.5 6.4 4.1
+
+Avg 1.9 0.7 0.3 1.7 0.6 0.2
+
+Max
+
+41.4 18.7 5.5
+
+6. CONCLUSIONS
+This paper presents a method for generation and use of statistical timing macro-models. Speciﬁcally, it addresses the challenge of maintaining accuracy during macro-model usage by considering the variability in the input slew as well as the output load, while minimizing computational overheads. Experimental results in a commercial timing analysis framework with non-separable statistical timing models demonstrate average performance improvements of 10× when using the model with less than 0.3 picosecond average and 5.5 picosecond (2.2%) maximum accuracy loss, respectively. Comparisons are performed with alternate approaches which validate the higher accuracy of the presented eﬃcient ﬁnite diﬀerence-based approach.
+7. REFERENCES
+[1] S. V. Venkatesh, R. Palermo, M. Mortazavi, and K. A. Sakallah, “Timing abstraction of intellectual property blocks,” in CICC, 1997, pp. 99–102.
+[2] C. W. Moon, H. Kriplani, and K. P. Belkhale, “Timing model extraction of hierarchical blocks by graph reduction,” in DAC, 2002, pp. 152–157.
+[3] A. Bhanji, C. Visweswariah, D. Sinha, G. Ditlow, K. Kalafala, N. Venkateswaran, and S. Gupta, “A hierarchical transistor and gate level statistical timing ﬂow for microprocessor designs,” in TAU, 2009, pp. 1–4.
+[4] B. Li, N. Chen, Y. Xu, and U. Schlichtmann, “On timing model extraction and hierarchical statistical timing analysis,” in IEEE Transactions on Computer-Aided Design, 32(3) March 2013, pp. 367–380.
+[5] A. Agarwal, D. Blaauw, and V. Zolotov, “Statistical timing analysis for intra-die process variations with spatial correlations,” in ICCAD, 2003, pp. 900–907.
+[6] H. Chang and S. S. Sapatnekar, “Statistical timing analysis considering spatial correlations using a single PERT-like traversal,” in ICCAD, 2003, pp. 621–625.
+[7] C. Visweswariah, K. Ravindran, K. Kalafala, S. G. Walker, and S. Narayan, “First-order incremental block-based statistical timing analysis,” in DAC, 2004, pp. 331–336.
+[8] L. Zhang, W. Chen, Y. Hu, and C. C. Chen, “Statistical static timing analysis with conditional linear MAX/MIN approximation and extended canonical timing model,” in IEEE Transactions on Computer-Aided Design, 25(6), pp. 1183 - 1191, June 2006.
+[9] L. Chen, J. Xiong, and L. He, “Non-Gaussian statistical timing analysis using second-order polynomial ﬁtting,” in IEEE Transactions on Computer-Aided Design, vol. 28, no. 1, 2009, pp. 130–140.
+[10] R. Goyal, S. Shrivastava, H. Parameswaran, and P. Khurana, “Improved ﬁrst-order parameterized statistical timing analysis for handling slew and capacitance variation,” in Proc. Intl. Conf. on VLSI, 2007, pp. 278–282.
+[11] V. Zolotov, D. Sinha, J. Hemmett, E. Foreman, C. Visweswariah, J. Xiong, J. Leitzen, and N. Venkateswaran, “Timing analysis with nonseparable statistical and deterministic variations,” in DAC, 2012, pp. 1061–1066.
+[12] D. Sinha, L. Silva, J. Wang, S. Raghunathan, D. Netrabile, and A. Shebaita, “TAU 2013 variation aware timing analysis contest,” in ISPD, 2013, pp. 171–178.
+[13] VLSI concepts - ETM basics. http://www.vlsi-expert.com/2011/02/etm-extracted-timingmodels-basics.html.
+[14] J. Qian, S. Pullela, and L. T. Pillage, “Modeling the eﬀective capacitance for the RC interconnect of CMOS gates,” in IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems, vol. 13, no. 12, 1994, pp. 1526–1535.
+
+

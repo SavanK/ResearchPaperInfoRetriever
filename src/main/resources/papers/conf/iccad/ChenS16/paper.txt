@@ -1,0 +1,812 @@
+A New Tightly-Coupled Transient Electro-Thermal Simulation Method for Power Electronics
+
+Quan Chen
+Department of Electrical and Electronic Engineering
+The University of Hong Kong Pokfulam, Hong Kong
+quanchen@eee.hku.hk
+
+Wim Schoenmaker
+Magwel N.V. Vital Decosterstraat 44 bus 27
+3000 Leuven, Belgium
+wim.schoenmaker@magwel.com
+
+ABSTRACT
+This paper presents a new transient electro-thermal (ET) simulation method for fast 3D chip-level analysis of power electronics with ﬁeld solver accuracy. The metallization stacks are meshed and solved with 3D ﬁeld solver using nonlinear temperature-dependent parameters, and the active devices are modeled with nonlinear tabular compact models to avoid time-consuming TCAD simulation. The main contributions include: 1) A tightly-coupled formulation that solves the electrical and thermal systems simultaneously to enable a more natural characterization of ET interaction and faster convergence for strong ET coupling; 2) A specialized exponentialintegrator-Newton-Krylov (EI-NK) transient solver to address the numerical challenges arising from the tightly-coupled ET simulation. Numerical experiments show that the proposed method outperforms the existing implicit time stepping with the Newton’s method and the exponential integrator with an explicit nonlinear approximation.
+1. INTRODUCTION
+Bipolar-CMOS-DMOS (BCD) integration is a key technology for power integrated circuits (ICs) offering many advantages by integrating three distinct types of devices on a single die. New challenges, however, have also been triggered to the thermal managements in the BCD technology due to the closer proximity of high-power DMOS transistors to other temperature-sensitive components and the more complicated geometry and material conﬁgurations. Accurate prediction in temperature proﬁle is needed to guide heat removal design and avoid potential reliability issues such as electromigration and negative bias temperature instability (NBTI). To this end, the strong coupling between electrical and thermal dynamics, e.g., the nonlinear temperature dependencies of electrical parameters and device characteristics [9], must be appropriately accounted. In addition, DMOS is often used as switches in BCD and operates under pulse inputs. The peak temperature of devices can go up and down in one pulse period and exceed the maximum threshold momentarily causing permanent damage, which cannot be detected by steady-state analysis [2]. Therefore, an accurate
+Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for proﬁt or commercial advantage and that copies bear this notice and the full citation on the ﬁrst page. Copyrights for components of this work owned by others than ACM must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior speciﬁc permission and/or a fee. Request permissions from Permissions@acm.org. ICCAD ’16 November 07-10, 2016, Austin, TX, USA c 2016 ACM ISBN 978-1-4503-4466-1/16/11 ...$15.00 DOI: http://dx.doi.org/10.1145/2966986.2966993.
+
+transient electro-thermal (ET) co-simulation is highly desired to detect and avoid thermal failures in the early stage of BCD designs.
+Most existing transient ET, and in a broader sense multi-physics, simulation methods fall into the “loosely-coupled” category. The electrical and thermal dynamics are treated as two uni-physics problems, solved separately by specialized methods, such as ﬁeld solution or equivalent network analysis, and coupled via communication between the two solvers through an appropriate interface at software level [4, 7]. Despite the methodological simplicity, the loosely-coupled strategy requires a careful bookkeeping of the interaction between electrical and thermal variables, and a complicated software communication scheme to ensure efﬁcient information exchange [10]. The deliberate split of electrical and thermal dynamics may also lead to slow convergence when the their coupling is strong. More importantly, modern high-performance computing architecture has entered an era that data motion is “penalized” while ﬂops are offered nearly “for free”. The frequent data exchange and relatively low arithmetic intensity required in loosely-coupled schemes are actually opposite to this hardware evolution direction [5]. Alternatively, a tightly-coupled ET simulation assembles the electrical and thermal components in one single numerical system and solves them simultaneously. The concurrent treatment to multiple physics generally leads to more natural and consistent characterization of physical interactions, and subsequently to more automated analysis, less data communication, and faster convergence for strong coupling.
+In the context of ET analysis for power ICs, a tightly-coupled simulation method was proposed in [10] which solves the electrical and thermal equations simultaneously in the time-domain. Being one step closer to the “ab initio" simulation, the ET solver in [10] can determine the voltage drop in the metal structures and the device temperatures with high accuracy and without limiting the applicability to special cases. The limitation of [10] is that the capacitive effects in the electrical system are neglected, i.e., only the thermal system is actually evolved in time with the electrical response determined solely by instantaneous boundary condition. This limitation was removed in [8] in which the interconnect and device gate capacitance is included in the formulation of electrical system, and an exponential integrator (EI) method was developed to speed up the transient electrical simulation. Yet [8] still used a loosely-coupled scheme to handle the ET coupling.
+While tightly-coupled approaches are promising for ET problems and, in a wider perspective, multi-physics problems, some numerical challenges need to be properly addressed for the tightlycoupled approaches to be a better strategy in practice. These challenges include presence of multiple time scales (stiff systems), strong nonlinearity and considerably increased problem size. The large
+
+time scale difference demands implicit time stepping methods such as the backward differentiation formula (BDF), the high nonlinearity favors the Newton’s method over the ﬁxed-point iteration underlying loosely-coupled approaches to achieve better convergence, and the elevated system size renders direct matrix factorization less feasible. As a consequence, BDF combined with the NewtonKrylov (NK) method, which uses iterative methods based on the Krylov subspace to solve the Jacobian matrix, is currently the preferred choice for large-scale evolutionary multi-physics problems [6]. However, the ET coupling considered in this work exhibits a particularly strong stiffness, with the thermal time constant larger than the electrical one by 3 to 6 orders of magnitude. Temporal integration using BDF usually results in unnecessarily small time steps, and ill-conditioned Jacobian matrices in the Newton’s method that make Krylov-subspace-based iterative methods difﬁcult to converge.
+In this paper, we aim to develop a tightly-coupled transient ET simulation method with accelerated convergence for strong coupling and sufﬁcient numerical scalability for large-scale power IC analysis. A nonlinear exponential-integrator-Newton-Krylov (EINK) method is developed to enhance numerical scalability with a combination of three components: 1) EI-based time integration to combat stiffness and allow larger time steps than BDF; 2) Newton’s method as core nonlinear solver for faster nonlinear convergence; and 3) Faster convergence for the Krylov subspace iterative solvers within the Newton’s method. Numerical experiments with a realistic power IC are conducted to demonstrate the desired performance of the proposed ET solver.
+2. TIGHTLY-COUPLED ET FORMULATION
+2.1 Basic Electrical and Thermal Models
+
+sist of the contribution from interconnect capacitive parasitics, and that from the device gate capacitances (Cd). For the conduction currents, Jc refers to the conduction currents of the on-chip metallic structures including interconnects, vias and contacts, and Jd the drain-source currents of power devices
+
+Jc = −σ (T ) ∇V, conductors Jd = f (Vgs, Vds, Tds) , power devices
+
+(2)
+
+In (2), Jc is obtained from the electrical potential V (primary electrical variable) with a ﬁeld solver using temperature-dependent conductivity σ (T ). The device current Jd, on the other hand, is looked up from a temperature-aware table model to avoid expensive TCAD simulation. Vgs, Vds, and Tds denote the gate-source voltage, the drain-source voltage and the device temperature averaged at the source and drain terminals, respectively. In this work the device capacitance is assumed temperature independent. For more details of the electrical model we refer the readers to [8] and the references therein.
+To model the thermal dynamics, the heat conduction equation is solved on the entire domain with a 3D thermal ﬁeld solver
+
+CT
+
+∂T ∂t
+
+− ∇ · (κ(T )∇T ) − Q = 0,
+
+(3)
+
+where T is the temperature (primary thermal variable), κ(T ) the temperature-dependent thermal conductivity, CT the volumetric heat capacity and Q the heat sources or sinks. The Q term in (3) has several contributors: 1) the Joule self-heating of the metal structures; 2) the self-heating of the active devices and 3) heat injected or extracted at the boundary of the simulation domain. Similar to [10], the ﬁrst two contributions are calculated by
+
+Q=
+
+E · Jc = σ(T )|∇V |2, conductors
+
+Jd · Vds,
+
+power devices
+
+(4)
+
+from the information provided by the electrical solver. The third one is modeled by thermal contacts placed on the domain boundary enforcing ﬁxed temperatures or ﬁxed heat ﬂux.
+The temperature-dependent models of the electrical and the thermal conductivities are given by the exponential models
+
+σ(T ) = σ0
+
+T T0
+
+ασ
+,
+
+(5)
+
+Figure 1: Multi-domain ET modeling (electrical ﬁeld solver for metallization + compact models for devices + thermal ﬁeld solver. the substrate is included in the thermal solver but not in the electrical solver)
+
+The transient ET co-simulator developed in this work is based on the multi-domain modeling strategy illustrated in Fig. 1 [8,10]. The electrical system is characterized by the current continuity equation with account for the capacitive effects
+
+(−∇
+
+·
+
+(ε∇)
+
++
+
+Cd)
+
+∂V ∂t
+
++ ∇ · (Jc + Jd) = 0,
+
+(1)
+
+Here the ﬁrst term represents the displacement currents and the second term the conduction currents. The displacement currents con-
+
+κ(T ) = κ0
+
+T T0
+
+ακ
+,
+
+(6)
+
+where the exponents ασ and ακ are material-dependent parameters. Other material parameters are assumed to be temperatureindependent.
+
+2.2 Loosely-Coupled and Tightly-Coupled Formulations
+In the loosely-coupled formulation, the electrical equation (1) and the thermal equation (3) are solved in a Gauss-Seidel manner [8]: in each thermal time step, the temperature is assumed constant to determine the electrical parameters and the transient electrical response is solved with multiple steps. At the end of the thermal step, the power dissipation of all electrical steps are summed and passed to the thermal solver, which restarts the same thermal step with the updated heat generation and temperature-dependent thermal conductivities to provide a new temperature. The two solvers iterate until self-consistency is achieved.
+For weak to medium ET coupling the loosely-coupled scheme usually converges reasonably fast. However, the convergence rate
+
+−∇ · (ε∇) + Cd 0 0 CT I
+
+V˙ T˙
+
+=−
+
+−∇ · [σ (T ) ∇]
+
+0
+
+0 −∇ · [κ (T ) ∇]
+
+V T
+
+−
+
+Jd (V, T ) Q (V, T )
+
+−
+
+b(E) b(T )
+
+(7)
+
+(a)
+
+(b)
+Figure 2: (a) Loosely-coupled scheme. (b) Tightly-coupled scheme.
+
+of loosely-coupled schemes deteriorates rapidly when the ET systems have strong mutual interactions, and the tightly-coupled scheme is preferred in this scenario to accelerate the convergence. The tightly-coupled scheme is formulated by combining the electrical system (1) and the thermal system (3) in one single system as shown in (7) and updating the potential V and temperature T simultaneously in each ET step. Here b(E), b(T ) denote respectively the electrical and thermal boundary conditions. The nodal potential vector V of NV length and the nodal temperature vector T of NT length are the primary unknowns to be determined. Fig. 2 compares the existing loosely-coupled and the proposed tightly-coupled schemes in the time evolution.
+With a given spatial discretization, (7) can be represented by a general nonlinear differential algebraic equation (DAE)
+
+where
+
+C
+
+dx dt
+
+=
+
+−F (x)
+
+−
+
+b,
+
+(8)
+
+C=
+
+CE CT
+
+,F =
+
+∇ · (σ (T ) ∇V ) + Jd(V, T ) ∇ · (κ (T ) ∇T ) + Q (V, T )
+
+,x =
+
+V T
+
+.
+
+(9)
+
+The standard solution approach for the nonlinear DAE is the
+
+BDF-Newton-Krylov combo (BDF-NK), which starts with reduc-
+
+ing (8) to a nonlinear algebraic equation via a polynomial approx-
+
+imation of the time derivative term. For instance, the ﬁrst-order
+
+BDF (backward Euler) results in
+
+Cxn+1 + hF (xn+1) − Cxn + hbn+1 = 0,
+
+(10)
+
+where h is the time step size between the nth and the (n + 1)th steps. Then the Newton’s method is applied to solve (10) iteratively
+
+C + hJ(xkn+1) Δxkn++11 = − hF (xkn+1) + C xkn+1 − xn + hbn+1 , (11)
+
+where Δxkn++11 denotes the update of x at the (k + 1)th Newton iteration in the (n + 1)th step. The Jacobian of F (x) is given by
+
+J (x) =
+
+∇
+
+·
+
+(σ
+
+(T ) ∇)
+
++
+
+∂Jd ∂V
+
+∇·
+
+∂σ(T ∂T
+
+)
+
+∇V
+
++
+
+∂Jd ∂T
+
+∂Q ∂V
+
+∇·
+
+κ (T ) ∇ +
+
+∂κ(T ∂T
+
+)
+
+∇T
+
++
+
+∂Q ∂T
+
+(12)
+
+When it comes to whether a loosely-coupled or a tightly-coupled
+
+formulation should be selected for a particular ET problem, it de-
+
+pends critically on the ET coupling strength, which can be esti-
+
+mated by looking at the Jacobian (12). The upper right block rep-
+
+resents the temperature sensitivity of the metal conductivities and
+
+the power device currents, and the lower left block indicates how
+
+sensitive the total heat generation is to the voltage variations. It is
+
+shown in [12] that the product of the norm of the two off-diagonal
+
+blocks in (12) largely determines the convergence rate of the non-
+
+linear Gauss-Seidel iteration underlying the loosely-coupled approach. Speciﬁcally, one may partition the matrix A = C−1J
+
+into a block form [A11A12; A21, A22]T and calculate the norm of
+
+the square matrix [12]
+
+S = A−111A12A−221A21
+
+(13)
+
+The larger is S , the stronger is the coupling and the slower convergence one may expect from the loosely-coupled scheme.
+The last step in BDF-NK is solving the linear system in (11) by a Krylov subspace iterative method such as the GMRES (generalized minimal residual method), which is more scalable compared to the direct method for large-scale problems. Each GMRES iteration only requires a matrix-vector product
+
+C + hJ(xkn+1) v
+
+(14)
+
+The BDF-NK approach, when applied in tightly-coupled ET simulation, has two major weaknesses. Firstly, the order of accuracy of BDF cannot go beyond two without compromising the numerical stability. To meet the accuracy requirement, the minimal step size is typically limited to be comparable with the fastest electrical transients in the metal interconnects. Due to that fact the electrical and thermal systems evolve at the same pace in a tightly-coupled scheme, a time stepping dictated mostly by the electrical characteristics is less efﬁcient for modeling the much slower thermal dynamics. Second, the linear system in (11) is often ill-conditioned due to the stiffness of the ET coupled system, and the Krylov subspace iterative solvers are known to converge slowly with such systems.
+
+3. EXPONENTIAL-INTEGRATOR-NEWTONKRYLOV METHOD FOR TIME-DOMAIN SOLUTION
+3.1 Formulation of EI-NK
+An exponential integrator (EI) approach was devised in [8] to tackle the stiffness in the ET coupled system1. The DAE (8) is ﬁrstly transformed to an ordinary differential equation (ODE) as-
+1In [8] the EI was applied to the electrical subsystem only in the loosely-coupled scheme. However, extension to the entire tightlycoupled system is not difﬁcult.
+
+suming C is invertible [11]2
+
+dx dt
+
+=
+
+−C−1F (x) − C−1b.
+
+(15)
+
+Then a linearisation is applied at the beginning of the simulation with respect to the initial guess x0
+
+dx dt
+
+=
+
+−C−1J0x − C−1 (F (x) − J0x) − C−1b
+
+= Ax − D(x) − ˜b,
+
+(16)
+
+where J0 is the Jacobian (12) evaluated at x0 and D(x) is a nonlinear difference function. The nonlinear ODE (16) has an analytical solution given by
+h
+xn+1 = eAhxn + eA(h−τ) −D(tn + τ ) − ˜b(tn + τ ) dτ .
+0
+(17) One way to differentiate different EI variants is to look at the approximation of the integral of the nonlinear function in (17). [8] applies the second-order Runge-Kutta (RK) approximation [1] to D(x) resulting in the EI-RK2 method
+
+an = xn + hϕ1 (Ah) Axn − D (xn) − ˜bn+1 xn+1 = an − h2ϕ2 (Ah) [D (an) − D (xn)]
+
+(18)
+
+where the ϕ-functions up to order-2 are deﬁned as
+
+ϕ0 (x) = ex,
+
+ϕ1 (x)
+
+=
+
+ex − 1 , x
+
+ϕ2 (x)
+
+=
+
+ex
+
+−x−1 x2
+
+Since matrix A is stiff with large gap between the largest and
+
+smallest eigenvalues, the matrix ϕ-functions applied to vectors are
+
+computed using the shift-and-invert (SAI) Krylov subspace method,
+
+an “inverse” version of the standard Krylov subspace methods, to
+
+provide a better approximation to slow manifold of the waveform
+
+and to enable large h to be used [8, 13, 14]. To keep the paper fo-
+
+cused the details of SAI-Krylov method is given in Appendix A.
+
+The EI approaches are attractive in transient ET analysis as they
+
+solve the linearized subpart of (16), i.e.,
+
+dx dt
+
+=
+
+Ax exactly and thus
+
+avoid the error from the ﬁnite-difference approximation of time
+
+derivative underlying BDF methods in the ﬁrst place [3]. The main
+
+source of error in EI comes only from the numerical approxima-
+
+tion of ϕk(A)v, and thus the order of accuracy can be made fairly
+
+high without losing numerical stability by increasing the subspace
+
+dimension m [11].
+
+The drawback of EI-RK2 lies in the relatively poor nonlinear
+
+modeling capability due to the explicit (RK), non-iterative approx-
+
+imation of D(x) in (17). Such approximation is acceptable in [8]
+
+while weak to medium ET nonlinearity is targeted (it is mean-
+
+while the reason for selecting a loosely-coupled framework in their
+
+work). The nonlinearity considered in our work, however, has to be
+
+strong enough to favor the tight coupling scheme. The explicit and
+
+one-off nonlinear solver thus becomes insufﬁcient and would limit
+
+the use of large steps. Implicit and iterative nonlinear modeling is
+
+needed which motivates the combination of EI and NK as detailed
+
+in the following.
+
+Starting from (17), we approximate D(x) by a second-order im-
+
+plicit formulation
+
+D(x)
+
+=
+
+1 2
+
+[D(xn+1) + D(xn)]
+
+(19)
+
+2the non-singularity of C can be warranted for the ET problem concerned by differentiating the Gauss law in non-conducting domain
+
+Substituting (19) into (17) and exploiting the ϕ-function expression, one obtains
+
+xn+1
+
+h
+
+= eAhxn −
+
+eA(h−τ )
+
+0
+
+D (xn+1) + D (xn) + ˜b (t + τ ) dτ 2
+
+=
+
+−
+
+h 2
+
+ϕ1
+
+(Ah) D (xn+1)
+
++
+
+eAh xn
+
+−
+
+h 2 ϕ1
+
+(Ah)
+
+D (xn) + 2˜bn+1
+
+=
+
+xn
+
+−
+
+h 2 ϕ1
+
+(Ah)
+
+D (xn+1) − 2Axn + D (xn) + 2˜bn+1
+
+(20)
+
+Note that now the right-hand-side (RHS) of (20) also contains xn+1. Solving (20) with the Newton’s method requires solving the a com-
+posite linear system in each iteration
+
+I
+
++
+
+h 2 ϕ1
+
+(Ah)
+
+A
+
+x(nk+)1
+
+−A
+
+−
+
+x(nk+)1
+
++
+
+h 2 ϕ1
+
+(Ah)
+
+D
+
+x(nk+))1
+
+Δx(nk++11) =
+
+(21)
+
++ D (xn) − 2Axn + 2˜bn+1 − xn
+
+Note that in (21), A x(nk+)1 = −C−1J x(nk+)1 uses the Jaco-
+bian evaluated at x(nk+)1. The RHS involves one evaluation of ϕfunction-vector product. As in the BDF case, the linear system in (21) is solved iteratively by GMRES. In each iteration the matrixvector product
+
+I
+
++
+
+h 2
+
+ϕ1
+
+(Ah)
+
+A
+
+x(nk+)1
+
+−A
+
+v
+
+(22)
+
+is evaluated using the SAI-Krylov subspace solver. The algorithmic ﬂow of EI-NK is given in Algorithm 1.
+
+Algorithm 1: EI-NK
+begin Given initial values [V0, T0]T Compute J0 via (12) and pre-factorize (C + γJ0) for n = 1, 2, ... to nET do Obtain ˜bn+1 for k ← 1 to nNT do Compute RHS of (21) with one SAI-Krylov
+solution
+Solve (21) for Δx(nk++11) by GMRES, with each matrix-vector product (22) evaluated by one
+SAI-Krylov solution
+If Δx(nk++11) < tolNT , xn+1 = x(nk++11)
+
+One difference between BDF-NK and EI-NK lies in the linear systems they solve by iterative solvers. The linear system (22) of EI-NK is intrinsically better conditioned than the one (14) of BDF-NK. This is because the ϕ-function performs in effect a contractive spectral mapping of Ah, i.e., if the eigenvalues of Ah, λ (Ah) ∈ (−∞, 0], then λ (ϕ1(Ah)) ∈ [0, 1]. As a consequence, no preconditioner is needed for (22) in the GMRES solution. On the other hand, preconditioners must be applied to (14) to ensure practical convergence. For a fair comparison, in this work we apply (C + hJ0)−1 as the preconditioner for (14). As will be shown in the numerical experiment section, the GMRES convergence of the unpreconditioned system in EI-NK is still better than the preconditioned system in BDF-NK.
+
+3.2 Complexity Analysis
+
+In this subsection we will brieﬂy analyze the computational complexity of transient ET analysis using the loosely-coupled scheme with BDF-NK (applied individually to the electrical and the thermal subsystems), the tightly-coupled scheme with BDF-NK and the tightly-coupled scheme with EI-NK. Without causing confusion we drop the “NK” in this subsection and denote the three approaches by LC-BDF, TC-BDF and TC-EI. TC-EI-RK2 is not considered since we are aiming at relatively strong ET interactions that make the RK-type of nonlinear approximation inefﬁcient. Fixed time steps are applied in all time integration. Since the major cost of these methods lies in the back-forward-substitutions (one backsubstitution plus one forward-substitution), as used in preconditioned GMRES iterations for BDF methods and the SAI Krylov subspace approximation of the ϕ-function for the EI method, we count the numbers and the sizes of back-forward-substitutions to measure the computational expense, as listed below (all numbers are averaged over the entire simulation)
+
+• LC-BDF: nloop×nLEC ×nLNCT −E ×nLGCMRES−E back-forward solves of size NV × NV , and nloop × nLTC × nLNCT −T × nLGCMRES−T back-forward solves of size NT × NT . nloop is the loosely-coupled ET loops to converge, nLEC , nLNCT −E and nLGCMRES−E are the number of time steps, the number of Newton iterations per time step, and the number of GM-
+RES iterations per Newton iteration for the electrical system.
+Similar notations apply to the thermal system.
+
+• TC-BDF: nTETC−BDF ×nTNCT−BDF ×nTGCM−RBEDSF back-forward solves of size (NV + NT ) × (NV + NT ), where nTETC−BDF , nTNCT−BDF and nTGCM−RBEDSF are the number of time steps, the number of Newton iterations per time step, and the number
+of GMRES iterations per Newton iteration for TC-BDF.
+
+• TC-EI: nTETC−EI ×nTNCT−EI × nTGCM−REEIS + 1 ×nSAI back-
+
+forward solves of size (NV + NT ) × (NV + NT ). The extra
+
+factor
+
+nT C−EI SAI
+
+refers
+
+to
+
+the
+
+dimension
+
+of
+
+the
+
+SAI
+
+Krylov
+
+subspace for approximating the ϕ-function-vector products
+
+(cf. Appendix A).
+
+In general, the loosely-coupled schemes need more back-forward
+
+substitutions of smaller sizes, whereas the tightly-coupled schemes
+
+require fewer substitutions with larger matrices. For strongly cou-
+
+pled ET interactions, the large nloop needed in the loosely-coupled
+
+scheme will render it less efﬁcient compared to the tightly-coupled
+
+one. For the two tightly-coupled schemes, TC-EI requires more
+
+back-forward solves per GMRES iteration due to the need of ap-
+
+proximating the ϕ-function in (22), but is able to use fewer time
+
+steps (lager step size) and fewer GMRES iterations per Newton it-
+
+eration than TC-BDF. As will be shown in the next section, the
+
+saving due to
+
+of TC-EI
+
+nT C−EI SAI
+
+.
+
+in
+
+nE
+
+T
+
+and nGMRES
+
+will outweigh the extra cost
+
+4. NUMERICAL RESULTS
+All the prototypes are implemented and tested in Matlab. A practical LDMOS ((laterally diffused metal oxide semiconductor) device is used to verify the proposed simulator. The 3D view and the speciﬁcations of the test structure are shown in Fig. 3. A 100KHz trapezoidal pulse (10μs period, 0.5μs rising/falling edge, 50% duty cycle) and 5V amplitude is applied as the gate driving signal. A spatial discretization by the 3D ﬁnite-volume method (FVM) results in a mesh with NV = 217, 202 potential unknowns and NT = 337, 869 temperature unknowns. We apply the secondorder BDF (BDF2) in all BDF-based approaches and use GMRES
+
+as the default Krylov subspace iterative method. Some convergence criteria need to be deﬁned for numerical comparisons. The looselycoupled ET iteration is considered convergent if
+
+max
+
+ΔV V
+
+,
+
+ΔT T
+
+< tolET
+
+The same criterion is applied to determine the convergence of the Newton’s method in the tightly-coupled approaches. tolET = 10−3
+is used throughout the testing. The relative GMRES tolerance is tolGMRES = 10−6, and the accuracy of the SAI-Krylov approximation of the ϕ-functions (25) is controlled by tolSAI = 10−8.
+
+Figure 3: 3D view of the power LDMOS structure (the die part
+is truncated for better visualization). The back-end structure consists of 6 metal layers. The die has an area of 750 × 450μm2
+and a thickness of 400μm. The LDMOS has 94 transistor ﬁn-
+gers with an 18.45mm total gate length.
+
+Voltage (V)
+
+Temperature (K)
+
+4 2 0
+0
+320
+310
+300 0
+450 400 350 300
+0
+
+0.2 0.4 0.6 0.8 1 1.2 1.4 1.6 1.8 2 10-5
+TC-BDF LC-BDF
+
+0.2 0.4 0.6 0.8 1 1.2 1.4 1.6 1.8 2 10-5
+TC-BDF LC-BDF
+
+0.2 0.4 0.6 0.8 1 1.2 1.4 1.6 1.8 2
+
+Time (s)
+
+10-5
+
+Temperature (K)
+
+Figure 4: Top: gate driving voltage. Middle: Device 1 drain temperature with low ET coupling ( S = 0.8). Bottom: Device 1 drain temperature with high ET coupling ( S = 9.1).
+
+We start with showing the beneﬁts of using a tightly-coupled
+
+scheme when the ET coupling is strong. We produce a weak ET
+
+coupling case by modifying the device current table model to re-
+
+duce
+
+the
+
+∂Jd ∂T
+
+and
+
+∂Q ∂V
+
+terms in (12), and a strong ET coupling
+
+case
+
+by increasing the two terms. The corresponding S values evalu-
+
+ated by (13) at the second time step are 0.8 and 9.1 respectively. To
+
+simplify the comparisons, only LC-BDF and TC-BDF are applied
+
+to simulate the two scenarios. The LC-BDF scheme uses 5 thermal
+
+steps and each contains 20 electrical steps, rendering 100 electrical
+
+steps in total. TC-BDF needs the same number of ET steps to re-
+
+solve the electrical transients as it is based on the same BDF2 time
+
+Table 1: Performance comparison of loosely-coupled and tightly-coupled schemes for weak and strong ET couplings. The ET loop numbers are averaged over thermal steps in LC-BDF. The amounts of Newton iterations and back-forward (B-F) solves are total numbers of the whole simulation.
+
+Method
+
+# of steps nT × nE or nET
+
+Low ET coupling (( S = 0.8))
+
+High ET coupling ( S = 9.1
+
+ET loop (avg) Newton B-F solves Runtime (s) ET loop (avg) Newton B-F solves Runtime (s)
+
+LC-BDF TC-BDF
+
+5 × 20 100
+
+3
+
+665+39 2793+167
+
+358
+
+1
+
+335 1672
+
+759
+
+9
+
+3840+191 26897+1267
+
+3669
+
+1 571 4768 2155
+
+integration. The transient temperatures at the drain terminal of the 1st device are shown in Fig. 4. As expected, the temperature starts to increase when the MOSFETs are turned on and decrease after the devices are turned off. For strong ET coupling the temperature increase is much more dramatic. Both LC-BDF and TC-BDF produce accurate solutions. The loosely-coupled scheme computes temperature at the end of each thermal step, thus the sampling interval is larger. The tightly-coupled scheme, on the other hand, updates the temperature at each ET step, and thus the sampling is denser. As can be seen in the second period of the high ET coupling case, the temperature difference between the peak and the end point can reach 66K, which would otherwise be omitted if one only simulates the temperature at the end point of each period and may cause damage to the devices. This indicates the necessity of a sufﬁcient resolution to the transient temperature variation for highpower applications.
+The computational performance of LC-BDF and TC-BDF is compared in Table 1 for one period. For the weak ET coupling, the LC method converges rapidly in three loops and thus is more efﬁcient than the TC scheme owing to the smaller matrix size in back-forward (B-F) solves. When the ET coupling becomes strong, the convergence of LC-BDF slows down signiﬁcantly and requires 9 loops to converge within 10−3. The number of Newton iterations increases by 6X, and that of back-forward substitutions as well as the runtime by 10X. In contrast, the performance degradation of tightly-coupled scheme is less signiﬁcant, in which the increases of Newton iteration, back-forward solves and runtime are only 0.7X, 2.7X and 2.7X, respectively. The back-forward substitutions for the electrical, thermal and combined systems are respectively 0.12s,0.19s and 0.45s, thus the lower efﬁciency of LC-BDF for the strongly coupled case is due to that the increase in the number of back-forward solves in LC-BDF outweighs the saving from solving smaller systems. This also demonstrates the advantages of tightly-coupled approaches when being used in strongly coupled ET problems.
+Next, we compare the performance of three different tightlycoupled methods discussed in this paper, namely, BDF-NK, EIRK2 and EI-NK (the TC preﬁx is omitted). Fig. 5 shows the temperature waveforms of the strong ET coupling case computed by the three methods using different step sizes. The reference solution is obtained by BDF-NK with small steps (h = 0.01μs). For h = 0.1μs the accuracy of BDF-NK remains acceptable, but for h = 0.25μs the error becomes noticeable. On the other hand, the EI-NK can provide accurate results up to h = 1μs, 10X larger than the step size allowed in BDF-NK owing to the higher order of accuracy in time integration. Finally, the accuracy of EI-RK2 is unsatisfactory due to the explicit approximation of nonlinearity. Since the tightly-coupled formulation is more commonly employed to handle strong ET interactions, the Newton’s method is generally the preferred nonlinear solver to accelerate convergence. The performance data of the tightly-coupled BDF-NK and EI-NK are tabulated in Table 2. Here the step sizes of BDF-NK and EI-NK are selected to be 0.1μs and 1μs that produce comparable accu-
+
+Temperature (K)
+
+440
+
+420
+
+400
+
+380
+Ref
+360
+TC-BDF (h=0.1 s) TC-BDF (h=0.25 s) 340 TC-EI (h=1 s) TC-EI-RK2 (h=0.1 s)
+320
+
+300 0
+
+0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9
+
+1
+
+Time (s)
+
+10-5
+
+Figure 5: Temperature (strong ET coupling, 1st device drain terminal) computed by BDF-NK, EI-NK and EI-RK2 with different step sizes h.
+
+racy, and hence EI-NK can use 10X fewer time steps to ﬁnish the simulation. Another difference lies in the convergence rate of the GMRES solver within the Newton’s method. BDF-NK, after the preconditioner is applied, still needs on average 4568/571 = 8.4 GMRES iterations per Newton step. In contrast, EI-NK requires only 192/45 = 4.3 GMRES iterations. Although EI-NK needs extra multiple back-forward solves in computing each ϕ-functionvector product, the saving from fewer time steps and faster GMRES convergence outweigh the extra cost, and render EI-NK 45% faster than BDF-NK.
+
+5. CONCLUSION
+We have proposed a new transient ET simulation framework for accurate chip-level ET analysis for BCD integration technology. The framework features a tightly-coupled formulation to provide better handling for the strong ET interactions as a consequence of the ever-increasing functionality integration density. To address the computational challenges arising from the tightly-coupled formulation, a specialized nonlinear EI-NK approach, is developed to enable large time steps and faster convergence in Krylov subspace iterative solution. The numerical results have demonstrated the advantages of the proposed framework.
+
+6. REFERENCES
+[1] M. Caliari and A. Ostermann. Implementation of exponential rosenbrock-type integrators. Applied Numerical Mathematics, 59(3-4):568–581, 2009.
+[2] R. Chandra. Transient temperature analysis. In EDSSERC, Sep 2006.
+[3] Q. Chen, W. Zhao, and N. Wong. Efﬁcient matrix exponential method based on extended Krylov subspace for transient simulation of large-scale linear circuits. In Design
+
+Table 2: Performance comparison of BDF-NK and EI-NK for the high EI coupling case. The GMRES count for EI-NK includes the pure GMRES iterations plus the extra one ϕ-function evaluation for generating the RHS of each Newton iteration. The SAI-Krylov dimension is unique for EI-NK and averaged over all GMRES iterations
+Method # of steps Newton GMRES SAI-Krylov (avg) B-F solves Runtime (s)
+
+TC-BDF-NK TC-EI-NK
+
+100 11
+
+571 4568 45 147+45
+
+NA 18
+
+4768 3276
+
+2155 1481
+
+Automation Conference (ASP-DAC), 2014 19th Asia and South Paciﬁc, pages 262–266, Jan 2014.
+[4] R. Gillon, P. Joris, H. Oprins, B. Vandevelde, A. Srinivasan, and R. Chandra. Practical chip-centric electro-thermal simulations. In 14th International Workshop on Thermal Inveatigation of ICs and Systems (THERMINIC), pages 220–223, Sep 2008.
+[5] D. E. Keyes et al. Multiphysics simulations: Challenges and opportunities. International Journal of High Performance Computing Applications, 27(1):4–83, 2013.
+[6] D. Knoll and D. Keyes. Jacobian-free newton-krylov methods: a survey of approaches and applications. Journal of Computational Physics, 193(2):357 – 397, 2004.
+[7] B. Krabbenborg, A. Bosma, H. de Graaff, and A. Mouthaan. Layout to circuit extraction for three-dimensional thermal-electrical circuit simulation of device structures. 15(7):765–774, Jul 1996.
+[8] Q. Mei, W. Schoenmaker, S. H. Weng, H. Zhuang, C. K. Cheng, and Q. Chen. An efﬁcient transient electro-thermal simulation framework for power integrated circuits. IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems, PP(99):1–1, 2015.
+[9] M. Pfost, D. Costachescu, A. Mayerhofer, M. Stecher, S. Bychikhin, D. Pogany, and E. Gornik. Accurate temperature measurements of DMOS power transistors up to thermal runaway by small embedded sensors. IEEE Transactions on Semiconductor Manufacturing, 25(3):294–302, Aug 2012.
+[10] W. Schoenmaker, O. Dupuis, B. De Smedt, P. Meuns, J. Ocenasek, W. Verhaegen, D. Dumlugol, and M. Pfost. Fully-coupled 3D electro-thermal ﬁeld simulator for chip-level analysis of power devices. In 19th International Workshop on Thermal Investigations of ICs and Systems (THERMINIC), pages 210–215, Sep 2013.
+[11] S.-H. Weng, Q. Chen, and C.-K. Cheng. Time-domain analysis of large-scale circuits by matrix exponential method with adaptive control. 31(8):1180–1193, 2012.
+[12] J. P. Whiteley, K. Gillow, S. J. Tavener, and A. C. Walter. Error bounds on block gauss´lcseidel solutions of coupled multiphysics problems. International Journal for Numerical Methods in Engineering, 88(12):1219–1237, 2011.
+[13] H. Zhuang, S.-H. Weng, and C.-K. Cheng. Power grid simulation using matrix exponential method with rational Krylov subspaces. In IEEE 9th International Conference on ASIC (ASICON), pages 369–372, Oct 2013.
+[14] H. Zhuang, S.-H. Weng, J.-H. Lin, and C.-K. Cheng. MATEX: A distributed framework for transient simulation of power distribution networks. In IEEE/ACM Design Automation Conference (DAC), pages 81:1–81:6, 2014.
+
+APPENDIX
+
+A. COMPUTATION OF ϕ-FUNCTION-VECTOR PRODUCTS WITH THE SAI-KRYLOV SUBSPACE METHOD
+The main step of SAI-Krylov for computing the ϕ-function-vector products is an m-step Arnoldi process applied to (I − γA)−1
+(I − γA)−1Vm = VmHm + H(m + 1, m)vm+1eTm, (23)
+in which Vm is an orthonormal basis of the m-dimensional Krylov subspace Km (I − γA)−1, v with γ being a shift parameter. H is the upper Hessenberg coefﬁcient matrix, Hm the leading m × m submatrix and em the m-th column of an identity matrix. Note that in implementation (I − γA)−1v is computed as (C + γJ)−1 Cv, for which the LU factors of (C + γJ) are ﬁrstly computed, followed by two triangular solves with Cv to obtain the result. Then the ϕ-function-vector product is approximated as its orthogonal projection onto the SAI-Krylov subspace
+
+ϕk (Ah) v ≈ VmVmT eAhv = βVmϕk Hmh/γ e1, (24)
+
+with Hm = I − H−m1 , β = v 2
+A posteriori residual estimate is given by
+
+resKrylov =
+
+β H(m+1, m) γ
+
+(I−γ A)vm+1 eTm H−m1 ϕk
+
+Hmh/γ
+
+e1 .
+
+(25)
+
+

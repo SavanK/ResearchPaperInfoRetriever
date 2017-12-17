@@ -1,0 +1,662 @@
+A Tensor-Based Volterra Series Black-Box Nonlinear System Identiﬁcation And Simulation Framework
+
+Kim Batselier
+Department of Electrical and Electronic Engineering
+The University of Hong Kong Hong Kong
+kimb@eee.hku.hk
+
+Zhongming Chen
+Department of Electrical and Electronic Engineering
+The University of Hong Kong Hong Kong
+zmchen@eee.hku.hk
+
+Haotian Liu
+Cadence Design Systems, Inc. USA
+haotian@cadence.com
+
+Ngai Wong
+Department of Electrical and Electronic Engineering The University of Hong Kong Hong Kong
+nwong@eee.hku.hk
+
+ABSTRACT
+Tensors are a multi-linear generalization of matrices to their dway counterparts, and are receiving intense interest recently due to their natural representation of high-dimensional data and the availability of fast tensor decomposition algorithms. Given the inputoutput data of a nonlinear system/circuit, this paper presents a nonlinear model identiﬁcation and simulation framework built on top of Volterra series and its seamless integration with tensor arithmetic. By exploiting partially-symmetric polyadic decompositions of sparse Toeplitz tensors, the proposed framework permits a pleasantly scalable way to incorporate high-order Volterra kernels. Such an approach largely eludes the curse of dimensionality and allows computationally fast modeling and simulation beyond weakly nonlinear systems. The black-box nature of the model also hides structural information of the system/circuit and encapsulates it in terms of compact tensors. Numerical examples are given to verify the efﬁcacy, efﬁciency and generality of this tensor-based modeling and simulation framework.
+Keywords
+tensors; Volterra series; nonlinear system identiﬁcation; black box; simulation
+1. INTRODUCTION
+Automatic system identiﬁcation and model selection of a nonlinear system or circuit from a given set of input-output data is an important goal in electronic design automation (EDA). For linear systems this goal has been largely achieved, which is evident from the rich literature and many sophisticated algorithms that are available, e.g., [1, 2]. In contrast, it is a much more difﬁcult task for nonlinear systems [3].
+Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for proﬁt or commercial advantage and that copies bear this notice and the full citation on the ﬁrst page. Copyrights for components of this work owned by others than ACM must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior speciﬁc permission and/or a fee. Request permissions from permissions@acm.org. ICCAD ’16, November 07-10, 2016, Austin, TX, USA
+c 2016 ACM. ISBN 978-1-4503-4466-1/16/11. . . $15.00 DOI: http://dx.doi.org/10.1145/2966986.2966996
+
+This article makes a step forward towards this goal by introducing a tensor-based framework for the automatic identiﬁcation and simulation of nonlinear systems and circuits with Volterra series. Our proposed framework is illustrated as a block diagram in Fig. 1. First, a set of Volterra kernels H1, H2, . . . , Hn are identiﬁed from a given set of measured discrete-time input/output data. These kernels are then used together with a new input to generate a simulated output of the nonlinear system. We present an algorithm for both the identiﬁcation and simulation blocks in this article. The main tool used for modeling nonlinear systems in our framework is the Volterra series, which has been successfully applied to modeling and simulating weakly nonlinear systems, e.g., [4–9]. We show that there is an inherent link between Volterra series and tensors and exploit this link to develop a fast simulation algorithm. We remark that the integration of Volterra theory and tensors has appeared in previous works on nonlinear simulation [10–12] and in system identiﬁcation [13]. The key novelties in this work are:
+• Representation of the Volterra kernels as tensors – This is not an entirely new idea and has appeared in prior work [10– 13]. However, we introduce, for the ﬁrst time in the literature, particular Toeplitz tensors that allow the development of a remarkably fast simulation algorithm via polyadic tensor decompositions. The obtained reduction in required simulation runtime and storage cost is demonstrated by means of numerical experiments.
+• Fast simulation by means of multi-mode convolution – The curse of dimensionality appears in the standard implementation of Volterra kernels wherein multi-mode convolutions are needed in computing higher order responses. This has limited the application of Volterra series to mostly mildly nonlinear systems. Via polyadic tensor decomposition we manage to compute the multi-mode convolution by means of only linear convolutions, regardless of the Volterra kernel order. This means that strongly nonlinear systems can now be efﬁciently captured with high-order kernels whereby the dimensionality curse is gratefully removed during simulation.
+This article is organized as follows. Section 2 reviews basic tensor notation and operations, followed by a succinct account on the Volterra series. The development of the nonlinear system identiﬁcation and accelerated tensor-based simulation is elaborated in Sec-
+
+tions 3 and 4. Section 5 presents three numerical examples demonstrating the efﬁcacy of the proposed black-box modeling and simulation scheme. Further remarks are given in Section 6 and Section 7 draws the conclusions.
+
+2. BACKGROUND
+
+2.1 Tensors
+
+First, we give a short introduction of tensors and the notation
+we use. Tensors are denoted by boldface capital calligraphic letters (e.g. A), matrices by boldface capital letters (e.g. A), vectors by boldface letters (e.g. a), and scalars by either Roman (e.g. a) or Greek (e.g. α) letters. The nth element in a sequence is denoted by a superscript in parentheses. For example, u(1), u(2), u(3) denote the ﬁrst three elements in a sequence of u vectors. Tensors are in our context generalizations of matrices and vectors. A d-way tensor A ∈ Rn1×···×nd is simply a d-way array. Each element of the tensor A is hence speciﬁed by d indices i1, . . . , id and denoted by ai1···id . The positive integers d, n1, n2, . . . , nd are called the order and the dimensions of the tensor, respectively. Fig. 2 illustrates a 3-way (or 3rd-order) tensor with dimensions 4, 3, 2.
+The matrix vector multiplication is generalized to the tensor case: the k-mode product of a d-way tensor A with a vector u ∈ Rnk is
+deﬁned by
+
+nk
+
+(A×k uT )i1···ik−1ik+1···id =
+
+uik ai1···ik···id .
+
+ik =1
+
+This operation effectively removes the kth mode, resulting in a (d− 1)-way tensor. Note that for a matrix A ∈ Rn×n and vector u ∈ Rn, we can write the familiar matrix vector products as A×1 uT uT A and as A ×2 uT A u.
+A d-way rank-1 tensor is the outer product of d vectors
+
+A = a(1) ◦ a(2) ◦ · · · ◦ a(d),
+
+where a(1) ∈ Rn1 , . . . , a(d) ∈ Rnd . The entries of A are completely determined by ai1i2···id = a(i11)a(i22) · · · a(idd).
+A cubical tensor is a tensor for which n1 = n2 = · · · = nd. A cubical tensor A is symmetric if ai1···id = aπ(i1,...,id) where π(i1, . . . , id) is any permutation of the indices and a Toeplitz tensor if ai1···id = ai1+1···id+1 holds for all entries.
+The Kronecker product [14, 15] and Hadamard product are denoted by ⊗ and by respectively. We introduce the shorthand notation xd x ⊗ x ⊗ · · · ⊗ x for the d-times repeated Kronecker
+product.
+An important operation on tensors is reshaping. The most com-
+mon reshapings are the matricization and vectorization [16], which reorder the entries of A into a matrix A and vector vec(A). The mode-n matricization of a tensor A rearranges the entries of A
+such that the rows of the resulting matrix are indexed by the nth
+tensor index in. The remaining indices are grouped in ascending order. The only reshapings used in this paper are the mode-1 ma-
+tricization and vectorization.
+
+EXAMPLE 1. The mode-1 matricization of the tensor A from
+
+Fig. 2 is
+
+⎛⎞
+
+1 5 9 13 17 21
+
+A = ⎜⎜⎝23
+
+6 7
+
+10 11
+
+14 15
+
+18 19
+
+2223⎟⎟⎠ .
+
+4 8 12 16 20 24
+
+and its vectorization is vec(A) = 1 2 · · · 24 T .
+
+The importance of the matricization and vectorization lies in the following two equations
+
+A ×1 uT ×2 · · · ×d uT = vec(A)T ud
+
+(1)
+
+and A ×2 uT ×3 · · · ×d uT = A ud−1,
+
+(2)
+
+which tell us how the k-mode products of a tensor A with a vector u can be computed.
+A polyadic decomposition [17, 18] of a d-way tensor A is its decomposition into a sum of R rank-1 tensors
+
+R
+
+A=
+
+a(i1) ◦ a(i2) ◦ · · · ◦ a(id).
+
+i=1
+
+To store a d-way tensor A in memory, we need to store all of its n1 × · · · × nd elements. In contrast, storing its polaydic decomposition needs only R(n1 +· · ·+nd) elements, which can be a significant reduction when R is small. When R is minimal, the polyadic decomposition is called canonical. Probably the most well-known canonical polyadic decomposition of a matrix is its singular value decomposition [19]. A symmetric tensor A can always be decomposed into a symmetric polyadic decomposition. This means that every rank-1 term is also a symmetric tensor and therefore
+
+R
+
+A=
+
+ai ◦ ai ◦ · · · ◦ ai.
+
+i=1
+
+Storage of a symmetric polyadic decomposition therefore needs only Rn elements when ai ∈ Rn.
+
+2.2 Volterra Series
+Volterra theory has been developed over a century ago and has found applications in analyzing communication systems and nonlinear control [4, 5]. The object of interest in this theory is the Volterra series, which can be regarded as a Taylor series with memory effects since its evaluation at a particular time instance requires information from the past. Speciﬁcally, a nonlinear discrete-time time-invariant system with an input u(t) ∈ R and an output y(t) ∈ R is described by a Volterra series as
+
+y(t) = y1(t) + y2(t) + y3(t) + · · · ,
+
+where
+
+M −1 M −1
+yn(t) = · · · hn(k1, · · · , kn)·
+k1=0 kn=0
+u(t − k1) · · · u(t − kn),
+
+(3)
+
+with hn(k1, · · · , kn) the nth-order Volterra kernel (the order n
+
+here is not to be confused with the tensor dimension n in Sec-
+
+tion 2.1) and M the memory of the kernel. We only consider causal
+
+systems, which implies that hn(k1, · · · , kn) = 0 when any of the
+
+indices k1, . . . , kn is negative. Note that y1 is the usual ﬁrst-order
+
+convolution of the input u(t) with the impulse response h1, which
+
+is well-known from linear system theory. For orders n ≥ 2 the
+
+kernels are not unique, since the products u(t − k1) · · · u(t − kn)
+
+are commutative. This becomes problematic when system prop-
+
+erties are to be described in terms of properties of the kernels. It
+
+therefore becomes important to consider restricted forms of the ker-
+
+nels that impose uniqueness. The form we assume throughout this
+
+work is the symmetric one. This implies that hn(k1, . . . , kn) =
+
+hn(π(k1, . . . , kn)), where π(k1, . . . , kn) is any permutation of the
+
+indices k1, . . . , kn, and reduces the number of distinct kernel val-
+
+ues from M n to
+
+M −1+n M −1
+
+≈ (M − 1)n/n!. It is straightforward
+
+Input Stream
+Discrete-Time Simulated/Measured
+I/O Data
+Output Stream
+
+Volterra
+
+(Nonlinear) System
+Identification
+
+Kernels H1, H2, ... , Hn
+
+Tensor-Based Simulated Simulation Output
+
+Reference vs. Simulated Waveforms and/or Error Plots
+
+Figure 1: General overview of the tensor-based black-box Volterra series identiﬁcation and simulation framework.
+
+i3 13 17 21
+14 18 22
+
+i2 15 19 23
+16 20 24 15 9
+
+i1
+
+2 6 10 3 7 11
+
+4 8 12
+
+Figure 2: An example tensor A ∈ R4×3×2.
+
+to see that each Volterra kernel hn corresponds with a symmetric n-way tensor Hn, which allows us to rewrite (3) as
+
+yn(t) = Hn ×1 uT ×2 · · · ×n uT ,
+
+(4)
+
+with u = u(t) u(t − 1) · · · u(t − M + 1) T ∈ RM . By using (1), (4) can be rewritten as
+
+yn(t) = vec(Hn)T un = (un)T vec(Hn),
+
+(5)
+
+which needs O(M n) multiplications. Deﬁning
+
+yn yn(0) yn(1) · · · yn(N − 1) T , uN u(0) u(1) · · · u(N − 1) T ,
+
+we can write (5) for t = 0, . . . , N − 1 for a linear system (n = 1), with vec(H1) = h1(0) h1(1) · · · h1(M − 1) T , to obtain
+
+⎛ u(0)
+
+0 ···
+
+0⎞
+
+y1 = ⎜⎜⎜⎝
+
+u(1) ...
+
+u(0) · · · ...
+
+0 ...
+
+⎟⎟⎟⎠ vec(H1),
+
+u(N − 1) u(N − 2) · · · u(N − M )
+
+which is the well-known expression for the discrete convolution of uN with the impulse response H1. The convolution is here performed as a matrix vector product of an N × M Toeplitz matrix containing the values of uN with the vectorization of H1. Likewise, it is possible to rewrite the convolution as a matrix vector product of an N × N Toeplitz matrix T1 containing the values of
+
+u(2) i3
+u(1) u(0)
+u(0)
+
+u(1)
+
+u(2)
+
+y2(0) y2(1) y2(2)
+i1
+
+00
+
+0
+
+00
+
+0
+
+h2(0,0) 0
+
+0
+
+00
+
+0
+
+h2(1,0) h2(0,0)
+
+0
+
+h2(1,1) h2(0,1)
+
+0
+
+h2(2,0) h2(1,0) h2(0,0)
+
+h2(2,1) h2(1,1) h2(0,1)
+
+h2(2,2) h2(1,2) h2(0,2)
+
+i2
+
+Figure 3: Toeplitz tensor T2 corresponding with the Volterra kernel h2.
+
+H1 with the vector uN as
+
+⎛h1(0) 0
+
+···
+
+··· 0 ⎞
+
+y1
+
+=
+
+⎜⎜⎜⎜⎜⎜⎜⎜⎜⎝h1
+
+(1) ... ... ...
+
+h1(0) ...
+
+··· ... ...
+
+···
+... ... ...
+
+0 ... ... ...
+
+⎟⎟⎟⎟⎟⎟⎟⎟⎟⎠ uN .
+
+0 · · · h1(M − 1) · · · h1(1) h1(0)
+
+(6)
+
+By following the same procedure of writing (5) for an arbitrary n for all values t = 0, . . . , N we obtain
+
+yn = Tn ×2 uTN ×3 · · · ×n+1 uTN ,
+
+(7)
+
+where Tn is a (n + 1)-way cubical Toeplitz tensor of dimension N containing the coefﬁcients of the Volterra kernel Hn. Observe how (7) reduces to (6) when n = 1. Fig. 3 illustrates the Toeplitz tensor Tn for the case n = 2. We call (7) a multi-mode convolution of uN with Hn. The complexity of computing such a multi-mode convolution can be deduced from using the matricization of Tn as
+described in (2). Indeed, we can rewrite (7) as
+
+yn = Tn unN , = Un vec(Hn),
+
+(8) (9)
+
+with Un an N × M n matrix. Computing the multi-mode convolution as described in (8) needs O(N (n+1)) multiplications, while
+
+using (9) has a computational complexity of O(N M n). Since in practice N M , the second way is better but still suffers from the curse of dimensionality due to the M n factor. We resolve this curse
+in Section 4 using a polyadic tensor decomposition. Also note that for the linear case (n = 1) the convolution can be computed using
+the Fast Fourier Transform (FFT) with a computational complexity of O(N log N ).
+
+3. IDENTIFICATION
+
+It is well-known that the estimation of the Volterra kernel val-
+
+ues for an unknown system from measured input/output is a linear
+
+problem. Once the values for the maximal order n and memory M
+
+are chosen, one then uses the measured input uN and output y sig-
+
+nal to estimate the values of H1, H2, . . . , Hn. By repeated use of
+
+(9), y = y1 + y2 + · · · + yn can be rewritten as the linear problem
+
+⎛⎞ vec(H1)
+
+y = U1
+
+U2
+
+···
+
+Un
+
+⎜⎜⎜⎝
+
+vec(H2) ...
+
+⎟⎟⎟⎠
+
+.
+
+(10)
+
+vec(Hn)
+
+The N ×(M +M 2+· · ·+M n) matrix U U1 U2 · · · Un
+
+introduces a constraint on how many samples need to be collected
+
+in order for the Volterra kernel values to be uniquely deﬁned. Indeed, the matrix U is square when N = M + M 2 + · · · + M n. If
+
+more samples are measured then the linear problem can be solved
+
+using a pseudoinverse approach. Again, the curse of dimension-
+
+ality appears in the growing size of the linear system as M and n
+
+increase. One way to alleviate this problem somewhat is by exploit-
+
+ing the symmetry of each of the Volterra kernels. The vectorization
+
+Hn contains many repeated entries, which could be removed on
+
+the condition that the corresponding values of U are adjusted. This
+
+reduces the dimensionality of the U matrix to N ×M +
+
+M −1+2 M −1
+
++
+
+···+
+
+M −1+n M −1
+
+, but does not resolves the curse.
+
+An alternative identiﬁcation procedure that uses higher order ten-
+
+sors explicitly is described in [13]. Instead of identifying the sym-
+
+metric Volterra kernels, approximations to their symmetric polyadic
+
+decompositions are identiﬁed instead by means of three iterative al-
+
+gorithms. The estimated kernels are always approximations since
+
+the number of terms R in each of the symmetric polyadic decompo-
+
+sitions is not known a priori. Quantifying the approximation error
+
+is difﬁcult in this case since then one needs to compute the output
+
+to Algorithm 1 as well.
+
+An interesting development is the use of kernel methods from
+
+machine learning in the identiﬁcation of the Volterra kernels [20].
+
+By representing the Volterra series as elements of a reproducing
+
+kernel Hilbert space, the complexity of the estimation process be-
+
+comes independent of the order of nonlinearity. Even inﬁnite Volterra
+
+series expansions can be estimated. Whether this identiﬁcation
+
+method can be used in our proposed framework requires further
+
+research. For this article, Algorithm 1 was implemented and used
+
+in the numerical experiments for prototyping and veriﬁcation of the
+
+proposed ideas.
+
+4. SIMULATION
+Once the symmetric Volterra kernels are estimated, one can use them to efﬁciently simulate the nonlinear system. Remember from (9) that a naive implementation of the multi-mode convolution has a computational complexity of O(N M n). We will illustrate how the simulation can be made signiﬁcantly faster by a polyadic tensor decomposition of Hn and by exploiting the Toeplitz structure of Tn. The main idea is that a polyadic decomposition of the Volterra
+
+Algorithm 1 Volterra kernel identiﬁcation
+Input: uN , y, M, n Output: H1, H2, . . . , Hn 1: for j = 1 . . . n do 2: construct Uj from uN , considering the symmetry of Hj 3: end for 4: h¯ ← solution of linear system (10) 5: for j = 1 . . . n do 6: extract symmetric Hj tensor from h¯ vector 7: end for
+
+Algorithm 2 Fast time-domain Volterra simulation
+
+Input: uN , H1, polyadic decompositions of H2, . . . , Hn Output: y
+1: y ← conv(uN , H1) 2: for j = 1 . . . n do
+3: for k = 1 . . . j do
+4: for i = 1 . . . R do 5: u(ik) ← conv(uN , h(ik)) 6: end for
+
+7: end for
+
+8:
+
+y←y+
+
+R i=1
+
+u(i1)
+
+···
+
+u(ij)
+
+9: end for
+
+tensor Hn sufﬁces to reconstruct the Toeplitz structure of Tn. Suppose we have a polyadic decomposition of Hn, then for a single output sample y(t) we can rewrite equation (4) as
+
+yn(t) = Hn ×1 uT ×2 · · · ×n uT ,
+
+R
+= ( h(i1) ◦ · · · ◦ h(in)) ×1 uT ×2 · · · ×n uT ,
+i=1
+
+R
+= (uT h(i1)) · · · (uT h(in)).
+i=1
+
+(11)
+
+If we now consider the kth mode and write out the inner products
+
+uT h(ik) for all t = 0, . . . , N − 1 we obtain
+
+⎛ u(0)
+
+0 ···
+
+0
+
+⎞
+
+⎜⎜⎜⎝
+
+u(1) ...
+
+u(0) · · ·
+
+0
+
+⎟⎟⎟⎠ h(ik),
+
+(12)
+
+u(N − 1) u(N − 2) · · · u(N − M )
+
+which is the convolution of uN with h(ik) that can be computed with a computational complexity of O(N log N ). The total com-
+
+putational complexity is hence O(nRN log N ) since there are n
+
+modes and R vectors per mode. Let u(ik) denote the convolution
+
+of uN with h(ik), then (11) is computed for all t = 0, . . . , N as
+
+yn =
+
+R i=1
+
+u(i1)
+
+···
+
+u(in). Using a symmetric polyadic de-
+
+composition of Hn can result in an additional speedup since then
+
+yn =
+
+R i=1
+
+ui
+
+···
+
+ui with a computational complexity of
+
+O(RN log N ). The algorithm for fast time-domain simulation us-
+
+ing polyadic decompositions of the Volterra kernels is presented in
+
+Algorithm 2. Note that the second for-loop in Algorithm 2 dis-
+
+appears when symmetric polyadic decompositions of the Volterra
+
+kernels are used.
+
+An additional way of reducing computational complexity of Al-
+
+gorithm 2 is truncating the polyadic decomposition of each Hj.
+
+This reduces the number of iterations of the third for-loop at the
+
+cost of introducing an approximation error.
+
+5. NUMERICAL EXPERIMENTS
+Algorithms 1 and 2 were implemented in Matlab and tested in the following examples. We compare its runtime with the traditional method of computing the multi-mode convolution. All computations were done on an Intel i5 quad-core processor running at 3.3 GHz with 16 GB RAM. The polyadic and symmetric polyadic decompositions were computed with the freely available TTr1SVD [21] and STEROID [22] algorithms. The quality of the identiﬁcation for unknown Volterra kernels was quantiﬁed by the mean squared error ||y − yˆ||22/N , where yˆ denotes the simulated output of the identiﬁed Volterra series.
+
+5.1 Decaying multi-dimensional exponentials
+First, we demonstrate the validity of Algorithms 1 and 2 by means
+of an artiﬁcial example. Symmetric Volterra kernels were generated up to order n = 5 and with memory M = 10 and containing
+exponentially decaying coefﬁcients in the following way. We ﬁrst deﬁne the ﬁrst-order Volterra kernels as h1(k1) = exp (−k12) with k1 = 0, .1, .2, . . . , .9. These coefﬁcients are stored in the M × 1 H1 tensor. The other remaining symmetric higher-order Volterra kernels are then generated as the following outer products of H1
+
+H2 = H1 ◦ H1, H3 = H1 ◦ H1 ◦ H1, H4 = H1 ◦ H1 ◦ H1 ◦ H1, H5 = H1 ◦ H1 ◦ H1 ◦ H1 ◦ H1.
+
+This implies that all generated symmetric Volterra kernels correspond, per deﬁnition, with rank-1 tensors H2, . . . , H5 . We also have that each entry of the nth-order Volterra kernel is given by
+hn(k1, . . . , kn) = exp (−k12 − k22 − · · · − kn2 ).
+
+A random input signal of 4000 samples was generated from a standard normal distribution. Computing the corresponding output using (9) took 18 seconds. Exploiting the symmetric rank-1 property of the Volterra kernels in Algorithm 2 to generate the output reduces the computation time to 0.01 seconds, which corresponds to a speedup with a factor of 1169. The input/output signals were used in Algorithm 1 to estimate the Volterra kernels. Since the correct Volterra kernels are known in this case, we use the relative identiﬁcation error to quantify the accuracy of our identiﬁcation algorithm. The relative identiﬁcation error is deﬁned as
+
+||Hk − Hˆ k||F ||Hk ||F
+
+,
+
+where Hˆ k denotes the estimated Volterra kernel and ||X ||F denotes the Frobenius norm of a tensor X (the square root of the sum of squares of all entries in X ). Table 1 lists the relative identiﬁcation errors for each order of the estimated Volterra kernels,
+conﬁrming the validity of Algorithm 1.
+
+Table 1: Relative identiﬁcation errors - decaying exponentials. order 1 2 3 4 5
+error 8.6e−8 1.0e−8 5.9e−10 1.0e−11 4.2e−13
+
+5.2 Nonlinear inductance
+Next, we consider a nonlinear inductance which is described by
+v = 0.02 (1 − (tanh2(i/5)) di , dt
+
+Figure 4: Output voltage of the nonlinear inductance for Volterra series of maximal order 1, 4, 7.
+where v is the output voltage and i is the input current. A 60Hz sinusoidal current and its corresponding voltage were sampled at 100kHz for 0.1 seconds. Volterra kernels were estimated by Algorithm 1 with memories M ranging from 1 to 5 and orders n from 1 up to 7. Fig. 4 shows one period of the simulated output voltage for different orders of the Volterra kernel. Table 2 lists the mean squared error of the output voltage for all identiﬁed Volterra series. Notice how the mean squared error is independent from M when n < 7 and decreases as soon as an extra odd order is included in the Volterra series. For n = 7 a steady decrease of the mean squared error is observed as a function of M . A 7th-order Volterra series with memory M = 5 manages to model the output voltage with a mean squared error of 0.0063.
+Table 2: Mean squared error - nonlinear inductance. HnHHMHH 1 2 3 4 5 1 .339 .162 .162 .162 .162 2 .339 .162 .162 .162 .162 3 .339 .061 .061 .061 .061 4 .339 .061 .061 .061 .061 5 .339 .021 .021 .020 .020 6 .339 .021 .021 .020 .020 7 .339 .009 .008 .007 .006
+Several input series were then used to compare the different simulation methods. Table 3 lists the typical runtime and storage cost for one set using three different simulation methods on the 7thorder Volterra series with memory M = 5. The ‘naive’ method computes the multi-mode convolution using (9). TTr1SVD and STEROID use Algorithm 2 with the respective polyadic and symmetric polyadic decompositions of the Volterra tensors. The larger storage requirement for the TTr1SVD method is due to that each ith Volterra kernel requires the storage of i mode vectors, while STEROID only needs to store only one vector for every term. The STEROID method is superior compared to the two other simulation methods with a speedup of 93 in runtime compared to the naive method and a reduction of required storage by a factor of 29.
+5.3 Double balanced mixer
+In this example we consider a double balanced mixer used for upconversion. The output RF signal is determined by the input LO
+
+Table 3: Runtimes and storage costs - nonlinear inductance. Simulation method Runtime [s] Storage [kB]
+
+Naive TTr1SVD [21] STEROID [22]
+
+48.27 4.01 0.52
+
+763 845
+26
+
+of mode vectors that it needs to store. The STEROID method is far superior with a speedup of 266 in runtime compared to the naive method and needs only about one third of the storage.
+
+Table 5: Runtimes and storage costs - double balanced mixer. Simulation method Runtime [s] Storage [kB]
+
+Naive TTr1SVD [21] STEROID [22]
+
+5.749 0.081 0.021
+
+0.98 2.11 0.39
+
+Figure 5: Output RF signal of the mixer for Volterra series of maximal order 1, 5, 7.
+and IF signals. All signals were sampled at 10 kHz for 1 second. The LO and IF signals have frequencies of 600 and 100 Hz respectively, with a phase difference of π/8. Again, Volterra kernels were estimated by Algorithm 1 with memories ranging from 1 to 5 and orders from 1 up to 7. Table 4 lists the mean squared error of the RF output signal as a function of M and n. One needs a minimal order and memory of 6 and 2 respectively in order to see a decrease in the mean squared error. The mean squared error seems to be small even for the linear system, however, these models are not able to capture the high frequency variations that are relatively small in amplitude while the Volterra series can.
+Table 4: Mean squared error - double balanced mixer. HnHHMHH 1 2 3 4 5 1 .006 .006 .006 .006 .006 2 .006 .006 .006 .006 .006 3 .006 .006 .006 .006 .006 4 .006 .006 .006 .006 .006 5 .006 .006 .006 .006 .006 6 .006 .003 .003 .003 .003 7 .006 .003 .003 .003 .003
+Fig. 5 shows one period of the simulated output RF signal for different orders of the Volterra kernel. Notice the small difference between the simulated output of the linear and 5th-degree Volterra series, indicating the high nonlinearity of the mixer. A 6th-degree Volterra series with memory M = 2 is able to follow the high frequency RF output. Increasing the memory M or order n did not lead to any further improvement of the simulated output. Again, the same input/output series were used for comparing the different simulation methods for the n = 6, M = 2 model. Table 5 lists the runtime and storage cost for the three different simulation methods. The same patterns as in the previous example can be observed. The TTr1SVD method needs more storage due to the increasing number
+
+6. REMARKS
+Some key contributions are summarized again:
+1. The (symmetric) polyadic tensor decomposition effectively breaks down the multi-mode convolution of an input vector with any higher order Volterra kernel into purely linear convolutions. Tensor decompositions are therefore key in overcoming the curse of dimensionality.
+2. Continuing from the previous remark, the relatively expensive tensor decomposition computation is done only once and is the overhead to pay. The simulation algorithm then beneﬁts from the recurring and cheap linear convolution operation.
+3. The least-squares framework for kernel identiﬁcation as described by (10), though being effective, is generic to this work and is employed due to its ease of implementation for validating ideas. Other, more sophisticated, Volterra kernel identiﬁcation methods can be readily substituted for robust Volterra kernel identiﬁcation subject to, say, noisy inputoutput samples.
+4. The identiﬁed Volterra kernels completely hide the circuit or topological details, while allowing efﬁcient user black-box simulation via compact tensor mode factor representation. In other words, the proposed framework also suggests an effective means of intellectual property (IP) protection.
+5. The proposed framework now handles only the identiﬁcation and simulation of single-input single-output (SISO) systems. The extension to the direct handling of multiple-input multiple-output (MIMO) data streams is underway. Moreover, research is being conducted on the characterization of stability and passivity of the identiﬁed models.
+7. CONCLUSIONS
+This paper has proposed a highly efﬁcient black-box identiﬁcation and simulation framework for nonlinear systems/circuits based solely on the provision of discrete-time input-output samples. A natural link has been established between Volterra kernels, multimode convolution and tensor decompositions. A new tensor-based Volterra simulation algorithm has been developed. Numerical examples have been given to demonstrate the signiﬁcant reduction in runtime and required storage cost for the simulation of some highly nonlinear systems. Compared to conventional Volterra-based simulation, a runtime speedup up to 1000× and a decrease in storage up to 29× have been observed.
+Acknowledgment
+This work is supported by the Hong Kong Research Grants Council under General Research Fund (GRF) Project 17212315, and the University Research Committee of The University of Hong Kong.
+
+8. REFERENCES
+[1] L. Ljung, Ed., System Identiﬁcation (2Nd Ed.): Theory for the User. Upper Saddle River, NJ, USA: Prentice Hall PTR, 1999.
+[2] T. Katayama, Subspace Methods for System Identiﬁcation, ser. Communications and Control Engineering. Springer London, 2005.
+[3] O. Nelles, Nonlinear System Identiﬁcation: From Classical Approaches to Neural Networks and Fuzzy Models, ser. Engineering online library. Springer, 2001.
+[4] W. Rugh, Nonlinear System Theory – The Volterra-Wiener Approach. Baltimore, MD: Johns Hopkins Univ. Press, 1981.
+[5] E. Bedrosian and S. O. Rice, “The output properties of Volterra systems (nonlinear systems with memory) driven by harmonic and Gaussian inputs,” Proc. IEEE, vol. 59, no. 12, pp. 1688–1707, Dec. 1971.
+[6] J. R. Phillips, “Projection-based approaches for model reduction of weakly nonlinear time-varying systems,” IEEE Trans. Comput.-Aided Design Integr. Circuits Syst., vol. 22, no. 2, pp. 171–187, Feb. 2003.
+[7] P. Li and L. Pileggi, “Compact reduced-order modeling of weakly nonlinear analog and RF circuits,” IEEE Trans. Comput.-Aided Design Integr. Circuits Syst., vol. 24, no. 2, pp. 184–203, Feb. 2005.
+[8] H. Liu and N. Wong, “Autonomous Volterra algorithm for steady-state analysis of nonlinear circuits,” IEEE Trans. Comput.-Aided Design Integr. Circuits Syst., vol. 32, no. 6, pp. 858–868, Jun. 2013.
+[9] Y. Zhang and N. Wong, “Compact model order reduction of weakly nonlinear systems by associated transform,” Int. J. Circ. Theor. Appl., vol. 44, no. 7, pp. 1367–1384, Jul. 2016.
+[10] R. Boyer, R. Badeau, and G. Favier, “Fast orthogonal decomposition of Volterra cubic kernels using oblique unfolding,” in Proc. Very Large Scale Integration (VLSI-SoC), Oct. 2011, pp. 160–163.
+[11] G. Favier and T. Bouilloc, “Parametric complexity reduction of Volterra models using tensor decompositions,” in 17th European Signal Processing Conference (EUSIPCO), Aug
+
+2009.
+[12] H. Liu, X. Y. Z. Xiong, K. Batselier, L. Jiang, L. Daniel, and N. Wong, “STAVES: Speedy tensor-aided volterra-based electronic simulator,” in Computer-Aided Design (ICCAD), 2015 IEEE/ACM International Conference on, Nov 2015, pp. 583–588.
+[13] G. Favier, A. Y. Kibangou, and T. Bouilloc, “Nonlinear system modeling and identiﬁcation using Volterra-PARAFAC models,” Int. J. Adapt. Control Signal Process, vol. 26, no. 1, pp. 30–53, Jan. 2012.
+[14] P. A. Regalia and M. K. Sanjit, “Kronecker products, unitary matrices and signal processing applications,” SIAM Review, vol. 31, no. 4, pp. 586–613, 1989.
+[15] C. F. V. Loan, “The ubiquitous Kronecker product,” J. Comp. Appl. Math., vol. 123, no. 1-2, pp. 85–100, Nov. 2000.
+[16] T. Kolda and B. Bader, “Tensor decompositions and applications,” SIAM Review, vol. 51, no. 3, pp. 455–500, 2009.
+[17] J. D. Carroll and J. J. Chang, “Analysis of individual differences in multidimensional scaling via an n-way generalization of “Eckart-Young” decomposition,” Psychometrika, vol. 35, no. 3, pp. 283–319, 1970.
+[18] R. A. Harshman, “Foundations of the PARAFAC procedure: Models and conditions for an “explanatory” multi-modal factor analysis,” UCLA Working Papers in Phonetics, vol. 16, no. 1, p. 84, 1970.
+[19] G. H. Golub and C. F. V. Loan, Matrix Computations, 3rd ed. The Johns Hopkins University Press, Oct. 1996.
+[20] M. O. Franz and B. Schölkopf, “A unifying view of Wiener and Volterra theory and polynomial kernel regression,” Neural Computation, vol. 18, no. 12, pp. 3097–3118, 2006.
+[21] K. Batselier, H. Liu, and N. Wong, “A constructive algorithm for decomposing a tensor into a ﬁnite sum of orthonormal rank-1 terms,” SIAM Journal on Matrix Analysis and Applications, vol. 26, no. 3, pp. 1315–1337, Sep. 2015.
+[22] K. Batselier and N. Wong, “Symmetric tensor decomposition by an iterative eigendecomposition algorithm,” J. Comp. App. Maths., pp. 69–82, Dec. 2016.
+
+

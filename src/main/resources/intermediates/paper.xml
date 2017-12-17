@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pdf2xml SYSTEM "pdf2xml.dtd">
+
+<pdf2xml producer="poppler" version="0.41.0">
+<page number="1" position="absolute" top="0" left="0" height="1188" width="918">
+	<fontspec id="0" size="19" family="Times" color="#231f20"/>
+	<fontspec id="1" size="12" family="Times" color="#231f20"/>
+	<fontspec id="2" size="8" family="Times" color="#231f20"/>
+	<fontspec id="3" size="9" family="Times" color="#231f20"/>
+	<fontspec id="4" size="11" family="Times" color="#231f20"/>
+	<fontspec id="5" size="8" family="Times" color="#231f20"/>
+	<fontspec id="6" size="11" family="Times" color="#231f20"/>
+	<fontspec id="7" size="11" family="Times" color="#231f20"/>
+	<fontspec id="8" size="8" family="Times" color="#231f20"/>
+	<fontspec id="9" size="6" family="Times" color="#231f20"/>
+	<fontspec id="10" size="4" family="Times" color="#100e0d"/>
+	<fontspec id="11" size="13" family="Times" color="#231f20"/>
+	<fontspec id="12" size="10" family="Times" color="#231f20"/>
+<text top="94" left="196" width="526" height="23" font="0"><b>Perceptual Space Warping: Preliminary Exploration</b></text>
+<text top="132" left="349" width="64" height="16" font="1">Alex Peer</text>
+<text top="129" left="413" width="6" height="14" font="2"><i>∗</i></text>
+<text top="132" left="490" width="79" height="16" font="1">Kevin Ponto</text>
+<text top="129" left="569" width="5" height="14" font="2"><i>†</i></text>
+<text top="167" left="394" width="131" height="13" font="3">Living Environments Lab</text>
+<text top="181" left="373" width="172" height="13" font="3">University of Wisconsin-Madison</text>
+<text top="239" left="81" width="10" height="15" font="4"><b>A</b></text>
+<text top="241" left="92" width="55" height="12" font="5"><b>BSTRACT</b></text>
+<text top="261" left="96" width="345" height="13" font="6">Distance has been shown to be incorrectly estimated in virtual</text>
+<text top="276" left="81" width="360" height="13" font="6">environments relative to the same estimation tasks in a real environ-</text>
+<text top="291" left="81" width="360" height="13" font="6">ment. This work describes a preliminary exploration of <i>Perceptual</i></text>
+<text top="305" left="81" width="360" height="13" font="7"><i>Space Warping</i>, which inﬂuences perceived distance in virtual en-</text>
+<text top="321" left="81" width="360" height="13" font="6">vironments by using a vertex shader to warp geometry. Empirical</text>
+<text top="336" left="81" width="360" height="13" font="6">tests demonstrate signiﬁcant effects, but of smaller magnitude than</text>
+<text top="351" left="81" width="51" height="13" font="6">expected.</text>
+<text top="373" left="81" width="81" height="13" font="6">Index Terms:</text>
+<text top="373" left="189" width="252" height="13" font="6">H.5.1 [Information Interfaces and Presenta-</text>
+<text top="388" left="81" width="360" height="13" font="6">tion]: Multimedia Information Systems—Artiﬁcial, augmented,</text>
+<text top="403" left="81" width="360" height="13" font="6">and virtual realities ; I.3.7 [Computing Methodologies]: Graphics</text>
+<text top="418" left="81" width="132" height="13" font="6">Utilities—Virtual reality</text>
+<text top="444" left="81" width="25" height="15" font="4"><b>1 I</b></text>
+<text top="446" left="107" width="86" height="12" font="5"><b>NTRODUCTION</b></text>
+<text top="465" left="96" width="345" height="13" font="7"><i>Distance compression </i>(DC), the perceived underestimation of</text>
+<text top="480" left="81" width="360" height="13" font="6">ego-centric distances, is a well researched phenomenon in <i>virtual</i></text>
+<text top="495" left="81" width="360" height="13" font="7"><i>environments </i>(VEs). Renner et al. found an average reported un-</text>
+<text top="510" left="81" width="360" height="13" font="6">derestimation of 26% across 30 papers[2]. While many researchers</text>
+<text top="525" left="81" width="360" height="13" font="6">have noted the effects of distance compression, and many possible</text>
+<text top="540" left="81" width="360" height="13" font="6">inﬂuences have been explored, the principle factors responsible for</text>
+<text top="555" left="81" width="230" height="13" font="6">this phenomenon remain largely unknown.</text>
+<text top="570" left="96" width="345" height="13" font="6">This paper presents <i>Perceptual Space Warping </i>(PSW), which</text>
+<text top="585" left="81" width="360" height="13" font="6">aims to mitigate distance compression by altering the VE in a</text>
+<text top="600" left="81" width="360" height="13" font="6">shader during runtime. PSW results in a ﬁnal image similar to</text>
+<text top="615" left="81" width="360" height="13" font="6">the geometric miniﬁcation shown by [1]; however, PSW can be</text>
+<text top="630" left="81" width="360" height="13" font="6">used without knowledge of device screen parameters or calibrated</text>
+<text top="645" left="81" width="360" height="13" font="6">FOV, and at a different place in the rendering pipeline. Although</text>
+<text top="660" left="81" width="360" height="13" font="6">not explored here, PSW could allow for piecewise linear or non-</text>
+<text top="675" left="81" width="360" height="13" font="6">linear warps; it also inﬂuences depth directly, allowing it to work in</text>
+<text top="690" left="81" width="360" height="13" font="6">concert with other techniques that would not be affected by image-</text>
+<text top="704" left="81" width="360" height="13" font="6">space manipulations, such as depth of ﬁeld. A potential disadvan-</text>
+<text top="719" left="81" width="360" height="13" font="6">tage: at larger warp modiﬁers, PSW introduces a distortion we call</text>
+<text top="734" left="81" width="360" height="13" font="6">”swim”, which causes the vague sensation, but not the actual vi-</text>
+<text top="749" left="81" width="360" height="13" font="6">suals, of surfaces rippling or bending. Also, at very large warp</text>
+<text top="764" left="81" width="234" height="13" font="6">modiﬁers, the scene is noticeably stretched.</text>
+<text top="790" left="81" width="33" height="15" font="4"><b>2 M</b></text>
+<text top="792" left="115" width="40" height="12" font="5"><b>ETHOD</b></text>
+<text top="812" left="96" width="345" height="13" font="6">PSW is implemented using a vertex shader that transforms ver-</text>
+<text top="827" left="81" width="360" height="13" font="6">tices by increasing their distance from the viewer on the viewspace</text>
+<text top="842" left="81" width="270" height="13" font="6">z-axis. Formally, we deﬁne this transformation as:</text>
+<text top="872" left="151" width="8" height="13" font="7"><i>V</i></text>
+<text top="876" left="159" width="13" height="10" font="2"><i>out</i></text>
+<text top="869" left="176" width="25" height="17" font="6">= <i>M</i></text>
+<text top="866" left="202" width="13" height="14" font="2"><i>−</i>1</text>
+<text top="869" left="218" width="56" height="17" font="7"><i>× </i>((<i>M ×V</i></text>
+<text top="876" left="273" width="8" height="10" font="2"><i>in</i></text>
+<text top="869" left="282" width="57" height="17" font="6">) <i>× </i>(1<i>,</i>1<i>,w</i></text>
+<text top="876" left="339" width="8" height="10" font="2"><i>m</i></text>
+<text top="869" left="348" width="22" height="17" font="7"><i>,</i>1))</text>
+<text top="872" left="425" width="16" height="13" font="6">(1)</text>
+<text top="896" left="96" width="44" height="13" font="6">where <i>V</i></text>
+<text top="900" left="140" width="8" height="10" font="2"><i>in</i></text>
+<text top="896" left="153" width="262" height="13" font="6">is an unwarped vertex position in 3-space and <i>V</i></text>
+<text top="900" left="414" width="13" height="10" font="2"><i>out</i></text>
+<text top="896" left="432" width="9" height="13" font="6">is</text>
+<text top="911" left="81" width="352" height="13" font="6">the warped resulting position, <i>M </i>is the modelview matrix, and <i>w</i></text>
+<text top="915" left="433" width="8" height="10" font="2"><i>m</i></text>
+<text top="926" left="81" width="219" height="13" font="6">is the <i>warp multiplier</i>. By modifying <i>w</i></text>
+<text top="930" left="300" width="8" height="10" font="2"><i>m</i></text>
+<text top="926" left="309" width="132" height="13" font="6">, one adjusts the magni-</text>
+<text top="941" left="81" width="195" height="13" font="6">tude and direction of the warp; a <i>w</i></text>
+<text top="945" left="276" width="8" height="10" font="2"><i>m</i></text>
+<text top="941" left="289" width="126" height="13" font="6">of 1 causes no change,</text>
+<text top="938" left="419" width="22" height="17" font="7"><i>&lt; </i>1</text>
+<text top="956" left="81" width="128" height="13" font="6">pulls objects closer, and</text>
+<text top="953" left="212" width="229" height="17" font="7"><i>&gt; </i>1 pushes them further away. This shader</text>
+<text top="971" left="81" width="360" height="13" font="6">was implemented in the Unity game engine. The Oculus Rift DK2</text>
+<text top="994" left="96" width="6" height="12" font="9"><i>∗</i></text>
+<text top="998" left="103" width="134" height="11" font="3">e-mail: alex.peer@wisc.edu</text>
+<text top="1009" left="97" width="5" height="12" font="9"><i>†</i></text>
+<text top="1013" left="103" width="130" height="11" font="3">e-mail: kbponto@wisc.edu</text>
+<text top="239" left="628" width="24" height="7" font="10">Physical</text>
+<text top="246" left="627" width="26" height="7" font="10">Beanbag</text>
+<text top="240" left="580" width="15" height="7" font="10">HMD</text>
+<text top="302" left="711" width="33" height="7" font="10">Perceptual </text>
+<text top="309" left="709" width="35" height="7" font="10">Space Warp</text>
+<text top="331" left="668" width="38" height="7" font="10">Virtual Target</text>
+<text top="358" left="521" width="273" height="13" font="3">Figure 1: PSW moves objects relative to the viewer.</text>
+<text top="406" left="477" width="360" height="13" font="6">head-mounted display (HMD) was used to display the VE, using</text>
+<text top="421" left="477" width="237" height="13" font="6">the Oculus v0.6 SDK and Unity integration.</text>
+<text top="436" left="492" width="345" height="13" font="6">A blind throwing task was used to measure participant’s percep-</text>
+<text top="451" left="477" width="360" height="13" font="6">tion of distance, similar to Sahm et al’s [3]; we differ in that our</text>
+<text top="466" left="477" width="354" height="13" font="6">participants are seated, and we use no blindfolds in Experiment 1.</text>
+<text top="492" left="477" width="31" height="15" font="4"><b>3 E</b></text>
+<text top="494" left="509" width="68" height="12" font="5"><b>XPERIMENT</b></text>
+<text top="492" left="581" width="7" height="15" font="4"><b>1</b></text>
+<text top="514" left="492" width="345" height="13" font="6">The goal of Experiment 1 (E1) is to conﬁrm that our task does</text>
+<text top="529" left="477" width="360" height="13" font="6">elicit and measure distance compression, and to explore the effect</text>
+<text top="544" left="477" width="223" height="13" font="6">of PSW. This yields ﬁve key hypotheses:</text>
+<text top="543" left="706" width="131" height="15" font="7"><i>H1</i>: Participants will be</text>
+<text top="559" left="477" width="360" height="13" font="6">able to throw bean bags accurately, in the favorable conditions of</text>
+<text top="573" left="477" width="241" height="13" font="7"><i>real environment </i>(RE) with visual feedback.</text>
+<text top="573" left="723" width="114" height="15" font="7"><i>H2</i>: Participants will</text>
+<text top="589" left="477" width="304" height="13" font="6">experience distance compression when viewing our VEs.</text>
+<text top="588" left="785" width="52" height="15" font="7"><i>H3</i>: PSW</text>
+<text top="603" left="477" width="360" height="13" font="6">will have a signiﬁcant and positive effect mitigating distance com-</text>
+<text top="618" left="477" width="48" height="13" font="6">pression.</text>
+<text top="618" left="531" width="306" height="15" font="7"><i>H4</i>: The virtual reality environment will change the de-</text>
+<text top="633" left="477" width="122" height="13" font="6">gree of effect of PSW.</text>
+<text top="633" left="603" width="234" height="15" font="7"><i>H5</i>: Target distance will not inﬂuence per-</text>
+<text top="648" left="477" width="206" height="13" font="6">cent error of thrown distance to target.</text>
+<text top="663" left="492" width="345" height="13" font="6">10 participants were recruited during an outreach event held be-</text>
+<text top="678" left="477" width="360" height="13" font="6">tween our lab and a local nonproﬁt; due to the informal nature of</text>
+<text top="693" left="477" width="230" height="13" font="6">the event, no demographics were gathered.</text>
+<text top="718" left="477" width="175" height="15" font="4"><b>3.1 Design and Procedure</b></text>
+<text top="740" left="492" width="345" height="13" font="6">Participants proceeded through three phases in the following or-</text>
+<text top="755" left="477" width="21" height="13" font="6">der:</text>
+<text top="754" left="502" width="318" height="15" font="7"><i>P0 </i>Practice Throwing, <i>P1 </i>RE Throwing, <i>P2 </i>VE Throwing.</text>
+<text top="770" left="492" width="240" height="13" font="6">In <i>P2</i>, 3 factors were investigated in the VE:</text>
+<text top="769" left="735" width="102" height="15" font="7"><i>warp</i>, the presence</text>
+<text top="785" left="477" width="259" height="13" font="6">or absence of PSW (within, 2 levels: no warp, <i>w</i></text>
+<text top="789" left="736" width="8" height="10" font="2"><i>m</i></text>
+<text top="785" left="748" width="40" height="13" font="6">of 1.4);</text>
+<text top="784" left="790" width="47" height="15" font="7"><i>environ-</i></text>
+<text top="799" left="477" width="360" height="15" font="7"><i>ment</i>, the surrounding environment in which the target is presented</text>
+<text top="815" left="477" width="174" height="13" font="6">(between, 2 levels: sparse, rich);</text>
+<text top="814" left="654" width="183" height="15" font="7"><i>distance</i>, the distance of the target</text>
+<text top="830" left="477" width="360" height="13" font="6">from the participant (within, 11 levels: 0.1m intervals between 4m</text>
+<text top="844" left="477" width="48" height="13" font="6">and 3m).</text>
+<text top="860" left="492" width="345" height="13" font="6">In <i>P2 </i>participants threw once at each of the 11 distances in each</text>
+<text top="875" left="477" width="360" height="13" font="6">warp condition, presented in random order, for a total of 22 throws</text>
+<text top="889" left="477" width="360" height="13" font="6">in the VE. Each participant saw one environment, half assigned to</text>
+<text top="904" left="477" width="360" height="13" font="6">sparse and half to rich. <i>P1 </i>consisted of 11 real-world throws at</text>
+<text top="919" left="477" width="360" height="13" font="6">distances of 3m (4 throws), 3.5m (3 throws), and 4m (4 throws),</text>
+<text top="934" left="477" width="360" height="13" font="6">in random order. <i>P0 </i>asked participants to practice throwing at a</text>
+<text top="949" left="477" width="360" height="13" font="6">3.7m target until they felt comfortable with the task. To maintain</text>
+<text top="964" left="477" width="360" height="13" font="6">the brisk pace necessitated by the venue, no blindfolds were used</text>
+<text top="979" left="477" width="339" height="13" font="6">in the real-world, and the screen was not blanked in the virtual.</text>
+<text top="1004" left="477" width="87" height="15" font="4"><b>3.2 Analysis</b></text>
+<text top="1026" left="492" width="345" height="13" font="6">A 2(<i>warp</i>)x2(<i>environment</i>)x11(<i>distance</i>) ANOVA shows a sig-</text>
+<text top="1041" left="477" width="360" height="13" font="6">niﬁcant increase in accuracy in warp 1.4 conditions ( F(1,8) =</text>
+<text top="1055" left="477" width="59" height="13" font="6">69.7780, p</text>
+<text top="1052" left="540" width="297" height="17" font="7"><i>&lt; </i>0.0001 ). No other signiﬁcant main effect or inter-</text>
+<text top="1070" left="477" width="302" height="13" font="6">action was found. This supports <i>H3 </i>and <i>H5</i>, but not <i>H4</i>.</text>
+<text top="1121" left="842" width="23" height="17" font="11">261</text>
+<text top="1045" left="81" width="200" height="13" font="12">IEEE Virtual Reality Conference 2016</text>
+<text top="1057" left="81" width="185" height="13" font="12">19–23 March, Greenville, SC, USA</text>
+<text top="1069" left="81" width="229" height="13" font="12">978-1-5090-0836-0/16/$31.00 ©2016 IEEE</text>
+</page>
+<page number="2" position="absolute" top="0" left="0" height="1188" width="918">
+	<fontspec id="13" size="9" family="Times" color="#231f20"/>
+<text top="86" left="96" width="345" height="13" font="6">Participants threw accurately in the RE, ( percent error: M=-</text>
+<text top="101" left="81" width="360" height="13" font="6">3.6, SD = 8.1 ), and underthrew in VE no warp conditions ( per-</text>
+<text top="116" left="81" width="360" height="13" font="6">cent error: M=-32.3, SD=12.6 ), supporting <i>H1 </i>and <i>H2</i>; t(9)=7.25,</text>
+<text top="131" left="81" width="14" height="13" font="6">p=</text>
+<text top="128" left="95" width="51" height="17" font="7"><i>&lt;</i>0.0001.</text>
+<text top="147" left="96" width="345" height="13" font="6">Participants underthrew more than expected in VE warp 1.4x</text>
+<text top="161" left="81" width="360" height="13" font="6">conditions ( percent error: M=-18.1, SD=15.1; DC corrected:</text>
+<text top="176" left="81" width="254" height="13" font="6">M=14.1, SD=5.1 ), an interesting result for <i>H3</i>.</text>
+<text top="202" left="81" width="104" height="15" font="4"><b>3.3 Discussion</b></text>
+<text top="224" left="96" width="345" height="13" font="6">Support for <i>H1</i>, <i>H2</i>, and <i>H5 </i>suggest our methods are viable for</text>
+<text top="239" left="81" width="360" height="13" font="6">further experiments. Lack of support for <i>H4 </i>suggests PSW is not</text>
+<text top="254" left="81" width="360" height="13" font="6">reliant on (or inﬂuenced by) depth cues present in rich scenes. This</text>
+<text top="269" left="81" width="360" height="13" font="6">is unexpected and may bear further investigation. Support for <i>H3</i></text>
+<text top="284" left="81" width="360" height="13" font="6">in general was not unexpected, but it is surprising that a 1.4 warp</text>
+<text top="299" left="81" width="360" height="13" font="6">multiplier results in a signiﬁcantly smaller mean correction of 14%,</text>
+<text top="314" left="81" width="160" height="13" font="6">rather than the expected 40%.</text>
+<text top="341" left="81" width="31" height="15" font="4"><b>4 E</b></text>
+<text top="343" left="113" width="68" height="12" font="5"><b>XPERIMENT</b></text>
+<text top="341" left="185" width="7" height="15" font="4"><b>2</b></text>
+<text top="363" left="96" width="345" height="13" font="6">Experiment 2 (E2) investigates three potential confounds or en-</text>
+<text top="378" left="81" width="352" height="13" font="6">hancements suggested by E1: Swim distortion, Calibration, and <i>w</i></text>
+<text top="382" left="433" width="8" height="10" font="2"><i>m</i></text>
+<text top="393" left="81" width="338" height="13" font="6">to Distance Mapping Exploration. E2 progressed as follows:</text>
+<text top="393" left="426" width="15" height="15" font="7"><i>P0</i></text>
+<text top="408" left="81" width="99" height="13" font="6">practice throwing,</text>
+<text top="408" left="185" width="256" height="15" font="7"><i>P1 </i>throwing over intervals, <i>P2 </i>calibration, <i>P3</i></text>
+<text top="423" left="81" width="109" height="13" font="6">calibrated throwing,</text>
+<text top="422" left="196" width="245" height="15" font="7"><i>P4 </i>real-world throwing and post-experiment</text>
+<text top="438" left="81" width="360" height="13" font="6">interview. The practice phase <i>P0 </i>was as in E1. <i>P4 </i>saw real-world</text>
+<text top="453" left="81" width="360" height="13" font="6">throwing to a target at 4m using the HMD as a blindfold; partici-</text>
+<text top="468" left="81" width="360" height="13" font="6">pants who were not accurate in <i>P4 </i>were removed from the current</text>
+<text top="483" left="81" width="360" height="13" font="6">analysis (2 removed). Participants were also screened for stereo</text>
+<text top="498" left="81" width="360" height="13" font="6">sensitivity via a random dot stereogram test (3 removed). 9 partic-</text>
+<text top="512" left="81" width="360" height="13" font="6">ipants total provide the data for our ﬁnal analysis, recruited from</text>
+<text top="527" left="81" width="360" height="13" font="6">the local campus (ages 19-35; 4 female). The throwing task in <i>P1</i></text>
+<text top="542" left="81" width="360" height="13" font="6">and <i>P3 </i>was similar to that of E1, but the scene was hidden during</text>
+<text top="557" left="81" width="360" height="13" font="6">the throw to better match [3]. Scenes were displayed for 5 seconds</text>
+<text top="572" left="81" width="158" height="13" font="6">before the screen went blank.</text>
+<text top="587" left="96" width="345" height="13" font="6">Swim: As discussed in the introduction, PSW introduces a dis-</text>
+<text top="602" left="81" width="360" height="13" font="6">tortion we call <i>swim </i>which may change perception of depth with</text>
+<text top="617" left="81" width="360" height="13" font="6">change of head pose. We created a second pose-independent warp</text>
+<text top="632" left="81" width="360" height="13" font="6">shader that creates a warp valid for only a single head rotation. This</text>
+<text top="647" left="81" width="360" height="13" font="6">eliminates the swim distortion for the controlled scenes in our ex-</text>
+<text top="662" left="81" width="360" height="13" font="6">periment, but not the general case. Both <i>P1 </i>and <i>P3 </i>involve swim</text>
+<text top="677" left="81" width="339" height="13" font="6">distortion as a factor (swim) of two levels: full swim, no swim.</text>
+<text top="692" left="96" width="270" height="13" font="6">Calibration: In <i>P2 </i>we ask participants change <i>w</i></text>
+<text top="696" left="366" width="8" height="10" font="2"><i>m</i></text>
+<text top="692" left="378" width="63" height="13" font="6">via joystick</text>
+<text top="707" left="81" width="360" height="13" font="6">to visually align a virtual and real target, by repeatedly removing</text>
+<text top="722" left="81" width="360" height="13" font="6">and replacing the HMD to view both VE and RE. The average of</text>
+<text top="737" left="81" width="360" height="13" font="6">4 trials is the participant’s calibrated VM, which is used for blind</text>
+<text top="752" left="81" width="84" height="13" font="6">throwing in <i>P3</i>.</text>
+<text top="767" left="96" width="122" height="13" font="6">Mapping: In <i>E1</i>, a <i>w</i></text>
+<text top="771" left="217" width="8" height="10" font="2"><i>m</i></text>
+<text top="768" left="230" width="211" height="13" font="6">of 1.4 did not map to the distance ex-</text>
+<text top="782" left="81" width="270" height="13" font="6">pected. <i>P1 </i>asks participants to throw at many <i>w</i></text>
+<text top="786" left="351" width="8" height="10" font="2"><i>m</i></text>
+<text top="782" left="360" width="81" height="13" font="6">s, to better de-</text>
+<text top="797" left="81" width="179" height="13" font="6">scribe the relationship between <i>w</i></text>
+<text top="801" left="260" width="8" height="10" font="2"><i>m</i></text>
+<text top="797" left="272" width="125" height="13" font="6">and perceived distance.</text>
+<text top="813" left="96" width="246" height="13" font="6">This yields the following speciﬁc hypotheses:</text>
+<text top="828" left="96" width="345" height="15" font="7"><i>H1. </i>Eliminating the swim distortion will improve blind throwing</text>
+<text top="843" left="81" width="50" height="13" font="6">accuracy.</text>
+<text top="843" left="137" width="304" height="15" font="7"><i>H2. </i>Users can perform the calibration task of matching</text>
+<text top="858" left="81" width="131" height="13" font="6">a virtual and real target.</text>
+<text top="857" left="219" width="222" height="15" font="7"><i>H3. </i>Using a user-calibrated warp multi-</text>
+<text top="873" left="81" width="234" height="13" font="6">plier will improve blind throwing accuracy.</text>
+<text top="872" left="320" width="121" height="15" font="7"><i>H4. </i>The optimal warp</text>
+<text top="888" left="81" width="310" height="13" font="6">multiplier will be dependent on the individual participant.</text>
+<text top="887" left="395" width="46" height="15" font="7"><i>H5. </i>The</text>
+<text top="903" left="81" width="360" height="13" font="6">relationship between warp multiplier and distance thrown is linear</text>
+<text top="918" left="81" width="162" height="13" font="6">and monotonically increasing.</text>
+<text top="943" left="81" width="163" height="15" font="4"><b>4.1 Design and Analysis</b></text>
+<text top="965" left="96" width="231" height="15" font="7"><i>P1</i>: 8 x 2 factorial, within-participant: 8 <i>w</i></text>
+<text top="969" left="327" width="8" height="10" font="2"><i>m</i></text>
+<text top="966" left="339" width="102" height="13" font="6">(0.6 to 2.0 at inter-</text>
+<text top="980" left="81" width="360" height="13" font="6">vals of 0.2) x 2 <i>swim </i>(full swim, no swim), 3 throws per condition.</text>
+<text top="995" left="81" width="360" height="13" font="6">Target distance also varied; each participant threw to the same set</text>
+<text top="1010" left="81" width="360" height="13" font="6">of 48 distances between 3m to 4m (0.1m intervals). 48 throws total,</text>
+<text top="1025" left="81" width="150" height="13" font="6">random order, double blind.</text>
+<text top="1040" left="96" width="345" height="15" font="7"><i>P3</i>. 2 x 11 factorial, within-participant: 2 <i>warp </i>(no warp, per-</text>
+<text top="1056" left="81" width="360" height="13" font="6">sonal warp) x 2 <i>swim </i>(full swim, no swim) x 11 <i>distances </i>(3m to</text>
+<text top="1070" left="81" width="359" height="13" font="6">4m at 0.1m intervals). 22 throws total, random order, double blind.</text>
+<text top="297" left="477" width="344" height="13" font="3">Figure 2: Linear ﬁts of participants’ throwing error over different <i>w</i></text>
+<text top="302" left="821" width="6" height="9" font="9"><i>m</i></text>
+<text top="297" left="828" width="9" height="13" font="3">s.</text>
+<text top="311" left="477" width="70" height="13" font="3">Xs indicate <i>w</i></text>
+<text top="317" left="547" width="6" height="9" font="9"><i>m</i></text>
+<text top="311" left="554" width="240" height="13" font="3">s expected to yield 0 error for that participant.</text>
+<text top="357" left="492" width="69" height="13" font="7"><i>P1</i>: An 8 (<i>w</i></text>
+<text top="361" left="561" width="8" height="10" font="2"><i>m</i></text>
+<text top="358" left="570" width="267" height="13" font="6">) x 2 (swim) repeated measures ANOVA showed</text>
+<text top="372" left="477" width="360" height="13" font="6">only a signiﬁcant main effect of warp multiplier ( F(7,56)=37.95, p</text>
+<text top="384" left="477" width="360" height="17" font="7"><i>&lt; </i>0.0001 ); no further signiﬁcant main effect or interaction. This</text>
+<text top="402" left="477" width="360" height="13" font="6">shows no support for <i>H1</i>. As shown in Figure 2, the shape of the</text>
+<text top="417" left="477" width="360" height="13" font="6">graphs support <i>H5</i>, and the individual variance of the x-axis cross-</text>
+<text top="432" left="477" width="183" height="13" font="6">ings where error is 0 supports <i>H4</i>.</text>
+<text top="447" left="492" width="134" height="13" font="7"><i>P2</i>: 7 of 9 calibrated <i>w</i></text>
+<text top="451" left="626" width="8" height="10" font="2"><i>m</i></text>
+<text top="447" left="634" width="203" height="13" font="6">s are near or less than 1 ( M=-0.03,</text>
+<text top="462" left="477" width="62" height="13" font="6">SD=0.02; 4</text>
+<text top="459" left="542" width="260" height="17" font="7"><i>&lt;</i>0.9, 4 <i>≈</i>1, 2 <i>&gt;</i>1.1 ). This does not support <i>H2</i>.</text>
+<text top="477" left="492" width="345" height="13" font="7"><i>P3</i>: A 2 (swim) x 11 (distance) repeated measures ANOVA</text>
+<text top="492" left="477" width="360" height="13" font="6">showed no signiﬁcant main effects or interactions. This shows no</text>
+<text top="507" left="477" width="347" height="13" font="6">support for <i>H1</i>, though it further reinforces E1 <i>H5</i>. Calibrated <i>w</i></text>
+<text top="511" left="823" width="8" height="10" font="2"><i>m</i></text>
+<text top="507" left="832" width="5" height="13" font="6">s</text>
+<text top="522" left="477" width="360" height="13" font="6">result in signiﬁcant percent throwing error ( M=-28.9, SD=16.9 ),</text>
+<text top="537" left="477" width="360" height="13" font="6">and little per-participant correction ( M=-3.7, SD=6.2 ). This does</text>
+<text top="552" left="477" width="84" height="13" font="6">not support <i>H3</i>.</text>
+<text top="575" left="477" width="208" height="15" font="4"><b>4.2 Discussion and Conclusion</b></text>
+<text top="597" left="492" width="345" height="13" font="6">Swim: We see no evidence that removing swim inﬂuenced per-</text>
+<text top="612" left="477" width="360" height="13" font="6">ception of distance. In post-experiment interviews, only two par-</text>
+<text top="627" left="477" width="360" height="13" font="6">ticipants mentioned noticing swim when it was described to them.</text>
+<text top="642" left="477" width="360" height="13" font="6">The throwing task used may not elicit enough head movement to</text>
+<text top="657" left="477" width="166" height="13" font="6">fully show the effects of swim.</text>
+<text top="672" left="492" width="271" height="13" font="6">Calibration: In P2, only 2 participants selected <i>w</i></text>
+<text top="676" left="763" width="8" height="10" font="2"><i>m</i></text>
+<text top="672" left="771" width="66" height="13" font="6">s that would</text>
+<text top="687" left="477" width="75" height="13" font="6">mitigate DC (</text>
+<text top="684" left="557" width="123" height="17" font="7"><i>&gt;</i>1 ), and calibrated <i>w</i></text>
+<text top="691" left="680" width="8" height="10" font="2"><i>m</i></text>
+<text top="687" left="688" width="149" height="13" font="6">s did little to correct DC in</text>
+<text top="702" left="477" width="223" height="13" font="6">P3. Had participants chosen consistent <i>w</i></text>
+<text top="706" left="700" width="8" height="10" font="2"><i>m</i></text>
+<text top="702" left="709" width="128" height="13" font="6">s, it might indicate they</text>
+<text top="717" left="477" width="360" height="13" font="6">were selecting the correct calibration for the HMD; had we seen</text>
+<text top="732" left="477" width="360" height="13" font="6">increased DC correction, we might conclude each participant per-</text>
+<text top="747" left="477" width="360" height="13" font="6">ceived a unique miscalibration. In the absence of either, we suspect</text>
+<text top="761" left="477" width="316" height="13" font="6">our calibration task was too difﬁcult to perform accurately.</text>
+<text top="776" left="492" width="345" height="13" font="6">Mapping: The mapping seems to be fairly linear and monoton-</text>
+<text top="791" left="477" width="291" height="13" font="6">ically increasing. Per-user differences in estimated <i>w</i></text>
+<text top="795" left="768" width="8" height="10" font="2"><i>m</i></text>
+<text top="791" left="780" width="57" height="13" font="6">for 0 error</text>
+<text top="806" left="477" width="117" height="13" font="6">suggests a per-user <i>w</i></text>
+<text top="810" left="594" width="8" height="10" font="2"><i>m</i></text>
+<text top="806" left="607" width="230" height="13" font="6">may be worth exploring, though some are</text>
+<text top="821" left="477" width="81" height="13" font="6">quite extreme (</text>
+<text top="818" left="558" width="171" height="17" font="7"><i>&gt; </i>2) and may induce distortion.</text>
+<text top="846" left="477" width="10" height="15" font="4"><b>A</b></text>
+<text top="848" left="487" width="125" height="12" font="5"><b>CKNOWLEDGEMENTS</b></text>
+<text top="868" left="492" width="345" height="13" font="6">This work was supported in part by the University of Wisconsin</text>
+<text top="883" left="477" width="206" height="13" font="6">- Madison Fall Research Competition.</text>
+<text top="908" left="477" width="10" height="15" font="4"><b>R</b></text>
+<text top="910" left="488" width="71" height="12" font="5"><b>EFERENCES</b></text>
+<text top="930" left="477" width="360" height="11" font="3">[1] B. Li, R. Zhang, A. Nordman, and S. A. Kuhl. The effects of miniﬁca-</text>
+<text top="944" left="498" width="339" height="11" font="3">tion and display ﬁeld of view on distance judgments in real and hmd-</text>
+<text top="958" left="498" width="339" height="11" font="3">based environments. In <i>Proceedings of the ACM SIGGRAPH Sympo-</i></text>
+<text top="972" left="498" width="263" height="11" font="13"><i>sium on Applied Perception</i>, pages 55–58. ACM, 2015.</text>
+<text top="986" left="477" width="360" height="11" font="3">[2] R. S. Renner, B. M. Velichkovsky, and J. R. Helmert. The perception of</text>
+<text top="1001" left="498" width="339" height="11" font="3">egocentric distances in virtual environments-a review. <i>ACM Computing</i></text>
+<text top="1014" left="498" width="158" height="11" font="13"><i>Surveys (CSUR)</i>, 46(2):23, 2013.</text>
+<text top="1029" left="477" width="360" height="11" font="3">[3] C. S. Sahm, S. H. Creem-Regehr, W. B. Thompson, and P. Willemsen.</text>
+<text top="1043" left="498" width="339" height="11" font="3">Throwing versus walking as indicators of distance perception in similar</text>
+<text top="1057" left="498" width="339" height="11" font="3">real and virtual environments. <i>ACM Transactions on Applied Percep-</i></text>
+<text top="1071" left="498" width="142" height="11" font="13"><i>tion (TAP)</i>, 2(1):35–45, 2005.</text>
+<text top="1121" left="54" width="23" height="17" font="11">262</text>
+</page>
+</pdf2xml>

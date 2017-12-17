@@ -1,0 +1,31 @@
+Programming Uncertain <T>hings (Keynote)
+Kathryn S. McKinley
+Microsoft Research, Redmond, WA, USA mckinley@microsoft.com
+
+Abstract
+Innovation flourishes with good abstractions. For instance, codification of the IEEE Floating Point standard in 1985 was critical to the subsequent success of scientific computing. Programming languages currently lack appropriate abstractions for uncertain data. Applications already use estimates from sensors, machine learning, big data, humans, and approximate algorithms, but most programming languages do not help developers address correctness, programmability, and optimization problems due to estimates.
+To address these problems, we propose a new programming abstraction called Uncertain<T> embedded into languages, such as C#, C++, Java, Python, and JavaScript. Applications use familiar discrete operations for estimates with Uncertain<T>. Overloaded conditional operators specify hypothesis tests and applications use them to control false positives and negatives. A simple compositional operator expresses domain knowledge. We carefully restrict expressiveness such that we can build a runtime that implements correct statistical reasoning at conditionals. Our system relieves developers of the need to implement or deeply understand statistics. We demonstrate substantial programmability, correctness, and efficiency benefits of this programming model for GPS sensor navigation, approximate computing, machine learning, and xBox.
+We encourage the community to develop and use abstractions for estimates.
+Categories and Subject Descriptors D.3.3 [Programming Languages]: Language Constructs and Features
+General Terms Languages, Verification, Measurement
+Keywords Programming with estimates, Probabilistic programming, Bayesian logic, Lazy evaluation
+Permission to make digital or hard copies of part or all of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. Copyrights for third-party components of this work must be honored. For all other uses, contact the Owner/Author. ASPLOS '16 April 02-06, 2016, Atlanta, GA, USA Copyright c 2016 ACM 978-1-4503-4091-5/16/04. . . $15.00 DOI: http://dx.doi.org/10.1145/2872362.2872416
+
+Resources
+We welcome you to use and contribute to the open source C# implementation of Uncertain T (https://github. com/klipto/Uncertainty) (Mytkowicz et al. 2015). We have published several papers on the Uncertain<T> programming language (Bornholt et al. 2014, 2015; Sampson et al. 2014), plan more, and have a web page for the latest news (Mytkowicz and McKinley 2016).
+Biography
+Kathryn S. McKinley is a Principal Research at Microsoft. Her research interests span programming languages, compilers, runtime systems, architecture, performance, and energy. She and her collaborators have produced several widely used tools: the DaCapo Java Benchmarks (30,000+ downloads), TRIPS Compiler, Hoard memory manager, MMTk memory management toolkit, and Immix garbage collector. Her awards include the ACM SIGPLAN Programming Languages Software Award; ACM SIGPLAN Distinguished Service Award; and best & test of time paper awards from ASPLOS, OOPSLA, ICS, SIGMETRICS, IEEE Top Picks, SIGPLAN Research Highlights, and CACM Research Highlights. She was program chair for ASPLOS, PACT, PLDI, ISMM, and CGO and currently a CRA and CRA-W Board member. Dr. McKinley was honored to testify to the House Science Committee (Feb. 14, 2013). She is honored to be among the IEEE and ACM Fellows and to have graduated 22 PhD students. She and her husband have three sons.
+Acknowledgements
+I particularly thank Todd Mytkowicz, and our collaborators James Bornholt, Na Meng, Diman Tootaghaj, and Adrian Sampson for their contributions.
+References
+J. Bornholt, T. Mytkowicz, and K. S. McKinley. Uncertain<T>: A first-order type for uncertain data. In International Conference on Architectural Support for Programming Languages and Operating Systems (ASPLOS), 2014.
+J. Bornholt, N. Meng, T. Mytkowicz, and K. S. McKinley. Programming the internet of Uncertain <T>hings. In Sensors to Cloud Architectures Workshop (SCAW), pages 1­7, 2015.
+
+1
+
+T. Mytkowicz and K. S. McKinley. The Uncertain<T> programming language, 2016. URL http://research. microsoft.com/en-us/projects/uncertainty/ default.aspx.
+T. Mytkowicz, J. Bornholt, A. Sampson, D. Tootaghaj, and K. S. McKinley. Uncertain<T>, 2015. URL https://github. com/klipto/Uncertainty.
+A. Sampson, P. Panchekha, T. Mytkowicz, K. S. McKinley, D. Grossman, and L. Ceze. Expressing and verifying probabilistic assertions. In ACM Conference on Programming Language Design and Implementation (PLDI), 2014.
+2
+
+

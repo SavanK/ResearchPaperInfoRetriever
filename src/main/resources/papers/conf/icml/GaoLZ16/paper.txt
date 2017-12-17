@@ -1,0 +1,1508 @@
+Exact Exponent in Optimal Rates for Crowdsourcing
+
+Chao Gao Yale University, 24 Hillhouse Ave, New Haven, CT 06511 USA
+Yu Lu Yale University, 24 Hillhouse Ave, New Haven, CT 06511 USA
+Dengyong Zhou Microsoft Research, One Microsoft Way, Redmond, WA 98052 USA
+
+CHAO.GAO@YALE.EDU YU.LU@YALE.EDU
+DENGYONG.ZHOU@MICROSOFT.COM
+
+Abstract
+
+In many machine learning applications, crowd-
+
+sourcing has become the primary means for la-
+
+bel collection. In this paper, we study the op-
+
+timal error rate for aggregating labels provided
+
+by a set of non-expert workers. Under the clas-
+
+sic Dawid-Skene model, we establish matching
+
+upper and lower bounds with an exact exponent
+
+mI() in which m is the number of workers and
+
+I() the average Chernoff information that char-
+
+acterizes the workers' collective ability. Such an
+
+exact characterization of the error exponent al-
+
+lows us to state a precise sample size requirement
+
+m
+
+>
+
+1 I ()
+
+log
+
+1
+
+in
+
+order
+
+to
+
+achieve
+
+an
+
+misclas-
+
+sification error. In addition, our results imply the
+
+optimality of various EM algorithms for crowd-
+
+sourcing initialized by consistent estimators.
+
+1. Introduction
+In many machine learning problems such as image classification and speech recognition, we need a large amount of labeled data. Crowdsourcing provides an efficient while inexpensive way to collect labels. On a commercial crowdsourcing platform like Amazon Mechanical Turk (Amazon Mechanical Turk), in general, it takes only few hours to obtain hundreds of thousands labels from crowdsourcing workers worldwide, and each label costs only several cents.
+Though massive in amount, the crowdsourced labels are usually fairly noisy. The low quality is partially due to the lack of domain expertise from the workers and presence of spammers. To overcome this issue, a common strategy is
+Proceedings of the 33 rd International Conference on Machine Learning, New York, NY, USA, 2016. JMLR: W&CP volume 48. Copyright 2016 by the author(s).
+
+to repeatedly label each item by different workers, and then estimate truth from the redundant labels, for example, using majority voting. Since the pioneering work by Dawid and Skene (Dawid & Skene, 1979), which jointly estimates truth and workers' abilities via a simple EM algorithm, various approaches have been developed in recent years for aggregating noisy crowdsourced labels. See (Whitehill et al., 2009; Welinder et al., 2010; Raykar et al., 2010; Ghosh et al., 2011; Bachrach et al., 2012; Liu et al., 2012; Zhou et al., 2012; Dalvi et al., 2013; Zhou et al., 2014; Venanzi et al., 2014; Parisi et al., 2014; Tian & Zhu, 2015) and references therein.
+Compared with the active progress in aggregation algorithms, statistical understandings of crowdsourcing do not get much attention except (Gao & Zhou, 2013; Karger et al., 2014; Zhang et al., 2014; Berend & Kontorovich, 2015). These papers not only show exponential convergence rates for several estimators, they also provide lower bounds to justify the optimality of the rates. However, the exponents found in these work are not matched in their upper and lower bounds. They are optimal only up to some constants. The main focus of this paper is to find the exact error exponent to better guide algorithm design and optimization.
+
+Main Contribution. We study the minimax rate of
+
+misclassification for estimating the truth from crowd-
+
+sourced labels. We provide upper and lower bounds with
+
+exact exponents that match each other. The exponent
+
+has a natural interpretation of the collective wisdom
+
+of a crowd. In the special case where each worker's
+
+ability is modeled by a real number pi  [0, 1], the exponent takes a simple form -(1 + o(1))mI(p) with
+
+I (p)
+
+=
+
+-
+
+1 m
+
+m i=1
+
+log
+
+2
+
+pi(1 - pi)
+
+being the average
+
+Re´nyi divergence of order 1/2. Therefore, in order to
+
+achieve an error of in the misclassification proportion,
+
+it is necessary and sufficient that the number of workers
+
+Exact Exponent in Optimal Rates for Crowdsourcing
+
+m satisfies m  (1 + o(1))I(p)-1 log(1/ ). Note that in previous work, only m =  I(p)-1 log(1/ ) can be
+claimed. Moreover, our general theorem has implications
+on the convergence rates of several existing algorithms.
+
+This paper is organized as follows. In Section 2, we present the problem setting. In Section 3, given the workers' abilities, we derive the optimal error exponent. In Section 4, we show that spectral methods can be used to achieve the optimal error exponent, followed by a discuss on other algorithms in Section 5. The main proofs are given in Section 6, and the remaining proofs are gathered in the supplementary material.
+
+2. Problem Setting
+
+Let us start from the classic model proposed by Dawid and Skene (Dawid & Skene, 1979). Assume there are m workers and n items to label. Denote the true label of the jth item by yj that takes on a value in [k] = {1, 2, ..., k}. Let Xij be the label given by the ith worker to the jth item. The ability of the ith worker is assumed to be fully characterized by a confusion matrix
+
+g(ih) = P(Xij = h|yj = g).
+
+(1)
+
+which satisfies the probabilistic constraint
+
+k h=1
+
+g(ih)
+
+=
+
+1.
+
+Given yj = g, Xij is generated by a multinomial dis-
+
+tribution with parameter g(i) = g(i1), ..., g(ik) . Our
+
+goal is to estimate the true labels y = (y1, · · · , yn) us-
+
+ing the observed labels {Xij}. Denote the estimate by
+
+y^ = (y^1, ..., y^n). The loss is measured by the error rate
+
+1 L(y^, y) =
+n
+
+n
+
+I{y^j = yj}.
+
+j=1
+
+(2)
+
+We would like to remark that the true labels are considered as deterministic here. It is straightforward to generalize our results to stochastic labels generated from a distribution. Also, we assume that every worker has labeled every item. Otherwise, we can regard the missing labels as a new category and the results in this paper stay the same.
+
+3. Main Results
+In this section, we assume the confusion matrices {(i)} are known. Our goal is to establish the optimal error rate with respect to the loss in Equation (2). Let P,y be the joint probability distribution of the data {Xij} given  and y specified in (1), and let E,y be the associated expectation operator. Then the optimality is characterized by
+
+M = inf sup E,yL(y^, y),
+y^ y[k]n
+
+(3)
+
+which identifies the lowest error rate that we can achieve uniformly over all possible true labels.
+Our main result of the paper is to show that under some mild condition the minimax risk (3) converges to zero exponentially fast with an exponent that characterizes the collective wisdom of a crowd. Specifically, the error exponent is -mI() with
+
+I() = min C(g, h),
+g=h
+
+(4)
+
+where C(g, h) is given as
+
+- min
+
+1
+
+m
+log
+
+0t1 m
+
+i=1
+
+k g(il) 1-t h(il) t
+l=1
+
+.
+
+To better present our main result, let us introduce some notations. Let m = mini,g,l g(il). Suppose the minimum of C(g, h) is achieved at g = a and h = b. For any
+ > 0, we define a set of workers
+
+A = i  [m] : a(ia)  (1 + )a(ib), b(ib)  (1 + )b(ia) .
+
+These workers in A have better expertise in distinguishing between categories a and b. Then, our main result can be summarized into the following theorem.
+
+Theorem 3.1. Assume log k o(m|A0.01|1/2) and | log m|
+
+= o(mI()), = o( mI()),
+
+| log m| as m 
+
+= .
+
+Then, we have
+
+inf sup E,yL(y^, y) = exp (-(1 + o(1))mI()) ,
+y^ y[k]n
+
+where I() is defined by (4).
+
+In Theorem 3.1, the assumption that | log m| = o(m|A0.01|1/2) can be relaxed to that | log m| = o(m|A|1/2) for some  > 0. To better present our result, we set  = 0.01 in the theorem. To prove the upper bound, we only need the first assumption log k = o(mI()). The other two assumptions on m are used for proving the lower bound. One could imagine that the larger m is, the more mistake we might make to estimate the true labels. When there is a constant c (independent of m) such that m c, the last two assumptions reduce to |A0.01|  and mI()  . That means as long as I() = (1/ m) and the number of experts goes to infinity as m grows, exp(-(1 + o(1))mI()) serves as a valid lower bound.
+Theorem 3.1 characterizes the optimal error rate for estimating the ground truth with crowdsourced labels. It implies exp (-(1 + o(1))mI()) is the best error rate that can be achieved by any algorithm. Moreover, it also implies there exists an algorithm that can achieve this optimal
+
+Exact Exponent in Optimal Rates for Crowdsourcing
+
+rate. The error exponent depends on an important quantity I(). When m = 1 and k = 2, this theorem reduces
+to the Chernoff-Stein Lemma (Cover & Thomas, 2006), in which I() is the Chernoff information between probability distributions. For the general problem, C(g, h) can be understood as the average Chernoff information between {g(i)}mi=1 and {h(i)}mi=1, which measures the collective ability of the m workers to distinguish between items with label g and items with label h. Then, I() is the collective ability of the m workers to distinguish between any
+two items of different labels. The higher the overall collective ability mI(), the smaller the optimal rate.
+
+By Markov's inequality, Theorem 3.1 implies
+
+1 n
+
+n
+
+I{y^j = yj}  exp (-(1 + o(1))mI()) ,
+
+j=1
+
+with probability tending to 1. This allows a precise state-
+
+ment for a sample size requirement to achieve a prescribed
+
+error. If it is required that the misclassification proportion
+
+is no greater than , then the number of workers should
+
+satisfy m
+
+
+
+(1
+
++
+
+o(1))
+
+I
+
+1 ()
+
+log
+
+1.
+
+A special case is
+
+<
+
+n-1.
+
+Since
+
+1 n
+
+n j=1
+
+I{y^j
+
+=
+
+yj }
+
+only takes
+
+value in
+
+{0, n-1, 2n-1, ..., 1}, an error rate smaller than n-1 im-
+
+plies that every item is correctly labeled. Therefore, as long
+
+as
+
+m
+
+>
+
+(1
+
++
+
+o(1))
+
+1 I ()
+
+log
+
+n,
+
+the
+
+misclassification
+
+rate
+
+is
+
+0
+
+with high probability.
+
+When k = 2, a special case of the general Dawid-Skene model takes the simple form
+
+1(i1) 2(i1)
+
+1(i2) 2(i2)
+
+=
+
+pi 1 - pi
+
+1 - pi pi
+
+.
+
+(5)
+
+This is referred to as the one-coin model, because the ability of each worker is parametrized by a biased coin with bias pi. In this special case, I() takes the following simple form
+
+1m
+
+I() = I(p) = - m
+
+log 2 pi(1 - pi) . (6)
+
+i=1
+
+Note that -2 log 2 pi(1 - pi) is the Re´nyi divergence of order 1/2 between Bernoulli(pi) and Bernoulli(1 - pi). Let us summarize the optimal convergence rate for the onecoin model in the following corollary.
+Corollary 3.1. Assume max1im(| log(pi)|  | log(1 - pi)|) = o(mI(p)), Then, we have
+inf sup Ep,yL(y^, y)
+y^ y{1,2}n
+= exp (-(1 + o(1))mI(p)) ,
+
+where I(p) is defined by (6).
+
+Corollary 3.1 has a weaker assumption than that of Theorem 3.1. When each pi is assumed to be in the interval [c, 1 - c] with some constant c  (0, 1/2), the assumption of Corollary 3.1 reduces to mI(p)  , which is actually the necessary and sufficient condition for consistency. The result of Corollary 3.1 is very intuitive. Note
+that the Re´nyi divergence -2 log 2 pi(1 - pi) is de-
+creasing for pi  [0, 1/2] and increasing for pi  [1/2, 1]. When most workers have pi's that are close to 1/2, then the rate of convergence will be slow. On the other hand, when pi is either close to 0 or close to 1, that worker has a high ability, which will contribute to a smaller convergence rate. It is interesting to note that the result is symmetric around pi = 1/2. This means for adversarial workers with pi < 1/2, an optimal algorithm can invert their labels and still get useful information.
+
+4. Adaptive Estimation
+
+The optimal rate in Theorem 3.1 can be achieved by the following procedure:
+
+y^j = arg max
+g[k]
+
+g(ih)
+
+I{Xij =h}
+.
+
+i[m] h[k]
+
+(7)
+
+This is the maximum likelihood estimator. When k = 2, it reduces to the likelihood ratio test by Neyman and Pearson (Neyman & Pearson, 1933). However, (7) is not practical because it requires the knowledge of the confusion matrix (i) for each i  [m]. A natural data-driven alternative is to first get an accurate estimator ^ of  in (7) and then consider the plug-in estimator,
+
+y^j = arg max
+g[k]
+
+^g(ih)
+
+I{Xij =h}
+.
+
+i[m] h[k]
+
+(8)
+
+In the next theorem, we show that as long as ^ is sufficiently accurate, (8) will also achieve the optimal rate in Theorem 3.1.
+Theorem 4.1. Assume that, as m  ,
+
+
+
+P max
+g[k]
+
+max
+h[k]
+
+log ^g(ih) - log g(ih)
+
+>   0
+
+(9)
+
+i[m]
+
+with  such that  + log k = o(mI()). Then, for any y  [k]n, we have
+1n n I{y^j = yj}  exp (-(1 + o(1))mI()) ,
+j=1
+with probability tending to 1, where I() is defined by (4).
+
+Theorem 4.1 guarantees that as long as the confusion matrices can be consistently estimated, the plugged-in MLE
+
+Exact Exponent in Optimal Rates for Crowdsourcing
+
+(8) achieves the optimal error rate. In what follows, we apply this result to verify the optimality of some methods proposed in the literature.
+
+4.1. Spectral Methods
+
+Let us first look at the spectral method proposed in (Zhang et al., 2014). They compute the second and third order empirical moments and then estimate the confusion matrices by using tensor decomposition. In particular, they randomly partition the m workers into three different groups G1, G2 and G3 to formulate the moments equations. For (a, h)  [3] × [k], let
+
+ah
+
+=
+
+1 |Ga|
+
+h(i),
+iGa
+
+h
+
+=
+
+|{j
+
+:
+
+yj = n
+
+h}| .
+
+Note that ah is a k dimensional vector and we denote its lth component as ahl. They use two steps to estimate the individual confusion matrices. They first estimate the ag-
+gregated confusion matrices a by deriving equations between the moments of the labels {Xij} and the following
+moments of ah,
+
+M2 =
+
+hahah, M3 =
+
+hahahah.
+
+h[k]
+
+h[k]
+
+Empirical moments are used to approximate the population
+moments. Due to the symmetric structure of M2 and M3, a robust tensor power method (Anandkumar et al., 2014) is
+applied to approximately solve these equations. Then they use another moment equation to get an estimator ^(i) of the confusion matrices (i) from the estimator of ah.
+
+Let min = minh[k] h,  = mina[3],l=h[k]{ahh - ahl} and k be the minimum kth eigenvalue of the matrices Sab = h[k] hah  bh for a, b  [3]. Applying Theorem 1 in (Zhang et al., 2014) to Theorem 4.1, we have
+the following result.
+
+Theorem 4.2. Assume log k = o(mI()) and mI() 
+
+min{
+
+36k log m min L
+
+,
+
+2
+
+log
+
+m}.
+
+Let y^ be the estimated labels
+
+from (8) using the estimated confusion matrices returned
+
+by Algorithm 1 in (Zhang et al., 2014). If the number of
+
+items n satisfies
+
+k5 log3 m log k n =  2mI2()m2 ink13 then for any y  [k]n, we have
+
+,
+
+1 n
+
+n
+
+I{y^j = yj}  exp (-(1 + o(1))mI()) ,
+
+j=1
+
+with probability tending to 1, where I() is defined by (4).
+
+Combined with Theorem 3.1, this result shows that an onestep update (8) of the spectral method proposed in (Zhang et al., 2014) can achieve the optimal error exponent.
+
+4.2. One-coin Model
+
+For the one-coin model, a simpler method of moments for
+
+estimating pi is proposed in (Gao & Zhou, 2013). Let n1 =
+
+|{j : yj = 1}|, n2 = n - n1, and  = n2/n. They observe
+
+the
+
+equation
+
+1 n
+
+n j=1
+
+P {Xij
+
+=
+
+2}
+
+=
+
+pi +(1-)(1-pi).
+
+This leads to a natural estimator
+
+1
+p^i = n
+
+n j=1
+
+I
+
+{Xij 2^
+
+= -
+
+2} 1
+
+-
+
+(1
+
+-
+
+^)
+
+,
+
+(10)
+
+where ^ is a consistent estimator of  proposed in (Gao & Zhou, 2013). Combining the consistency result of p^i in (Gao & Zhou, 2013) and Theorem 4.1, we have the following result.
+
+Theorem 4.3. Assume |2 - 1|  c for some constant c >
+
+0,
+
+m
+
+
+
+pi
+
+
+
+1
+
+-
+
+m
+
+for
+
+all
+
+i
+
+
+
+[m]
+
+and
+
+1 m
+
+i[m](2pi -
+
+1)2
+
+
+
+1
+
+-
+
+4 m
+
+.
+
+Let
+
+y^
+
+be
+
+the
+
+estimated
+
+labels
+
+from
+
+(8)
+
+using
+
+(10). If the number of items n satisfies
+
+log2 m log n n =  2mI2(p) , then for any y  [k]n, we have
+
+1 n
+
+n
+
+I{y^j = yj}  exp (-(1 + o(1))mI(p)) ,
+
+j=1
+
+with probability tending to 1, where I(p) is defined by (6).
+
+5. Discussion
+In this section, we show the implications of our results on analyzing two popular crowdsourcing algorithms, EM algorithm and majority voting.
+5.1. EM Algorithm
+In the probabilistic model of crowdsourcing, the true labels can be regarded at latent variables. This naturally leads to apply the celebrated EM algorithm (Dempster et al., 1977) to obtain a local optimum of maximum marginal likelihood with the following iterations (Dawid & Skene, 1979):
+
+· (M-step) update the estimate of workers' abilities
+
+((ti+) 1),gh 
+
+P(t) {yj = g} I{Xij = h} (11)
+
+j
+
+· (E-step) update the estimate of true labels
+
+P(t+1) {yj = g} 
+
+((ti+) 1),gh I{Xij =h}
+
+i,h
+
+(12)
+
+Exact Exponent in Optimal Rates for Crowdsourcing
+
+The M-step (11) is essentially the maximum likelihood estimator. Bayesian versions of (11) are considered in (Raykar et al., 2010; Liu et al., 2012). Though the E-step (12) gives a probabilistic predication of the true label, a hard label can be obtained as y^j = arg maxg[k] P(t+1) {yj = g}. According to Theorem 4.1, as long as the M-step gives a consistent estimate of the workers' confusion matrices, the E-step will achieve the optimal error rate. This may explain why the EM algorithm for crowdsourcing works well in practice. In particular, as we have shown, when it is initialized by moment methods (Zhang et al., 2014; Gao & Zhou, 2013), the EM algorithm is provably optimal after only one step of iteration.
+
+5.2. Majority Voting
+Majority voting is perhaps the simplest method for aggregating crowdsourced labels. In what follows, we establish the exact error exponent of the majority voting estimator and show that it is inferior compared with the optimal error exponent. For simplicity, we only discuss the one-coin model. Then, the majority voting estimator is given by
+m
+y^j = arg max I{Xij = g}.
+g{1,2} i=1
+Its error rate is characterized by the following theorem.
+Theorem 5.1. Assume pi  1 - m for all i  [m], 2m i[m] pi(1 - pi)   as m   and | log m| = o( mJ(p)). Then, we have
+
+sup Ep,yL(y^, y) = exp (-(1 + o(1))mJ(p)) ,
+y{1,2}n
+
+where
+
+1 J(p) = - min
+t(0,1] m
+
+m
+
+log
+
+pit + (1 - pi)t-1
+
+.
+
+i=1
+
+The theorem says that -mJ(p) is the error exponent for the majority voting estimator. Given the simple relation
+
+J (p)
+
+=
+
+- min 1 t(0,1] m
+
+m
+
+log
+
+pit + (1 - pi)t-1
+
+i=1
+
+
+
+-1 m
+
+m
+
+min log
+t>0
+
+pit + (1 - pi)t-1
+
+i=1
+
+(13)
+
+=
+
+-1
+
+m
+log
+
+2
+
+m
+
+pi(1 - pi)
+
+i=1
+
+= I(p),
+
+we can see that the majority voting estimator has an inferior error exponent J(p) to that of the optimal rate I(p) in Theorem 4.3. In fact, the inequality (13) holds if and only
+
+if pi's are all equal, in which case, the majority voting is equivalent to the MLE (7). When pi's are varied among workers, majority voting cannot take the varied workers'
+abilities into account, thus being sub-optimal.
+
+6. Proofs
+Proof of Theorem 3.1. The main proof idea is as follows. Consider the maximum likelihood estimator (7), we first derive the upper bound by union bound and Markov's inequality. The proof of lower bound is quite involved and it consists of three steps. Based on a standard lower bound technique, we first lower bound the misclassification rate by testing error. Then we calculate the testing error using the Neyman-Person Lemma. Finally, we give a lower bound for the tail probability of a sum of random variables, using the technique from the proof of the Cramer-Chernoff Theorem (Van der Vaart, 2000, Proposition 14.23).
+
+Upper Bound. Let y^ = (y^1, ..., y^n) be defined as in (7). In the following, we give a bound for P(y^j = yj). Let us denote by Pl the joint probability distribution of {Xij, i  [m]} given  and yj = l. Without loss of generality, let yj = 1. Using union bound, we have
+
+k
+P1(y^j = 1)  P1(y^j = g).
+g=2
+For each g  2, we have
+
+P1(y^j = g)
+
+
+
+
+P1 
+i[m] h[k]
+
+g(ih) 1(ih)
+
+I{Xij =h}
+
+
+
+> 1
+
+
+
+min
+t0
+
+E1
+
+i[m] h[k]
+
+g(ih) 1(ih)
+
+tI{Xij =h}
+
+(14)
+
+= min
+t0
+
+1(ih) 1-t
+
+g(ih)
+
+t
+,
+
+i[m] h[k]
+
+where (14) is due to Markov's inequality for each t  0. Therefore, we have
+
+k
+
+P1(y^j = 1) 
+
+exp (-mC (1, g))
+
+g=2
+
+ (k - 1) exp -m min C(1, g) ,
+g=1
+which leads to 1 n Pyj (y^j = yj)  (k - 1) exp (-mI())
+j[n]
+= exp (-(1 + o(1))mI()) ,
+when log k = o(mI()).
+
+Exact Exponent in Optimal Rates for Crowdsourcing
+
+Lower Bound. Now we establish a matching lower bound. We first introduce some notations. Define
+
+k
+Bt(g(i), h(i)) =
+l=1
+
+g(il) 1-t
+
+h(il)
+
+t
+.
+
+Without loss of generality, we let
+
+C(1, 2) = min C(g, h) = I().
+g=h
+Using the fact that the supremum over [k]n is bigger than the average over [k]n , the minimax rate M can be lower bounded as
+
+sup E,yL(y^, y)
+y[k]n
+
+1
+
+ kn
+
+E,yL(y^, y)
+
+y[k]n
+
+=
+
+1k kn
+
+n
+Pl {y^j = l}
+
+l=1 j=1
+
+
+
+2n kn
+
+1 2
+
+P1{y^j
+
+=
+
+1}
+
++
+
+1 2
+
+P2
+
+{y^j
+
+=
+
+2}
+
+.
+
+j=1
+
+Taking an infimum of y^ on both sides leads to
+
+inf sup E,yL(y^, y)
+y^ y[k]n
+
+2n
+
+1
+
+1
+
+
+
+inf inf y^ kn j=1 y^j
+
+2 P1{y^j = 2} + 2 P2{y^j = 1}
+
+=
+
+2n inf
+kn j=1 y^j
+
+1 2
+
+P1{y^j
+
+=
+
+2}
+
++
+
+1 2
+
+P2
+
+{y^j
+
+=
+
+1}
+
+.
+
+By the Neyman-Pearson Lemma (Neyman & Pearson, 1933), for any fixed j  [n], the Bayes testing error
+
+1 2
+
+P1
+
+{y^j
+
+=
+
+2}
+
++
+
+1 2
+
+P2
+
+{y^j
+
+=
+
+1}
+
+is minimized by the likelihood ratio test
+
+y^j = arg max
+g{1,2}
+
+g(ih)
+
+I{Xij =h}
+.
+
+i[m] h[k]
+
+Therefore,
+
+P1(y^j = 2)
+
+=
+
+
+P1 
+i[m] h[k]
+
+2(ih) 1(ih)
+
+tI{Xij =h}
+
+
+
+> 1
+
+= P(Sm > 0).
+
+Here t is a positive constant that we will specify later. And Sm = i[m] Wi, with the random variable Wi defined as
+
+P
+
+Wi = t log
+
+2(ih) 1(ih)
+
+We lower bound P(Sm > 0) by
+
+= 1(ih).
+
+(15)
+
+P(Wi)
+0<Sm i[m]
+
+ P(Wi)
+
+0<Sm<L i[m]
+
+=
+
+P(Wi)eWi
+
+Bt(1(i), 2(i))
+
+0<Sm<L i[m] Bt(1(i), 2(i)) i[m]
+
+eWi
+
+ Bt(1(i), 2(i))e-L
+
+Qi(Wi)
+
+i[m]
+
+0<Sm <L
+
+ Bt(1(i), 2(i))e-LQ(0 < Sm < L),
+i[m]
+
+where the distribution Qi is defined as
+
+Qi
+
+Wi = t log
+
+2(ih) 1(ih)
+
+1(ih) 1-t 2(ih) t = Bt(1(i), 2(i)) , (16)
+
+and Q is defined as the joint distribution of Q1, · · · , Qm.
+
+To precede, we will need the following two lemmas.
+
+Lemma 6.1. If A is not empty, there is an unique t0 such
+
+that
+
+t0 = argmin
+
+Bt(1(i), 2(i)).
+
+t[0,1] i[m]
+
+(17)
+
+Moreover, we have 0 < t0 < 1.
+
+Lemma 6.2. Let t = t0 defined in (17). Then under the assumption of Theorem 3.1, Sm is a zero mean random variable satisfying the central limit theorem, i.e. for any
+x,
+
+Q Sm  x  (x), as m  , Var(Sm)
+where  is the cumulative distribution function of a N (0, 1) random variable.
+
+The proof of Lemma 6.1 and Lemma 6.2 are given in the supplementary material. Let t = t0 and L = 2 VarQ(Sm). Using Lemma 6.2 and Chebyshev's inequality, we have
+Q(0 < Sm < L)  1 - Q(Sm  0) - Q(Sm  L)  1 - 5/8 - 1/4 = 1/8
+
+Exact Exponent in Optimal Rates for Crowdsourcing
+
+for sufficiently large m. Note that
+
+EQWi2
+
+=
+
+h[k]
+
+t log
+
+2(ih) 1(ih)
+
+
+
+max
+i,h
+
+t log
+
+2(ih) 1(ih)
+
+ log2 m.
+
+2
+Qi
+2
+
+Wi = t log
+
+2(ih) 1(ih)
+
+Consequently,
+
+VarQ(Sm) =
+
+VarQ(Wi) 
+
+EQWi2  m log2 m.
+
+i[m]
+
+i[m]
+
+Under the assumption that log2 m = o(mI2()), we have e-L  e- m log2 m  e-o(mI()). This leads to the lower bound
+
+P1(y^j = 2) 
+
+Bt(1(i), 2(i))e-o(mI())
+
+i[m]
+
+= exp (-(1 + o(1))mI()) .
+
+Note that the same bound holds for P2(y^j = 1). Hence,
+
+2
+
+inf sup EL(y^, y)
+y^ y[k]n
+
+
+
+exp (-(1 + o(1))mI()) k
+
+= exp (-(1 + o(1))mI()) ,
+
+under the assumption that log k = o (mI()). This completes the proof.
+
+Proof of Theorem 4.1. Define
+
+
+
+ E = max max
+g[k] i[m] h[k]
+
+log ^g(ih) - log g(ih)
+
+  .
+
+
+Then, we have
+
+
+
+1 Pn
+
+I{y^j = yj} > 
+
+j
+
+
+
+
+
+1 Pn
+
+I{y^j = yj} > , E + P(Ec)
+
+j
+
+
+
+1 = Pn
+
+I{y^j = yj} > E P(E) + P(Ec)
+
+j
+
+1 n
+
+P (y^j = yj|E) P(E)/ + P(Ec)
+
+j
+
+1 =
+n
+
+P (y^j = yj, E) / + P(Ec).
+
+j
+
+Let us give a bound for P (y^j = yj, E). Without loss of generality, let yj = 1. Then,
+
+P (y^j = yj, E)
+
+k
+ P (y^j = g, E)
+g=2
+
+
+
+
+k
+
+P
+
+g=2
+
+i[m] h[k]
+
+^g(ih) ^1(ih)
+
+I{Xij =h}
+
+
+
+> 1, E
+
+=
+
+
+k
+
+P
+
+g=2
+
+i[m] h[k]
+
+g(ih) 1(ih)
+
+I{Xij =h}
+
+i[m] h[k]
+
+^g(ih)1(ih) g(ih)^1(ih)
+
+I{Xij =h}
+
+
+
+> 1, E
+
+On the event E,
+
+
+log 
+i[m] h[k]
+
+^g(ih)1(ih) g(ih)^1(ih)
+
+I{Xij =h} 
+
+
+
+i[m] h[k]
+
+log ^g(ih) - log ^1(ih)
+
+g(ih)
+
+1(ih)
+
+I{Xij = h}  2.
+
+Then
+
+P (y^j = yj, E)
+
+
+
+
+k
+P e2
+
+g=2
+
+i[m] h[k]
+
+g(ih) 1(ih)
+
+I{Xij =h}
+
+
+
+> 1
+
+k
+ e2 min
+0t1
+
+1(ih) 1-t g(ih) t
+
+g=2
+
+i[m] h[k]
+
+ (k - 1) exp -m min C(1, g) + 2 .
+g=1
+
+Thus, 1 n P (y^j = yj, E)  (k - 1) exp (-mI() + 2) .
+j[n]
+
+Letting = (k - 1) exp (-(1 - )mI() + 2) with  = 1/ mI(), we have
+
+1 n
+
+P (y^j = yj, E) /  exp - mI() .
+
+j
+
+Thus, the proof is complete under the assumption that log k +  = o(mI()) and P(Ec) = o(1).
+
+Proof of Theorem 5.1.
+
+The
+
+risk
+
+is
+
+1 n
+
+n j=1
+
+P{y^j
+
+=
+
+yj }.
+
+Consider the random variable I{y^j = yj}. It has the
+
+Exact Exponent in Optimal Rates for Crowdsourcing
+
+same distribution as I{ mi=1(Ti - 1/2) > 0}, where Ti  Bernoulli(1 - pi). Therefore,
+
+1 n
+
+n
+
+P{y^j = yj} = P
+
+m
+(Ti - 1/2) > 0 .
+
+j=1
+
+i=1
+
+We first derive the upper bound. Using Chernoff's method, we have
+
+mm
+P (Ti - 1/2) > 0  Ee(Ti-1/2)
+
+i=1 i=1
+
+m
+
+= exp
+
+log (1 - pi)e/2 + pie-/2 .
+
+i=1
+
+The desired upper bound follows by letting t = e-/2 and optimizing over t  (0, 1].
+
+ii)  Sm
+
+N (0, 1) under the distribution Q.
+
+VarQ (Sm )
+
+The proof of Lemma 6.3 is given in the supplementary file. Let L = 2 VarQ(Sm), and we have
+ e-LQ(0 < Sm < L)  0.25e-2 VarQ(Sm).
+
+Finally, we need to show VarQ(Sm) = o(mJ(p)). This is because
+
+m
+
+Var(Sm) 
+
+EQWi2  m20/4
+
+i=1
+
+ m log2 m = o(m2J (p)2),
+
+where the last equality is implied by the assumption | log m| = o( mJ(p)). The proof is complete.
+
+Now we show the lower bound using the similar arguments
+
+as in the proof of Theorem 3.1. Define Wi = (Ti - 1/2)
+
+and Sm =
+
+m i=1
+
+Wi.
+
+Then,
+
+we
+
+have
+
+References
+Amazon Mechanical Turk. https://www.mturk.com/mturk.
+
+m
+P (Ti - 1/2) > 0
+
+Anandkumar, Animashree, Ge, Rong, Hsu, Daniel, Kakade, Sham M, and Telgarsky, Matus. Tensor decom-
+
+i=1
+= P {Sm > 0}
+
+positions for learning latent variable models. The Journal of Machine Learning Research, 15(1):2773­2832,
+
+m
+ P(Wi)
+
+2014.
+
+0<Sm<L i=1
+
+Bachrach, Yoram, Graepel, Thore, Minka, Tom, and
+
+=
+
+0<Sm <L
+
+m P(Wi)eWi i=1 (1 - pi)e/2 + pie-/2
+
+Guiver, John. How to grade a test without knowing the answers -- a Bayesian graphical model for adaptive crowdsourcing and aptitude testing. In Proceedings of
+
+m (1 - pi)e/2 + pie-/2 eWi
+i=1
+
+the 29th International Conference on Machine Learning (ICML-12), pp. 1183­1190, 2012.
+
+m Berend, Daniel and Kontorovich, Aryeh. A finite sample  (1 - pi)e/2 + pie-/2 e-LQ {0 < Sm < L} . analysis of the naive bayes classifier. Journal of Machine
+
+i=1 Learning Research, 16:1519­1545, 2015.
+
+Note that under Q, Wi has distribution
+
+Qi(Wi = /2)
+
+=
+
+(1
+
+-
+
+(1 - pi)e/2 pi)e/2 + pie-/2
+
+,
+
+Qi(Wi = -/2)
+
+=
+
+(1
+
+-
+
+pie-/2 pi)e/2 + pie-/2
+
+.
+
+We choose 0  [0, ) to minimize f () =
+
+m i=1
+
+(1 - pi)e/2 + pie-/2
+
+.
+
+This leads to the equa-
+
+tion EQSm = 0. It is sufficient to lower bound e-LQ {0 < Sm < L} to finish the proof. To do this, we
+
+need the following result.
+
+Cover, Thomas M and Thomas, Joy A. Elements of information theory. John Wiley & Sons, 2006.
+Dalvi, N., Dasgupta, A., Kumar, R., and Rastogi, V. Aggregating crowdsourced binary ratings. In Proceedings of the 22nd international conference on World Wide Web, pp. 1220­1229, 2013.
+Dawid, A. P. and Skene, A. M. Maximum likeihood estimation of observer error-rates using the EM algorithm. Journal of the Royal Statistical Society, 28(1):20­28, 1979.
+
+Lemma 6.3. Suppose pi  1 - m for all i  [m] and 2m i[m] pi(1 - pi)   as m  . Then we have
+i) 0  -2 log m.
+
+Dempster, A. P., Laird, N. M., and Rubin, D. B. Maximum likelihood from incomplete data via the EM algorithm. Journal of the Royal Statistical Society, 39(1): 1­38, 1977.
+
+Exact Exponent in Optimal Rates for Crowdsourcing
+
+Gao, Chao and Zhou, Dengyong. Minimax optimal convergence rates for estimating ground truth from crowdsourced labels. arXiv preprint arXiv:1310.5764, 2013.
+Ghosh, Arpita, Kale, Satyen, and McAfee, Preston. Who moderates the moderators? Crowdsourcing abuse detection in user-generated content. In Proceedings of the 12th ACM conference on Electronic commerce, pp. 167­ 176, 2011.
+Karger, David R, Oh, Sewoong, and Shah, Devavrat. Budget-optimal task allocation for reliable crowdsourcing systems. Operations Research, 62(1):1­24, 2014.
+Liu, Q., Peng, J., and Ihler, A. Variational inference for crowdsourcing. In Advances in Neural Information Processing Systems 25, pp. 701­709, 2012.
+
+Zhang, Yuchen, Chen, Xi, Zhou, Dengyong, and Jordan, Michael I. Spectral methods meet em: A provably optimal algorithm for crowdsourcing. In Advances in neural information processing systems, pp. 1260­1268, 2014.
+Zhou, D., Platt, J. C., Basu, S., and Mao, Y. Learning from the wisdom of crowds by minimax entropy. In Advances in Neural Information Processing Systems 25, pp. 2204­ 2212, 2012.
+Zhou, Dengyong, Liu, Qiang, Platt, John, and Meek, Christopher. Aggregating ordinal labels from crowds by minimax conditional entropy. In Proceedings of the 31st International Conference on Machine Learning (ICML14), pp. 262­270, 2014.
+
+Neyman, J and Pearson, ES. On the problem of the most efficient tests of statistical hypotheses. Philosophical Transactions of the Royal Society of London A: Mathematical, Physical and Engineering Sciences, 231(694706):289­337, 1933.
+
+Parisi, Fabio, Strino, Francesco, Nadler, Boaz, and Kluger, Yuval. Ranking and combining multiple predictors without labeled data. Proceedings of the National Academy of Sciences, 111(4):1253­1258, 2014.
+
+Raykar, V. C., Yu, S., Zhao, L. H., Valadez, G. H., Florin, C., Bogoni, L., and Moy, L. Learning from crowds. Journal of Machine Learning Research, 11:1297­1322, 2010.
+
+Tian, Tian and Zhu, Jun. Max-margin majority voting for learning from crowds. In Advances in Neural Information Processing Systems 28, pp. 1612­1620, 2015.
+
+Van der Vaart, Aad W. Asymptotic statistics. Cambridge university press, 2000.
+
+Venanzi, Matteo, Guiver, John, Kazai, Gabriella, Kohli, Pushmeet, and Shokouhi, Milad. Community-based Bayesian aggregation models for crowdsourcing. In Proceedings of the 23rd international conference on World wide web, pp. 155­164, 2014.
+
+Welinder, Peter, Branson, Steve, Perona, Pietro, and Belongie, Serge J. The multidimensional wisdom of crowds. In Advances in Neural Information Processing Systems 23, pp. 2424­2432, 2010.
+
+Whitehill, J., Ruvolo, P., Wu, T., Bergsma, J., and Movellan, J. Whose vote should count more: optimal integration of labels from labelers of unknown expertise. In Advances in Neural Information Processing Systems 22, pp. 2035­2043, 2009.
+
+

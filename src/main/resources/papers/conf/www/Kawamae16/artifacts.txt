@@ -1,0 +1,13 @@
+http://dx.doi.org/10.1145/2872427.2882981
+http://hadoop.apache.org/
+http://www.nltk.org/
+http://hadoop.apache.org/
+http://memcached.org/
+http://dl.acm.org/
+http://www.cs.uic.edu/~liub/NBS/sentiment-analysis.html
+https://snap.stanford.edu/data/web
+http://twitter.com
+http://www.acm.org/about/class/ccs98-html
+http://parameterserver.org/
+http://petuum.github.io/
+http://spark.apache.org/

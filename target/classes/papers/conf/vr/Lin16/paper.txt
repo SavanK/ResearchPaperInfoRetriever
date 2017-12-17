@@ -1,0 +1,17 @@
+Keynote Speaker
+Towards Immersive Multimodal Display: Interactive Auditory Rendering for Complex Virtual Environments
+Ming Lin Department Of Computer Science, University Of North Carolina At Chapel Hill
+
+Abstract
+
+Bio
+
+Extending the frontier of visual computing, an interactive, multimodal VR environment utilizes audio and touch-enabled interfaces to communicate information to a user and augment the graphical rendering. By harnessing other sensory channels, an immersive multimodal display can further enhance a user's experience in a virtual world. In addition to immersive environments, multimodal display can provide a natural and intuitive human-computer interface for many desktop applications such as computer games, online virtual worlds, visualization, simulation, and training. Compared to visual and haptic rendering, sound rendering has extremely demanding computing requirements, making the problem of auditory display highly challenging.
+In this talk, I will give an overview of our recent work on interactive auditory display consisting of sound synthesis and sound propagation. These include generating realistic physically-based sounds from perceptually-guided principles and dynamic simulation. I will also describe novel algorithms for immersive sound effects based on improved numerical techniques and fast geometric sound propagation. Finally, I present new techniques on cross-modal interaction for VR. These systems improve the state of the art in sound rendering by at least one to two orders of magnitude and will be demonstrated in complex, dynamic virtual environments and VR applications. I conclude by discussing possible future research directions on multimodal interaction with VR systems.
+
+Ming C. Lin is currently John R. & Louise S. Parker Distinguished Professor of Computer Science at the University of North Carolina (UNC), Chapel Hill and an honorary Chair Professor (Yangtze Scholar) at Tsinghua University in China. She obtained her B.S., M.S., and Ph.D. in Electrical Engineering and Computer Science from the University of California, Berkeley. She received several honors and awards, including the NSF Young Faculty Career Award in 1995, Honda Research Initiation Award in 1997, UNC/IBM Junior Faculty Development Award in 1999, UNC Hettleman Award for Scholarly Achievements in 2003, Beverly W. Long Distinguished Professorship 2007-2010, Carolina Women's Center Faculty Scholar in 2008, UNC WOWS Scholar 20092011, IEEE VGTC Virtual Reality Technical Achievement Award in 2010, and several best paper awards at international conferences. She is a Fellow of ACM and IEEE.
+Her research interests include physically-based modeling, virtual environments, sound rendering, haptics, robotics, and geometric computing. She has (co-)authored more than 250 refereed publications in these areas and co-edited/authored four books. She has served on hundreds of program committees of leading conferences and co-chaired dozens of international conferences and workshops. She is currently a member of IEEE Computer Society (CS) Board of Governors, the Chair of 2015 IEEE CS Transactions Operations Committee and a member of Executive Committee of IEEE CS Publications Board. She is a former Editor-in-Chief of IEEE Transactions on Visualization and Computer Graphics (2011-2014) and a member of several editorial boards. She also has served on several steering committees and advisory boards of international conferences, as well as government and industrial technical advisory committees.
+
+xvii
+
+

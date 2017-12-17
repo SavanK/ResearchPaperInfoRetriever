@@ -1,0 +1,1695 @@
+SDCA without Duality, Regularization, and Individual Convexity
+
+Shai Shalev-Shwartz School of Computer Science and Engineering, The Hebrew University of Jerusalem, Israel
+
+SHAIS@CS.HUJI.AC.IL
+
+Abstract
+Stochastic Dual Coordinate Ascent is a popular method for solving regularized loss minimization for the case of convex losses. We describe variants of SDCA that do not require explicit regularization and do not rely on duality. We prove linear convergence rates even if individual loss functions are non-convex, as long as the expected loss is strongly convex.
+
+1. Introduction
+
+We consider the following loss minimization problem:
+
+1n
+
+min F (w)
+wRd
+
+:=
+
+n
+
+i=1
+
+fi(w)
+
+.
+
+An important sub-class of problems is when each fi can
+
+be written as fi(w)
+
+=
+
+i(w)
+
++
+
+ 2
+
+w
+
+2, where i is Li-
+
+smooth and convex. A popular method for solving this
+
+sub-class of problems is Stochastic Dual Coordinate As-
+
+cent (SDCA), and (Shalev-Shwartz & Zhang, 2013) established the convergence rate of O~((Lmax/ + n) log(1/ )),
+
+where Lmax = maxi Li.
+
+As its name indicates, SDCA is derived by considering a
+
+dual problem. In this paper, we consider the possibility of
+
+applying SDCA for problems in which individual fi do not
+
+necessarily
+
+have
+
+the
+
+form
+
+i
+
+(w)
+
++
+
+ 2
+
+w
+
+2, and can even be
+
+non-convex (e.g., deep learning optimization problems, or
+
+problems arising in fast calculation of the top singular vec-
+
+tors (Jin et al., 2015)). In many such cases, the dual prob-
+
+lem is meaningless. Instead of directly using the dual prob-
+
+lem, we describe and analyze a variant of SDCA in which
+
+only gradients of fi are being used. Following (Johnson
+
+& Zhang, 2013), we show that SDCA is a member of the
+
+Stochastic Gradient Descent (SGD) family of algorithms,
+
+that is, its update is based on an unbiased estimate of the
+
+gradient, but unlike the vanilla SGD, for SDCA the vari-
+
+Proceedings of the 33 rd International Conference on Machine Learning, New York, NY, USA, 2016. JMLR: W&CP volume 48. Copyright 2016 by the author(s).
+
+ance of the estimation of the gradient tends to zero as we converge to a minimum.
+Our analysis assumes that F is -strongly convex and each fi is Li-smooth. When each fi is also convex we establish the convergence rate of O~(L¯/+n), where L¯ is the average of Li and the O~ notation hides logarithmic terms, including the factor log(1/ ). This matches the best known bound for SVRG given in (Xiao & Zhang, 2014). Lower bounds have been derived in (Arjevani et al., 2015; Agarwal & Bottou, 2014). Applying an acceleration technique ((ShalevShwartz & Zhang, 2015; Lin et al., 2015)) we obtain the convergence rate O~(n1/2 L¯/ + n). If fi are non-convex we first prove that SDCA enjoys the rate O~(L¯2/2 + n). Finally, we show how the acceleration technique yields the bound O~ n3/4 L¯/ + n . That is, we have the same
+dependency on the square root of the condition number, L¯/, but this term is multiplied by n3/4 rather than by
+n1/2. Understanding if this factor can be eliminated is left to future work.
+Related work: In recent years, many randomized methods for optimizing average of functions have been proposed. For example, SAG (Le Roux et al., 2012), SVRG (Johnson & Zhang, 2013), Finito (Defazio et al., 2014b), SAGA (Defazio et al., 2014a), S2GD (Konecny` & Richta´rik, 2013), and UniVr (Allen-Zhu & Yuan, 2015). All of these methods have similar convergence rates for strongly convex and smooth problems. Here we show that SDCA achieves the best known convergence rate for the case in which individual loss functions are convex, and a slightly worse rate for the case in which individual loss functions are non-convex. A systematic study of the convergence rate of the different methods under non-convex losses is left to future work.
+This version of the paper improves upon a previous unpublished version of the paper (Shalev-Shwartz, 2015) in three aspects. First, the convergence rate here depends on L¯ as opposed to Lmax in (Shalev-Shwartz, 2015). Second, the version in (Shalev-Shwartz, 2015) only deals with the regularized case, while here we show that the same rate can be obtained for unregularized objectives. Last, for the non-convex case, here we derive
+
+SDCA without Duality, Regularization, and Individual Convexity
+
+the bound O~ n3/4 L¯/ + n while in (Shalev-Shwartz,
+2015) only the bound of O~(L2max/2 + n) has been given.
+(Csiba & Richta´rik, 2015) extended the work of (ShalevShwartz, 2015) to support arbitrary mini-batching schemes, and (He & Taka´c, 2015) extended the work of (ShalevShwartz, 2015) to support adaptive sampling probabilities. A primal form of SDCA has been also given in (Defazio, 2014). Using SVRG for non-convex individual functions has been recently studied in (Shamir, 2015; Jin et al., 2015), in the context of fast computation of the top singular vectors of a matrix.
+
+2. SDCA without Duality
+
+We start the section by describing a variant of SDCA that do not rely on duality. To simplify the presentation, we start in Section 2.1 with regularized loss minimization problems. In Section 2.2 we tackle the non-regularized case and in Section 2.3 we tackle the non-convex case.
+
+We recall the following basic definitions: A (differentiable)
+
+function f is -strongly convex if for every u, w we have
+
+f (w) - f (u)  f (u)
+
+(w
+
+-
+
+u)
+
++
+
+ 2
+
+w-u
+
+2. We say
+
+that f is convex if it is 0-strongly convex. We say that
+
+f is L-smooth if f (w) - f (u)  L w - u . It
+
+is well known that smoothness and convexity also implies
+
+that f (w) - f (u)  f (u)
+
+(w
+
+-
+
+u)
+
++
+
+L 2
+
+w-u
+
+2.
+
+2.1. Regularized problems
+
+In regularized problems, each fi can be written as fi(w) =
+
+i(w)
+
++
+
+ 2
+
+w
+
+2. Similarly to the original SDCA algorithm,
+
+we maintain vectors 1, . . . , n, where each i  Rd. We
+
+call these vectors pseudo-dual vectors. The algorithm is
+
+described below.
+
+Algorithm 1: Dual-Free SDCA
+
+for Regularized Objectives
+
+Goal:
+
+Minimize
+
+F (w)
+
+=
+
+1 n
+
+n i=1
+
+i(w)
+
++
+
+ 2
+
+w
+
+2
+
+Input: Objective F , number of iterations T ,
+
+step size ,
+
+Smoothness parameters L1, . . . , Ln
+
+Initialize:
+
+w(0)
+
+=
+
+1 n
+
+n i=1
+
+i(0)
+
+for some (0) = (1(0), . . . , n(0))
+
+i  [n], qi = (Li + L¯)/(2nL¯)
+
+where
+
+L¯
+
+=
+
+1 n
+
+n i=1
+
+Li
+
+For t = 1, . . . , T
+
+Pick
+
+i
+
+
+
+q,
+
+denote
+
+i
+
+=
+
+ qi n
+
+Update:
+
+i(t) = i(t-1) - in i(w(t-1)) + i(t-1)
+
+w(t) = w(t-1) - i i(w(t-1)) + i(t-1)
+
+Observe that SDCA keeps the primal-dual relation
+
+w(t-1) = 1 n
+
+n
+
+i(t-1)
+
+i=1
+
+Observe also that the update of  can be rewritten as
+
+i(t) = (1 - i)i(t-1) + i -i(w(t-1)) ,
+
+where i = in. Namely, the new value of i is a convex
+combination of its old value and the negative gradient. Finally, observe that, conditioned on the value of w(t-1) and (t-1), we have that
+
+Eiq[w(t)] = w(t-1) - 
+
+i
+
+qi qin
+
+(i
+
+(w(t-1))
+
++
+
+i(t-1)
+
+)
+
+= w(t-1) - 
+
+1 n
+
+n
+
+i(w(t-1)) + w(t-1)
+
+i=1
+
+= w(t-1) - P (w(t-1)) .
+
+That is, SDCA is in fact an instance of Stochastic Gradient Descent (SGD). As we will see shortly, the advantage of SDCA over a vanilla SGD algorithm is because the variance of the update goes to zero as we converge to an optimum.
+
+Our convergence analysis relies on bounding the following potential function, defined for every t  0,
+
+ Ct = 2
+
+w(t) - w
+
+2+
+
+ n2
+
+n1 [
+i=1 qi
+
+i(t) - i
+
+2] ,
+
+(1)
+
+where
+
+w = argmin F (w), and i, i = -i(w) . (2)
+w
+
+Intuitively, Ct measures the distance to the optimum both in primal and pseudo-dual variables. Observe that if F is LF -smooth and convex then
+
+F (w(t)) - F (w)  LF 2
+
+w(t) - w
+
+2
+
+
+
+LF 
+
+Ct
+
+,
+
+and therefore a bound on Ct immediately implies a bound on the sub-optimality of w(t).
+
+The following theorem establishes the convergence rate of SDCA for the case in which each i is convex.
+
+Theorem 1 Assume that each i is Li-smooth and convex,
+
+and Algorithm 1 is run with   min
+
+1 4L¯
+
+,
+
+1 4 n
+
+. Then,
+
+for every t  1,
+
+E[Ct]  (1 - )t C0 ,
+
+where Ct is as defined in (1). In particular, to achieve
+
+E[F (w(T )) - F (w)]  it suffices to set  =
+
+min
+
+1 4L¯
+
+,
+
+1 4 n
+
+and
+
+T  ~
+
+L¯ +n
+
+.
+
+
+
+SDCA without Duality, Regularization, and Individual Convexity
+
+Variance Reduction: The lemma below tells us that the variance of the SDCA update decreases as we get closer to the optimum.
+
+Lemma 1 Under the same conditions of Theorem 1, the expected value of w(t) - w(t-1) 2 conditioned on w(t-1)
+satisfies:
+
+E[ w(t)-w(t-1) 2]  3 
+
+1 2
+
+w(t-1) - w
+
+2 + Ct-1
+
+.
+
+2.2. SDCA without regularization
+We now turn to the case in which the objective is not explicitly regularized. The algorithm below tackles this problem by a reduction to the regularized case. In particular, we artificially add regularization to the objective and compensate for it by adding one more loss function that cancels out the regularization term. While the added function is not convex (in fact, it is concave), we prove that the same convergence rate holds due to the special structure of the added loss function.
+
+Algorithm 2: Dual-Free SDCA
+
+for Non-Regularized Objectives
+
+Goal:
+
+Minimize
+
+F (w)
+
+=
+
+1 n
+
+n i=1
+
+fi
+
+(w)
+
+Input: Objective F , number of iterations T ,
+
+step size , Strong convexity parameter ,
+
+Smoothness parameters L1, . . . , Ln
+
+Define:
+
+For
+
+all
+
+i
+
+
+
+[n],
+
+i(w)
+
+=
+
+n+1 n
+
+fi(w),
+
+L~i
+
+=
+
+n+1 n
+
+Li
+
+For
+
+i
+
+=
+
+n
+
++
+
+1,
+
+i(w)
+
+=
+
+- i 2
+
+w
+
+2, L~i =  i
+
+Solve:
+
+Rewrite
+
+F
+
+as
+
+F (w)
+
+=
+
+1 n+1
+
+n+1 i=1
+
+i(w)
+
++
+
+ 2
+
+w
+
+2
+
+Call Algorithm 1 with F above and with {L~i}
+
+Theorem 2 Assume that F is -strongly convex, that each
+
+fi is Li-smooth and convex, and that Algorithm 2 is run
+
+with   min
+
+1 8(L¯ +)
+
+,
+
+1 4 (n+1)
+
+. Then, for every t  1,
+
+E[Ct]  (1 - )t C0 ,
+
+where Ct is as defined in (1). In particular, to achieve E[F (w(T )) - F (w)]  it suffices to set  =
+
+min
+
+1 8(L¯ +)
+
+,
+
+1 4 (n+1)
+
+and
+
+T  ~
+
+L¯ +n
+
+.
+
+
+
+2.3. The non-convex case
+We now consider the non-convex case. For simplicity, we focus on the regularized setting. In the non-regularized setting we can simply replace every fi with i(w) =
+
+fi
+
+(w)
+
+-
+
+ 2
+
+w
+
+2 and apply the regularized setting. Note that
+
+this does not change significantly the smoothness (because
+
+ is typically much smaller than the average smoothness of
+
+the fi).
+
+We can apply Algorithm 1 for the non-convex case, and the only change is the choice of , as reflected in the theorem below.
+
+Theorem 3 Consider running algorithm 1 on F which is
+
+-strongly convex, assume that each i is Li-smooth, and
+
+  min
+
+ 4L¯ 2
+
+,
+
+1 4 n
+
+. Then, for every t  1,
+
+E[Ct]  (1 - )t C0 ,
+
+where Ct is as defined in (1). In particular, to achieve
+
+E[F (w(T )) - F (w)]  it suffices to set  =
+
+min
+
+ 4L¯ 2
+
+,
+
+1 4 n
+
+and
+
+T  ~
+
+L¯2 2 + n
+
+.
+
+As can be seen, the dependence of T on the condition num-
+
+ber,
+
+L¯ 
+
+,
+
+is
+
+quadratic
+
+for
+
+the
+
+non-convex
+
+case,
+
+as
+
+opposed
+
+to
+
+a linear dependency for the convex case. We next show
+
+how to improve the bound using acceleration.
+
+2.4. Acceleration
+
+Accelerated SDCA (Shalev-Shwartz & Zhang, 2015) is ob-
+
+tained by solving (using SDCA) a sequence of problems,
+
+where at each iteration, we add an artificial regularization
+
+of
+
+the
+
+form
+
+ 2
+
+w - y(t-1)
+
+2, where y(t-1) is a function of
+
+w(t-1) and w(t-2). The algorithm has been generalized in
+
+(Lin et al., 2015) to allow the inner solver to be any algo-
+
+rithm. For completeness, we provide the pseudo-code of
+
+the "Catalyst" algorithm of (Lin et al., 2015) and its analy-
+
+sis.
+
+Algorithm 3: Acceleration
+
+Goal: Minimize a -strongly convex function F (w)
+
+Parameters: , T
+
+Initialize:
+
+Initial solution w(0)
+
+0 s.t. 0  F (w(0)) - F (w)
+
+y(0)
+
+=
+
+w(0), q
+
+=
+
+ +
+
+For: t = 1, . . . , T
+
+Define Gt(w) Set t = (1 -
+
+0=.9F(qw) )
+
++
+
+ 2
+
+t-1
+
+w - y(t-1)
+
+2
+
+FSientdy(wt)(t=) sw.t.(tG) +t(w(qqt)-+)qq-(wm(ti)n-w
+
+Gt(w) w(t-1)
+
+ )
+
+t
+
+Output: w(T )
+
+SDCA without Duality, Regularization, and Individual Convexity
+
+Lemma 2 Fix > 0 and suppose we run the Acceleration algorithm (Algorithm 3) for
+
+T =
+
++
+
++
+
+log
+
+
+
+iterations. Then, F (w(T )) - F (w)  .
+
+Proof The lemma follows directly from Theorem 3.1
+
+of (Lin et al., 2015) by observing that Algorithm 3 is a
+
+specification of Algorithm 1 in (Lin et al., 2015) with
+
+0 = t=
+
+q (which implies 0(1 - )t, and with
+
+that =
+
+t = 0 0.9 q.
+
+for
+
+every
+
+t),
+
+with
+
+Theorem 4 Let F
+
+=
+
+1 n
+
+n i=1
+
+i(w)
+
++
+
+ 2
+
+w
+
+2,
+
+assume
+
+that each i is Li smooth and that F is -strongly con-
+
+vex. Assume also that (L¯/)2  3n (otherwise we can
+
+simply apply O~(n) ning Algorithm 3
+
+iterations of Algorithm with parameters  =
+
+1L¯)./Thne,n,Trun=-
+
+~ 1 + n-1/4 L¯/ , and while at each iteration of Al-
+
+gorithm 3 using ~ (n) iterations of Algorithm 1 to minimize Gt, guarantees that F (w(T )) - F (w)  (with high probability). The total required number of iterations of Al-
+gorithm 1 is therefore bounded by O~ n + n3/4 L¯/ .
+
+Observe that for the case of convex individual functions, accelerating Algorithm 1 yields the upper bound O~ n + n1/2 L¯/ . Therefore, the convex and nonconvex cases have the same dependency on the condition number, but the non-convex case has a worse dependence on n.
+3. Proofs
+
+i)i(t-1) + iui. It follows that,
+
+At-1
+
+-
+
+At
+
+=
+
+-1 qi
+
+i(t) - i
+
+2+ 1 qi
+
+i(t-1) - i
+
+2
+
+(3)
+
+1 =-
+qi
+
+(1 - i)(i(t-1) - i) + i(ui - i)
+
+2
+
+1 +
+qi
+
+i(t-1) - i
+
+2
+
+=
+
+1 qi
+
+(-(1
+
+-
+
+i
+
+)
+
+i(t-1) - i
+
+2 - i
+
+ui - i
+
+2
+
++ i(1 - i) i(t-1) - ui 2 + i(t-1) - i 2 )
+
+= i qi
+
+i(t-1) - i 2 - ui - i 2 + (1 - i) vi 2
+
+ = qi2
+
+i(t-1) - i 2 - ui - i 2 + (1 - i) vi 2 . (4)
+
+Taking expectation w.r.t. i  q we obtain
+
+E[At-1 - At] =
+
+(5)
+
+n  i=1 qi
+
+i(t-1) - i 2 - ui - i 2 + (1 - i) vi 2
+
+= 
+
+n1 At-1 + i=1 qi
+
+- ui - i 2 + (1 - i) vi 2
+
+.
+
+As to the second potential, we have
+
+Bt-1 - Bt = - w(t) - w 2 + w(t-1) - w 2 (6) = 2 (w(t-1) - w) ( vi) - i2 vi 2 .
+
+Taking expectation w.r.t. i  q and noting that Eiq(ivi) = F (w(t-1)) we obtain
+
+E[Bt-1 - Bt] =2 (w(t-1) - w) F (w(t-1))
+
+-
+
+2 n2
+
+i
+
+1 qi
+
+vi
+
+2.
+
+(7)
+
+3.1. Proof of Theorem 1
+
+Observe that 0 = F (w) which implies that w = -i(w).
+
+=
+1
+
+1 n
+
+n
+
+i i(w) + w, i i, where i =
+
+Define ui = -i(w(t-1)) and vi = -ui + i(t-1). We also denote two potentials:
+
+n1 At = j=1 qj
+
+j(t) - j 2
+
+,
+
+Bt =
+
+w(t) - w 2 .
+
+We will first analyze the evolution of At and Bt. If on round t we update using element i then i(t) = (1 -
+
+We now take a potential of the form Ct = caAt + cbBt. Combining (5) and (7) we obtain
+
+E[Ct-1 - Ct] = caAt-1 - ca
+
+i
+
+1 qi
+
+ui - i
+
+2
+
++ 2cb(w(t-1) - w) F (w(t-1))
+
++
+
+i
+
+1 qi
+
+vi
+
+2
+
+ca(1
+
+-
+
+i)
+
+-
+
+cb2 n2
+
+(8)
+
+We will choose the parameters , ca, cb such that
+
+  min
+
+qi , 2
+
+1 4L¯
+
+and
+
+cb
+
+n2 =
+
+ca 2
+
+(9)
+
+SDCA without Duality, Regularization, and Individual Convexity
+
+This implies that i
+
+=
+
+in
+
+=
+
+ qi
+
+
+
+1/2, and therefore the
+
+term in (8) is non-negative. Next, due to strong convexity
+
+of F we have that
+
+(w(t-1) - w) F (w(t-1))  F (w(t-1)) - F (w) +  w(t-1) - w 2 .
+2
+
+Taking expectation over Ct-1 and continue recursively, we obtain that E[Ct]  (1 -  )t C0  e-  t C0. Finally, since qi  1/(2n) for every i, we can choose
+11  = min 4L¯ , 4 n
+
+Therefore,
+
+E[Ct-1 - Ct] = caAt-1 - ca
+
+i
+
+1 qi
+
+ui - i
+
+2
+
++ 2cb(F (w(t-1)) - F (w)) + cbBt-1
+
+and therefore
+
+1
+
+4
+
+L¯ n+
+
+.
+
+ 
+
+The proof is concluded by choosing cb = /2 and ca = /n2.
+
+=   Ct-1+
+
+
+
+2cb(F (w(t-1)) - F (w)) - ca
+i
+
+1 qi
+
+ui - i
+
+2
+
+.
+
+(10)
+
+Note that ui -i = i(w(t-1))-i(w). In Lemma 3 we show that when i is Li smooth and convex then
+
+i(w(t-1)) - i(w) 2
+
+(11)
+
+ 2 Li (i(w(t-1)) - i(w) - i(w) (w(t-1) - w))
+
+3.2. Proof of Lemma 1
+
+We have:
+
+E[ w(t) - w(t-1) 2] =
+
+qii2 i(w(t-1)) + i(t-1) 2
+
+i
+
+
+
+32 n2
+
+i
+
+1 (
+qi
+
+i(w(t-1)) + i
+
+2
+
++ i(t-1) - i 2)
+
+(triangle inequality)
+
+Therefore, denoting  =
+
+2
+
+maxi
+
+Li qi
+
+we obtain that
+
+i
+
+1 qi
+
+ui - i
+
+2=
+
+i
+
+1 qi
+
+i(w(t-1)) - i(w)
+
+2
+
+(12)
+
+  (i(w(t-1)) - i(w) - i(w) (w(t-1) - w))
+
+32 = n2
+
+
+
+32 n2
+
+(
+
+1 qi
+
+i(w(t-1)) - i(w) 2
+
+i
+
++
+
+1 qi
+
+i(t-1) - i
+
+2)
+
+2nL¯
+
+w(t-1) - w
+
+2
+
++
+
+1 qi
+
+i(t-1) - i
+
+2
+
+i
+
+i
+=  n F (w(t-1)) - F (w) -  w(t-1) - w 2 2
+
+(smoothness and (14))
+
+ 3
+
+1 2
+
+w(t-1) - w
+
+2 + Ct-1
+
+  n F (w(t-1)) - F (w) .
+
+(13)
+
+(because
+
+
+
+
+
+1 4L¯
+
+)
+
+.
+
+The definition of qi implies that for every i,
+
+Li qi
+
+=
+
+2nL¯
+
+Li Li + L¯
+
+
+
+2nL¯ .
+
+Combining this with (12) and (10) we obtain
+
+(14)
+
+E[Ct-1 - Ct]    Ct-1 +  2cb - 4n2L¯ca (F (w(t-1)) - F (w))
+
+Plugging
+
+the
+
+value
+
+of
+
+cb
+
+=
+
+ca n2 2
+
+yields
+
+that
+
+the
+
+coefficient
+
+in the last term is
+
+2 can2 2
+
+- 4n2L¯ca
+
+=
+
+can2
+
+1 - 4L¯ 
+
+0,
+
+where
+
+we
+
+used
+
+the
+
+choice
+
+of
+
+
+
+
+
+1 4L¯
+
+.
+
+In
+
+summary,
+
+we
+
+have
+
+shown that E[Ct-1 - Ct]    Ct-1, which implies that
+
+E[Ct]  (1 -  ) Ct-1 .
+
+3.3. Proof of Theorem 2
+
+The beginning of the proof is identical to the proof of Theorem 1. The change starts in (12), where we cannot apply (11) to n+1 because it is not convex. To overcome this, we first apply (11) to 1, . . . , n, and obtain that
+
+n1 i=1 qi
+
+ui - i
+
+2= n 1 i=1 qi
+
+i(w(t-1)) - i(w) 2
+
+ 2 max L~i · i qi
+
+n
+(i(w(t-1)) - i(w) - i(w) (w(t-1) - w))
+i=1
+
+= 2 (n + 1) max L~i (F (w(t-1)) - F (w)) , i qi
+
+SDCA without Duality, Regularization, and Individual Convexity
+
+where the last equality follows from the fact that
+
+n i=1
+
+i(w)
+
+=
+
+(n + 1)F (w),
+
+which also implies that
+
+i i(w) = 0. In addition, since n+1(w) =
+
+-
+
+(n+1) 2
+
+w
+
+2, we have
+
+1 qn+1
+
+n+1(w) - n+1(w) 2
+
+2(n + 1)2 =
+
+w - w
+
+2
+
+qn+1
+
+= 2 (n + 1) L~n+1 ·  w - w 2 qn+1 2
+
+ 2 (n + 1) L~n+1 (F (w) - F (w)) , qn+1
+
+where the last inequality is because of the -strong convexity of F . Combining the two inequalities, we obtain an analogue of (12),
+
+n+1 1 i=1 qi
+
+ui - i
+
+2
+
+ 4 (n + 1) max L~i i[n+1] qi
+
+(F (w(t-1)) - F (w)) .
+
+The rest of the proof is almost identical, except that we have
+
+n
+
+replaced
+
+by
+
+n+1
+
+and
+
+L¯
+
+replaced
+
+by
+
+L~
+
+:=
+
+1 n+1
+
+n i=1
+
+L~i.
+
+We now need to choose
+
+11  = min 8L~ , 4 (n + 1) .
+
+Observe that,
+
+(n+1)L~ = n + 1 n
+
+n
+Li +(n+1) = (n+1)(L¯ +) ,
+
+i=1
+
+so we can rewrite
+
+11  = min 8(L¯ + ) , 4 (n + 1) .
+
+This yields
+
+1 4
+
+2L¯ n+3+
+
+.
+
+ 
+
+3.4. Proof of Theorem 3
+
+The beginning of the proof is identical to the proof of Theorem 1 up to (8).
+
+We will choose the parameters , ca, cb such that
+
+  min
+
+qi 2
+
+,
+
+1 4L¯
+
+and
+
+cb
+
+n2 =
+
+ca 2
+
+(15)
+
+This implies that i
+
+=
+
+in
+
+=
+
+ qi
+
+
+
+1/2, and therefore the
+
+term in (8) is non-negative. Next, due to strong convexity
+
+of F we have that
+
+(w(t-1) - w) F (w(t-1))
+ F (w(t-1)) - F (w) +  w(t-1) - w 2 2
+  w(t-1) - w 2 .
+
+Therefore,
+
+E[Ct-1 - Ct]
+
+= caAt-1 - ca
+
+i
+
+1 qi
+
+ui - i
+
+2 + 2cbBt-1
+
+=   Ct-1 +  
+
+cbBt-1 - ca
+i
+
+1 qi
+
+ui - i
+
+2
+
+.
+
+(16)
+
+Next, we use the smoothness of the i to get
+
+i
+
+1 qi
+
+ui - i
+
+2=
+
+i
+
+1 qi
+
+i(w(t-1)) - i(w) 2
+
+
+
+i
+
+L2i qi
+
+w(t-1) - w
+
+2 = Bt-1
+
+i
+
+L2i . qi
+
+The definition of qi implies that for every i,
+
+Li qi
+
+=
+
+2nL¯
+
+Li Li + L¯
+
+
+
+2nL¯ ,
+
+so by combining with (16) we obtain
+
+E[Ct-1 - Ct]    Ct-1 +  cb - 2n2L¯2ca Bt-1
+
+The last term will be non-negative if
+
+cb ca
+
+ 2n2L¯2.
+
+Since
+
+we chose
+
+cb ca
+
+=
+
+n2 2
+
+we obtain the requirement
+
+n2 2
+
+ 2n2L¯2
+
+
+
+   4L¯2
+
+.
+
+In summary, we have shown that E[Ct-1 -Ct]    Ct-1.
+
+The rest of the proof is identical, but the requirement on 
+
+is
+
+  min
+
+1 4L¯2 , 4 n
+
+,
+
+and therefore
+
+1 4 
+
+L¯2 n + 2
+
+.
+
+4. Proof of Theorem 4
+
+Proof Gt to
+
+acEcaucrhacityerattionOo(f1A)l(g1o-rithm)t,3wrheeqrueires=to0m.9inimq.izIef
+
+SDCA without Duality, Regularization, and Individual Convexity
+
+t  T where T is as defined in Lemma 2, then we have that,
+
+-t log(1-)  -T log(1-) = - log(1 - ) log 800 q
+
+Using
+
+Lemma
+
+4,
+
+- log(1-) 
+
+
+
+2
+
+for
+
+every
+
+
+
+
+
+(0, 1/2).
+
+In
+
+our case,  is indeed in (0, 1/2) because of the definition of
+
+ and our assumption that (L¯/)2  3n. Hence,
+
+log( 1 ) = O(log(( + )/( ))) . t
+
+Combining this with Theorem 3, and using the definition of Gt, we obtain that the number of iterations required1 by
+each application of Algorithm 3 is
+
+O~
+
+(L¯ + )2 ( + )2 + n
+
+= O~(n) ,
+
+where in the equality we used the definition of . Finally, multiplying this by the value of T as given in Lemma 2 we obtain (ignoring log-terms):
+
+ 1+ n
+
+
+
+(1 +
+
+ ) n = n + n3/4
+
+L¯ .
+
+
+
+
+
+Lemma 4 For a  (0, 1/2) we have - log(1-a)/a  1.4.
+Proof Denote g(a) = - log(1 - a)/a. It is easy to verify that the derivative of g in (0, 1/2) is positive and that g(0.5)  1.4. The proof follows.
+5. Summary
+We have described and analyzed a dual free version of SDCA that supports non-regularized objectives and nonconvex individual loss functions. Our analysis shows a linear rate of convergence for all of these cases. Two immediate open questions are whether the worse dependence on the condition number for the non-accelerated result for the non-convex case is necessary, and whether the factor n3/4 in Theorem 4 can be reduced to n1/2.
+Acknowledgements
+In a previous draft of this paper, the bound for the nonconvex case was n5/4 + n3/4 L¯/. We thank Ohad Shamir for showing us how to derive the improved bound of n + n3/4 L¯/. The work is supported by ICRI-CI and by the European Research Council (TheoryDL project).
+
+4.1. Technical Lemmas
+
+References
+
+Lemma 3 Assume that  is L-smooth and convex. Then, Agarwal, Alekh and Bottou, Leon. A lower bound for the
+
+for every w and u,
+
+optimization of finite sums. In ICML, 2014.
+
+(w)-(u) 2  2L (w) - (u) - (u) (w - u) .Allen-Zhu, Zeyuan and Yuan, Yang. Univr: A univer-
+
+Proof For every i, define
+
+sal variance reduction framework for proximal stochastic gradient method. arXiv preprint arXiv:1506.01972,
+
+g(w) = (w) - (u) - (u) (w - u) .
+
+2015.
+
+Clearly, since  is L-smooth so is g. In addition, by convexity of  we have g(w)  0 for all w. It follows that g is nonnegative and smooth, and therefore, it is self-bounded (see Section 12.1.3 in (Shalev-Shwartz & Ben-David, 2014)):
+
+Arjevani, Yossi, Shalev-Shwartz, Shai, and Shamir, Ohad. On lower and upper bounds for smooth and strongly convex optimization problems. arXiv preprint arXiv:1503.06833, 2015.
+
+g(w) 2  2Lg(w) .
+Using the definition of g, we obtain (w) - (u) 2 = g(w) 2  2Lg(w) = 2L (w) - (u) - (u) (w - u) .
+
+Csiba, Dominik and Richta´rik, Peter. Primal method for erm with flexible mini-batching schemes and nonconvex losses. arXiv preprint arXiv:1506.02227, 2015.
+Defazio, Aaron. New Optimisation Methods for Machine Learning. PhD thesis, Australian National Univer- sity, 2014.
+
+1While Theorem 3 bounds the expected sub-optimality, by techniques similar to (Shalev-Shwartz & Zhang, 2015) it can be converted to a bound that holds with high probability.
+
+Defazio, Aaron, Bach, Francis, and Lacoste-Julien, Simon. Saga: A fast incremental gradient method with support for non-strongly convex composite objectives. In Advances in Neural Information Processing Systems, pp. 1646­1654, 2014a.
+
+SDCA without Duality, Regularization, and Individual Convexity
+Defazio, Aaron J, Caetano, Tibe´rio S, and Domke, Justin. Finito: A faster, permutable incremental gradient method for big data problems. arXiv preprint arXiv:1407.2710, 2014b.
+He, Xi and Taka´c, Martin. Dual free sdca for empirical risk minimization with adaptive probabilities. arXiv preprint arXiv:1510.06684, 2015.
+Jin, Chi, Kakade, Sham M, Musco, Cameron, Netrapalli, Praneeth, and Sidford, Aaron. Robust shift-and-invert preconditioning: Faster and more sample efficient algorithms for eigenvector computation. arXiv preprint arXiv:1510.08896, 2015.
+Johnson, Rie and Zhang, Tong. Accelerating stochastic gradient descent using predictive variance reduction. In Advances in Neural Information Processing Systems, pp. 315­323, 2013.
+Konecny`, Jakub and Richta´rik, Peter. Semi-stochastic gradient descent methods. arXiv preprint arXiv:1312.1666, 2013.
+Le Roux, Nicolas, Schmidt, Mark, and Bach, Francis. A stochastic gradient method with an exponential convergence rate for finite training sets. In Advances in Neural Information Processing Systems, pp. 2663­2671, 2012.
+Lin, Hongzhou, Mairal, Julien, and Harchaoui, Zaid. A universal catalyst for first-order optimization. In Advances in Neural Information Processing Systems, pp. 3366­3374, 2015.
+Shalev-Shwartz, S. and Zhang, T. Accelerated proximal stochastic dual coordinate ascent for regularized loss minimization. Mathematical Programming SERIES A and B (to appear), 2015.
+Shalev-Shwartz, Shai. Sdca without duality. arXiv preprint arXiv:1502.06177, 2015.
+Shalev-Shwartz, Shai and Ben-David, Shai. Understanding Machine Learning: From Theory to Algorithms. Cambridge university press, 2014.
+Shalev-Shwartz, Shai and Zhang, Tong. Stochastic dual coordinate ascent methods for regularized loss minimization. Journal of Machine Learning Research, 14:567­ 599, Feb 2013.
+Shamir, Ohad. A stochastic pca and svd algorithm with an exponential convergence rate. In ICML, 2015.
+Xiao, Lin and Zhang, Tong. A proximal stochastic gradient method with progressive variance reduction. SIAM Journal on Optimization, 24(4):2057­2075, 2014.
+
+

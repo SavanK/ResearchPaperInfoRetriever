@@ -1,0 +1,1941 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Find Author - conf/imc/LiuTZZZZ16 (0) </title>
+<style type="text/css">
+body {
+	font: normal 11pt Arial, Helvetica, sans-serif;
+}
+
+body.author {
+	background-color: BurlyWood;
+}
+
+body.funding {
+	background-color: LightGreen;
+}
+
+body.artifacts {
+	background-color: orange;
+}
+
+button.matchBootstrap {
+	margin-bottom: 10px;
+	margin-right: 5px;
+	white-space: nowrap;
+}
+
+h1 {
+	text-align: center;
+	margin: 5px;
+}
+
+h2 {
+	text-align: left;
+	margin: 5px;
+}
+
+input[type="radio"].matchBootstrap,
+input[type="checkbox"].matchBootstrap {
+	margin-right: 5px;
+}
+
+input[type="radio"].matchBootstrap,
+input[type="checkbox"].matchBootstrap {
+	margin-bottom: 14px;
+}
+
+input[type="radio"].matchSelect {
+	margin-bottom: 7px;
+}
+
+input[type="radio"].matchText {
+	vertical-align: top;
+}
+
+span.author {
+	font-weight: bold;
+	background-color: yellow;
+}
+
+table {
+	border: none;
+	padding: 0;
+}
+
+table td {
+	vertical-align: top;
+	padding: 0;
+}
+
+table td.info {
+	width: 600px;
+}
+
+table td.diacritics {
+	width: 120px;
+	float: right;
+	text-align: right;
+}
+
+table td.diacriticsBootstrap {
+	width: 140px;
+	float: right;
+	text-align: right;
+}
+
+table td.diacritics button,
+table td.diacriticsBootstrap button {
+	white-space: nowrap;
+}
+
+table td.rowlabel {
+	text-align: right;
+	font-weight: bold;
+	padding-right: 5px;
+}
+
+table.info {
+	width: 600px;
+	padding: 0;
+	margin: 0;
+	border: none;
+}
+
+table.info td {
+	padding: 0;
+}
+
+table.info td.rowlabel input {
+	font-weight: normal;
+}
+
+table.info .bootstrap-select.wide {
+	width: 100% !important;
+}
+
+td.matchBootstrap {
+	padding-top: 6px;
+}
+
+textarea {
+	width: 32em;
+}
+
+.bootstrap-select>.dropdown-toggle {
+	margin-bottom: 5px;
+}
+
+.floater {
+	float: left;
+	padding-right: 20px;
+}
+
+
+.message {
+	color: red;
+}
+
+.pdf {
+	display: none; /* We decided not to server the PDF at all */
+	top: 0px;
+	right: 0px;
+	position: fixed;
+	width: 650px;
+	height: 660px;
+	border: 2px solid black
+}
+
+.pdf object {
+	width: 650px;
+	height: 660px;
+}
+
+.wide {
+	width: 100%;
+}
+
+#keyDest {
+	display: none;
+}
+
+#keySrc {
+	text-decoration: underline;
+	cursor: copy;
+}
+
+.academic {
+}
+
+.nonacademic {
+	color: red;
+}
+</style>
+
+<script type="text/javascript">
+// For these, the lone diacritic will precede old
+// and the pair should be replaced with new.
+var pre_diacritics = [
+	{
+		mark: '\u00A8', // diaeresis
+		uses: [
+			{old: 'a', new: '\u00E4'},
+			{old: 'e', new: '\u00EB'},
+			{old: 'i', new: '\u00EF'},
+			{old: 'o', new: '\u00F6'},
+			{old: 'u', new: '\u00FC'},
+			{old: 'y', new: '\u00FF'},
+
+			{old: 'A', new: '\u00C4'},
+			{old: 'E', new: '\u00CB'},
+			{old: 'I', new: '\u00CF'},
+			{old: 'O', new: '\u00D6'},
+			{old: 'U', new: '\u00DC'}
+		]
+	},
+	{
+		mark: '\u00B4', // acute
+		uses: [
+			{old: 'a', new: '\u00E1'},
+			{old: 'e', new: '\u00E9'},
+			{old: 'i', new: '\u00ED'},
+			{old: 'o', new: '\u00F3'},
+			{old: 'u', new: '\u00FA'},
+			{old: 'y', new: '\u00FD'},
+
+			{old: 'A', new: '\u00C1'},
+			{old: 'E', new: '\u00C9'},
+			{old: 'I', new: '\u00CD'},
+			{old: 'O', new: '\u00D3'},
+			{old: 'U', new: '\u00DA'},
+			{old: 'Y', new: '\u00DD'}
+		]
+	},
+	{
+		mark: '\u0060', // grave
+		uses: [
+			{old: 'a', new: '\u00E0'},
+			{old: 'e', new: '\u00E8'},
+			{old: 'i', new: '\u00EC'},
+			{old: 'o', new: '\u00F2'},
+			{old: 'u', new: '\u00F9'},
+
+			{old: 'A', new: '\u00C0'},
+			{old: 'E', new: '\u00C8'},
+			{old: 'I', new: '\u00CC'},
+			{old: 'O', new: '\u00D2'},
+			{old: 'U', new: '\u00D9'}
+		]
+	},
+	{
+		mark: '\u02DC', // tilde
+		uses: [
+			{old: 'a', new: '\u00E3'},
+			{old: 'n', new: '\u00F1'},
+			{old: 'o', new: '\u00F5'},
+
+			{old: 'A', new: '\u00C3'},
+			{old: 'N', new: '\u00D1'},
+			{old: 'O', new: '\u00D5'}
+		]
+	},
+	{
+		mark: '\u02D8', // breve
+		uses: [
+			{old: 'a', new: '\u0103'},
+			{old: 'e', new: '\u0115'},
+			{old: 'i', new: '\u012D'},
+			{old: 'o', new: '\u014F'},
+			{old: 'u', new: '\u016D'},
+
+			{old: 'A', new: '\u0102'},
+			{old: 'E', new: '\u0114'},
+			{old: 'I', new: '\u012C'},
+			{old: 'O', new: '\u014E'},
+			{old: 'U', new: '\u016C'}
+		]
+	},
+	{
+		mark: '\u02C7', // caron
+		uses: [
+			{old: 'c', new: '\u010D'},
+			{old: 'z', new: '\u017E'},
+
+			{old: 'C', new: '\u010C'},
+			{old: 'Z', new: '\u017D'}
+		]
+	},
+	{
+		mark: '\u02C6', // circumflex
+		uses: [
+			{old: 'a', new: '\u00E2'},
+			{old: 'e', new: '\u00EA'},
+			{old: 'i', new: '\u00EE'},
+			{old: 'o', new: '\u00F4'},
+			{old: 'u', new: '\u00FB'},
+
+			{old: 'A', new: '\u00C2'},
+			{old: 'E', new: '\u00CA'},
+			{old: 'I', new: '\u00CE'},
+			{old: 'O', new: '\u00D4'},
+			{old: 'U', new: '\u00DB'}
+		]
+	},
+	{
+		mark: '\u00B0', // ring
+		uses: [
+			{old: 'a', new: '\u00E5'},
+			
+			{old: 'A', new: '\u00C5'}
+		]
+	}
+];
+
+// For these, the lone diacritic will _follow_ old
+// and the pair should be replaced with new.
+var post_diacritics = [
+	{
+		mark: '\u00B8', // cedilla
+		uses: [
+			{old: 'c', new: '\u00E7'},
+			{old: 's', new: '\u015F'},
+			{old: 't', new: '\u0163'},
+
+			{old: 'C', new: '\u00C7'},
+			{old: 'S', new: '\u015E'},
+			{old: 'T', new: '\u0162'}
+		]
+	}
+];
+
+// template
+/*
+	{
+		mark: '', //
+		uses: [
+			{old: '', new: ''},
+		]
+	},
+*/
+
+function collectDiacritics(diacritics) {
+	var text = "";
+	
+	for (var i = 0; i < diacritics.length; i++)
+		for (var j = 0; j < diacritics[i].length; j++)
+			text += diacritics[i][j].mark;
+	return text;
+}
+
+var diacritics = collectDiacritics([pre_diacritics, post_diacritics]);
+
+function repairDiacriticsInText(text) {
+	var replaced;
+	
+	do {
+		replaced = false;
+		// Try for pre_diacritics
+		for (var i = 0; !replaced && i < pre_diacritics.length; i++) {
+			var index = text.indexOf(pre_diacritics[i].mark);
+			
+			if (index < 0 || text.length <= index + 1)
+				continue;
+			for (var j = 0; j < pre_diacritics[i].uses.length; j++)
+				if (text[index + 1] == pre_diacritics[i].uses[j].old) {
+					text = text.substring(0, index) + 
+							pre_diacritics[i].uses[j].new +
+							text.substring(index + 2);
+					replaced = true;
+					break;
+				}
+		}
+		
+		// Try for post_diacritics
+		for (var i = 0; !replaced && i < post_diacritics.length; i++) {
+			var index = text.indexOf(post_diacritics[i].mark);
+			
+			if (index < 0 || index - 1 < 0)
+				continue;
+			for (var j = 0; j < post_diacritics[i].uses.length; j++)
+				if (text[index - 1] == post_diacritics[i].uses[j].old) {
+					text = text.substring(0, index - 1) +
+							post_diacritics[i].uses[j].new +
+							text.substring(index + 1);
+					replaced = true;
+					break;
+				}
+		}
+	} while(replaced);
+	return text;
+}
+</script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script type="text/javascript">
+			var institutionRow = null;
+			
+			$(function() {
+				institutionRow = document.getElementById("institutionRow").innerHTML;
+			});
+		</script>
+		<link rel="stylesheet" type="text/css" href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css">
+		<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+
+		<link rel="stylesheet" type="text/css" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.9.3/css/bootstrap-select.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.9.3/js/bootstrap-select.min.js"></script>
+		<script type="text/javascript">
+			var blacklist = [
+				"permissions@acm.org",
+				"Permissions@acm.org"
+			];
+			
+			function validateEmail(email) {
+				var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+				if (!re.test(email))
+					return false;
+				
+				for (var i = 0; i < email.length; i++) {
+					var code = email.charCodeAt(i);
+					
+					if (code <= 32 || 127 <= code)
+						return false;
+				}
+				return true;
+			}
+			
+			function includesAny(value, terms) {
+				for (var i = 0; i < terms.length; i++)
+					if (value.includes(terms.substr(i, 1)))
+						return true;
+				return false;
+			}
+
+			function getEmail() {
+				var form = document.forms["form"];
+				var email = form["email"].value;
+				
+				if (email == "_other")
+					email = form["otherEmail"].value;
+				return email.trim();
+			}
+
+			function nonEmptyEmail() {
+				return getEmail() != "";
+			}
+
+			function suffixForIndex(index) {
+				return index == 0 ? "" : index.toString();
+			}
+
+			function getInstitution(index) {
+				var form = document.forms["form"];
+				var institution = form["institution" + suffixForIndex(index)].value;
+				
+				if (institution == "_otherInstitution")
+					institution = form["otherInstitution" + suffixForIndex(index)].value;
+				return institution.trim();
+			}
+
+			function getDepartment(index) {
+				var form = document.forms["form"];
+				var department = form["department" + suffixForIndex(index)].value;
+				
+				return department.trim();
+			}
+
+			function nonEmptyInstitution(index) {
+				return getInstitution(index) != "";
+			}
+
+			function nonEmptyDepartment(index) {
+				return getDepartment(index) != "";
+			}
+
+			function getCount() {
+				var count = Number(document.getElementById("affCount").value);
+
+				return count;
+			}
+
+			function anyNonEmptyInstitution() {
+				var count = getCount();
+
+				for (var i = 0; i < count; i++)
+					if (nonEmptyInstitution(i))
+						return true;
+				return false;
+			}
+
+			function anyNonEmptyDepartment() {
+				var count = getCount();
+
+				for (var i = 0; i < count; i++)
+					if (nonEmptyDepartment(i))
+						return true;
+				return false;
+			}
+
+			function confirmPolishL(name) {
+				copyText("\u0142");
+				return confirm("The " + name + "\"Wroc law\" (with a space and a simple l) should probably be " +
+						"Wroc\u0142aw (no space and stroked l).\n" +
+						"I've just copied the letter to the clipboard for pasting.\n" +
+						"Would you like to submit the present spelling anyway?");
+			}
+
+			function validateForm(form) {
+				{
+					var panic = document.getElementById("panic").checked;
+					var reason = form["reason"].value;
+					
+					if (panic) {
+						if (reason == "") {
+							alert("You may not panic without entering a reason for doing so.");
+							return false;
+						}
+						else
+							return confirm("In a panic situation, only the reason for the panic is recorded; other information is ignored.  " +
+									"The task will be removed from the queue so that you might possibly continued with other tasks.  " +
+									"Proceed with the panic?");
+					}
+					else
+						if (reason != "") {
+							alert("You must panic if there is reason to do so.  Either check the box or remove the reason.");
+							return false;
+						}
+				}
+
+				{
+					var email = getEmail();
+
+					if (email != "" && !validateEmail(email)) {
+						alert("The email is not well formed and can't be used.");
+						return false;
+					}
+
+					for (var i = 0; i < blacklist.length; i++)
+						if (blacklist[i] == email) {
+							alert("The email is blacklisted and can't be used.");
+							return false;
+						}
+				}
+
+				{
+					var count = getCount();
+
+					for (var i = 0; i < count; i++) {
+						var hasInstitution = nonEmptyInstitution(i);
+						var hasDepartment = nonEmptyDepartment(i);
+
+						if (hasDepartment && !hasInstitution)
+							if (!confirm("It seems unlikely there is a department but no institution.\nAre you sure?"))
+								return false;
+							else
+								break;
+					}
+				}
+
+				{
+					var count = getCount();
+
+					for (var i = 0; i < count; i++) {
+						var suffix = suffixForIndex(i);
+						var institution = getInstitution(i);
+	
+						if (includesAny(institution, diacritics)) {
+							alert("The institution includes one or more broken diacritics which need to be repaired, " + 
+									"either manually or with the button, before the page can be accepted.");
+							return false;
+						}
+
+						var department = getDepartment(i);
+	
+						if (includesAny(department, diacritics)) {
+							alert("The department includes one or more broken diacritics which need to be repaired, " + 
+									"either manually or with the button, before the page can be accepted.");
+							return false;
+						}
+					}
+				}
+
+				{
+					var count = getCount();
+
+					for (var i = 0; i < count; i++) {
+						var suffix = suffixForIndex(i);
+						var institution = getInstitution(i);
+	
+						if (institution.includes("Wroc law") && !confirmPolishL("institution"))
+							return false;
+
+						var department = getDepartment(i);
+	
+						if (department.includes("Wroc law")  && !confirmPolishL("department"))
+							return false;
+					}
+				}
+
+				{
+					var hasEmail = nonEmptyEmail();
+					var hasInstitution = anyNonEmptyInstitution();
+					var hasDepartment = anyNonEmptyDepartment();
+					var hasEnough = hasEmail && hasInstitution; // && hasDepartment;
+
+					var message = "Not all information is provided:\n";
+					if (!hasEmail)
+						message += "   Email is missing\n";
+					if (!hasInstitution)
+						message += "   Institution is not provided\n";
+					if (!hasDepartment)
+						message += "   Department is not specified\n";
+					message += "\nDo you really want to submit the form?";
+					
+					if (!hasEnough && !confirm(message))
+						return false;
+				}
+				return true;
+			}
+
+			function addFirstLast(input) {
+				var id = "otherEmailTxt";
+				var element = document.getElementById(id);
+				
+				if (!element.value.startsWith(input)) {
+					element.value = input + element.value;
+					document.getElementById("otherEmailRad").checked = true;
+				}
+				return false;
+			}
+
+			function isValid(form) {
+				var panic = document.getElementById("panic").checked;
+				var reason = form["reason"].value;
+				
+				if (panic && reason == "")
+					return false;
+				if (!panic && reason != "")
+					return false;
+				return true;
+			}
+			
+			function updateSubmit() {
+				var form = document.forms["form"]
+				var valid = isValid(form);
+				
+				document.getElementById("submit").disabled = !valid;
+			}
+			
+			function onPanicChanged(panic) {
+				updateSubmit();
+			}
+
+			function onReasonChanged(reason) {
+				updateSubmit();
+			}
+
+			function onOtherEmailChanged(otherEmail) {
+				document.getElementById("otherEmailRad").checked = true;
+			}
+
+			function trailingDigits(text) {
+				var stop = text.length;
+				var start = stop;
+
+				for (var i = stop - 1; i >= 0; i--)
+					if ('0' <= text[i] && text[i] <= '9')
+						start--;
+					else
+						break;
+				return text.slice(start, stop);
+			}
+
+			function getIndex(element) {
+				var name = element.name;
+				var index = trailingDigits(name);
+
+				return index;
+			}
+
+			function onInstitutionChanged(institution) {
+				var index = getIndex(institution);
+
+				document.getElementById("selectInstitutionRad" + index).checked = true;
+			}
+			
+			function onOtherInstitutionChanged(otherInstitution) {
+				var index = getIndex(otherInstitution);
+
+				document.getElementById("otherInstitutionRad" + index).checked = true;
+			}
+
+			function copyKey(keySrc) {
+				var text = keySrc.innerText;
+
+				copyText(text);
+			}
+
+			function copyText(text) {
+				var keyDest = document.getElementById("keyDest");
+				
+				keyDest.style.display = "inherit";
+				keyDest.value = text;
+				keyDest.select();
+				
+				try {
+					var successful = document.execCommand("copy");
+					
+					if (!successful)
+						console.log("Copying text command failed.");
+				}
+				catch (err) {
+					console.log("Oops, unable to copy");
+				}
+				keyDest.style.display = "none";
+			}
+
+			function repairDiacritics(button, id) {
+				var index = trailingDigits(button.id);
+				var suffix = suffixForIndex(index);
+				var element = document.getElementById(id + suffix);
+				var oldText = element.value;
+				var newText = repairDiacriticsInText(oldText);
+				
+				element.value = newText;
+				return false;
+			}
+
+			function updateAttribute(html, attribute, index) {
+				var oldPattern = attribute + "=\"([^\"]*)\"";
+				var newPattern = attribute + "=\"$1" + index + "\"";
+				var re = new RegExp(oldPattern, "g");
+
+				html = html.replace(re, newPattern);
+				return html;
+			}
+
+			function updateInnerHtml(innerHtml, index) {
+				innerHtml = updateAttribute(innerHtml, "id", index);
+				innerHtml = updateAttribute(innerHtml, "name", index);
+				return innerHtml;
+			}
+
+			function copyInnerHtml(id, index) {
+				var innerHtml = document.getElementById(id).innerHTML;
+
+				innerHtml = updateInnerHtml(innerHtml, index);
+				return innerHtml;
+			}
+
+			function insertRow(table, rowIndex, innerHtml) {
+				table.insertRow(rowIndex).innerHTML = innerHtml;
+			}
+
+			function addAffiliation() {
+				var count = getCount();
+				var startIndex;
+// <#if message == "">
+				startIndex = 7;
+// <#else>
+				startIndex = 8;
+// </#if>
+				var rowIndex = startIndex + 3 * count;
+				var table = document.getElementById("main");
+
+				insertRow(table, rowIndex++, copyInnerHtml("spacerRow", count));
+				// It is done this way since institutionRow is rewritten by bootstrap-select
+				insertRow(table, rowIndex++, updateInnerHtml(institutionRow, count));
+				insertRow(table, rowIndex++, copyInnerHtml("departmentRow", count));
+				
+				$("#selectInstitution" + count).selectpicker();
+
+				document.getElementById("affCount").value = count + 1;
+			}
+		</script>
+	</head>
+	<body class="author">
+		<h1>Find Author</h1>
+		<!--div class="pdf">
+			<object data="paper.pdf" type="application/pdf">
+				alt: <a href="paper.pdf">paper.pdf</a>
+			</object>
+			<br>
+		</div-->
+		<div class="floater">
+			<h2>Form</h2>
+			<form name="form" method="post" onsubmit="return validateForm(this);">
+				<input type="hidden" name="key" value="conf/imc/LiuTZZZZ16">
+				<input type="hidden" name="type" value="author">
+				<input type="hidden" name="index" value="0">
+				<input type="hidden" id="affCount" name="affiliationCount" value="1">
+				<input type="hidden" name="queue" value="${queue?html}">
+				<input type="hidden" name="receipt" value="${receipt?html}">
+				<table id="main">
+<!--<#if message != "">-->
+					<tr>
+						<td class="message rowlabel">Message:</td>
+						<td class="message info">${message}</td>
+					</tr>
+<!--</#if>-->
+					<tr>
+						<td class="rowlabel">Title:</td>
+						<td class="info">
+							Network Growth and Link Prediction Through an Empirical Lens.
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">URL:</td>
+						<td class="info">
+							<a href="http://dl.acm.org/citation.cfm?id=2987452" target="_blank">http://dl.acm.org/citation.cfm?id=2987452</a>
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Key:</td>
+						<td class="info">
+							conf/imc/<span id="keySrc" onclick="return copyKey(this);">LiuTZZZZ16</span> (0)
+							<input id="keyDest" type="text">
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel matchBootstrap">Panic:</td>
+						<td class="info">
+							<table class="info">
+								<tr>
+									<td><input type="checkbox" class="matchBootstrap" id="panic" name="panic" onchange="onPanicChanged(this);"></td>
+									<td class="wide"><input class="wide" type="text" name="reason" maxlength="63" oninput="onReasonChanged(this);" placeholder="Reason for panic"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel matchBootstrap">Problem:</td>
+						<td class="info">
+							<table class="info">
+								<tr>
+									<td><input class="wide" type="text" name="problem" maxlength="63" size="63" placeholder="Description of the problematic situation"></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">&nbsp;</td>
+						<td class="info">&nbsp;</td>
+					</tr>
+					<tr>
+						<td class="rowlabel">Email:</td>
+						<td class="info">
+							<table class="info">
+								<tr>
+									<td colspan="2">
+										Author <span class="author">Qingyun Liu</span> has this email address:
+										<!--button onclick="return addFirstLast('qingyun.liu');">Add first.last</button-->
+									</td>
+								</tr>
+								<tr>
+									<td><input type="radio" class="matchBootstrap" id="otherEmailRad" name="email" value="_other" checked></td>
+									<td class="wide">
+										<table>
+											<tr>
+												<td>
+													<button class="matchBootstrap" onclick="return addFirstLast('qingyun.liu');">Add first.last</button>
+												</td>
+												<td>
+													<input class="wide" type="text" id="otherEmailTxt" name="otherEmail" placeholder="Other or leave blank" maxlength="63" size="63" oninput="onOtherEmailChanged(this);">
+												</td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr id="spacerRow">
+						<td class="rowlabel">&nbsp;</td>
+						<td class="info">&nbsp;</td>
+					</tr>
+					<tr id="institutionRow">
+						<td class="rowlabel">Institution:</td>
+						<td class="info">
+							<table class="info">
+								<tr>
+									<td><input type="radio" class="matchText" name="institution" value="Rice University"></td>
+									<td class="wide">Rice University</td>
+								</tr>
+								<tr>
+									<td><input type="radio" class="matchSelect" id="selectInstitutionRad" name="institution" value="_selectInstitution"></td>
+									<td class="wide">
+										<select class="wide selectpicker" id="selectInstitution" onchange="onInstitutionChanged(this);" name="selectInstitution" data-live-search="true">
+											<option>ACE Institute of Technology</option>
+											<option>ASA Institute of Business and Computer Technology</option>
+											<option>Abcott Institute</option>
+											<option>Abilene Christian University</option>
+											<option>Abraham Lincoln University</option>
+											<option>Acacia University</option>
+											<option>Access Institute</option>
+											<option>Access International Business Institute</option>
+											<option>Adams State University</option>
+											<option>Adelphi University</option>
+											<option>Adler University</option>
+											<option>Adrian Dominican Montessori Teacher Education Institute</option>
+											<option>Advance Science Institute</option>
+											<option>Advanced Computing Institute</option>
+											<option>Advanced Technology Institute</option>
+											<option>Advanced Training Institute</option>
+											<option>Agape English Language Institute for Internationals</option>
+											<option>Air Force Institute of Technology</option>
+											<option>Air University</option>
+											<option>Air University Extension Course Program</option>
+											<option>Akron Machining Institute Inc</option>
+											<option>Alabama A & M University</option>
+											<option>Alabama State University</option>
+											<option>Alaska Pacific University</option>
+											<option>Albany State University</option>
+											<option>Alcorn State University</option>
+											<option>Alderson Broaddus University</option>
+											<option>Alfred University</option>
+											<option>Allen University</option>
+											<option>Alliant International University</option>
+											<option>Allied American University</option>
+											<option>Alpha Institute of the Treasure Coast</option>
+											<option>Alvernia University</option>
+											<option>Amberton University</option>
+											<option>America Evangelical University</option>
+											<option>American Academy McAllister Institute of Funeral Services</option>
+											<option>American Advanced Institute of Technology</option>
+											<option>American Advanced Technicians Institute</option>
+											<option>American Business and Technology University</option>
+											<option>American Comedy Institute</option>
+											<option>American English Institute</option>
+											<option>American Graduate University</option>
+											<option>American Institute</option>
+											<option>American Institute - Lauderdale Lakes</option>
+											<option>American Institute for Paralegal</option>
+											<option>American Institute of Applied Science</option>
+											<option>American Institute of Baking</option>
+											<option>American Institute of Interior Design</option>
+											<option>American Institute of Pharmaceutical Technology</option>
+											<option>American Institute of Technology - Fontana</option>
+											<option>American Institute of Technology - Gardena</option>
+											<option>American Institute of Technology - NV</option>
+											<option>American InterContinental University</option>
+											<option>American Jewish University</option>
+											<option>American Learning Institute</option>
+											<option>American National University</option>
+											<option>American National University - Salem</option>
+											<option>American Pathways University</option>
+											<option>American Professional Institute - Gainesville</option>
+											<option>American Public University System</option>
+											<option>American Scientific Institute</option>
+											<option>American Sentinel University - Aurora</option>
+											<option>American Studies Program</option>
+											<option>American Technical Institute</option>
+											<option>American University</option>
+											<option>American University of Armenia</option>
+											<option>American University of Puerto Rico</option>
+											<option>Amridge University</option>
+											<option>Anaheim University</option>
+											<option>Anderson University</option>
+											<option>Andrews University</option>
+											<option>Andrews University/Dayton</option>
+											<option>Angeles Institute</option>
+											<option>Angelo State University</option>
+											<option>Anthem Institute - Jersey City</option>
+											<option>Anthem Institute - Manhattan</option>
+											<option>Anthem Institute - New Brunswick</option>
+											<option>Anthem Institute - Parsippany</option>
+											<option>Antioch University</option>
+											<option>Antonelli Institute</option>
+											<option>Apollos University</option>
+											<option>Appalachian State University</option>
+											<option>Arcadia University</option>
+											<option>Argosy University - Orange County Campus</option>
+											<option>Arizona Christian University</option>
+											<option>Arizona Culinary Institute</option>
+											<option>Arizona State University</option>
+											<option>Arkansas State University</option>
+											<option>Arkansas State University - Beebe</option>
+											<option>Arkansas State University - Newport</option>
+											<option>Arkansas State University Mountain Home</option>
+											<option>Arkansas Tech University</option>
+											<option>Arkansas Valley Technical Institute of Arkansas Tech University</option>
+											<option>Armstrong State University</option>
+											<option>Army Institute for Professional Development U.S. Training Ar</option>
+											<option>Art Institute of Cincinnati</option>
+											<option>Art Institute of Ohio - Cincinnati</option>
+											<option>Asbury University</option>
+											<option>Ashford University</option>
+											<option>Ashford University Online</option>
+											<option>Ashland University</option>
+											<option>Aspen University</option>
+											<option>Astar Education Institute</option>
+											<option>Atelier Esthetique Institute of Esthetics</option>
+											<option>Athens State University</option>
+											<option>Atlanta English Institute</option>
+											<option>Atlanta Institute of Music</option>
+											<option>Atlantic University</option>
+											<option>Atlantic University College</option>
+											<option>Atlantis University</option>
+											<option>Auburn University Main Campus</option>
+											<option>Auburn University-Montgomery</option>
+											<option>Audio Recording Technology Institute</option>
+											<option>Augusta State University</option>
+											<option>Aurora University</option>
+											<option>Austin Peay State University</option>
+											<option>Ave Maria University</option>
+											<option>Aveda Frederic's Institute</option>
+											<option>Aveda Institute</option>
+											<option>Aveda Institute - Boise</option>
+											<option>Aveda Institute - Corpus Christi</option>
+											<option>Aveda Institute - Covington</option>
+											<option>Aveda Institute Birmingham</option>
+											<option>Aveda Institute Chapel Hill</option>
+											<option>Aveda Institute Denver</option>
+											<option>Aveda Institute Des Moines</option>
+											<option>Aveda Institute Lafayette</option>
+											<option>Aveda Institute Las Vegas</option>
+											<option>Aveda Institute New York</option>
+											<option>Aveda Institute Portland</option>
+											<option>Aveda Institute Provo</option>
+											<option>Aveda Institute Rhode Island</option>
+											<option>Aveda Institute South Florida</option>
+											<option>Aveda Institute Tallahassee</option>
+											<option>Aveda Institute Tucson</option>
+											<option>Aveda Institute Twin Falls</option>
+											<option>Aveda Institute of Columbus</option>
+											<option>Aveda Institute-Baton Rouge</option>
+											<option>Aveda Institute-Houston</option>
+											<option>Avenue Five Institute</option>
+											<option>Averett University</option>
+											<option>Aviation Institute of Maintenance - Atlanta</option>
+											<option>Aviation Institute of Maintenance - Chesapeake</option>
+											<option>Aviation Institute of Maintenance - Dallas</option>
+											<option>Aviation Institute of Maintenance - Houston</option>
+											<option>Aviation Institute of Maintenance - Indianapolis</option>
+											<option>Aviation Institute of Maintenance - Kansas City</option>
+											<option>Aviation Institute of Maintenance - Manassas</option>
+											<option>Aviation Institute of Maintenance - Orlando</option>
+											<option>Aviation Institute of Maintenance - Philadelphia</option>
+											<option>Avila University</option>
+											<option>Avtech Institute of Technology</option>
+											<option>Azusa Pacific Online University</option>
+											<option>Azusa Pacific University</option>
+											<option>B.H. Carroll Theological Institute</option>
+											<option>BMSI Institute</option>
+											<option>Babel University Professional School of Translation</option>
+											<option>Baker University</option>
+											<option>Bakke Graduate University</option>
+											<option>Ball State University</option>
+											<option>Baltimore Hebrew University Inc</option>
+											<option>Banner Institute</option>
+											<option>Baptist University of the Americas</option>
+											<option>Barry University</option>
+											<option>Baruch College of the City University of New York</option>
+											<option>Bascom Palmer Eye Institute Residency in Ocular Disease</option>
+											<option>Bastyr University</option>
+											<option>Baylor University</option>
+											<option>Beacon University</option>
+											<option>Belhaven University</option>
+											<option>Bellarmine University</option>
+											<option>Bellasa Professional Institute</option>
+											<option>Bellevue University</option>
+											<option>Belmont University</option>
+											<option>Bemidji State University</option>
+											<option>Benedictine University</option>
+											<option>Benjamin Franklin Institute of Technology</option>
+											<option>Bentley University</option>
+											<option>Berdan Institute</option>
+											<option>Berean Institute</option>
+											<option>Bergin University of Canine Studies</option>
+											<option>Berkel Training Institute</option>
+											<option>Berks Technical Institute</option>
+											<option>Beth Hamedrash Shaarei Yosher Institute</option>
+											<option>Bethany Global University</option>
+											<option>Bethany University</option>
+											<option>Bethel House Training Institute</option>
+											<option>Bethel University</option>
+											<option>Bethesda University</option>
+											<option>Bethune - Cookman University</option>
+											<option>Beulah Heights University</option>
+											<option>Big Sky Somatic Institute</option>
+											<option>Bilingual Education Institute</option>
+											<option>Bio Kosmetique Institute of Aesthetics</option>
+											<option>Bio-Chi Institute</option>
+											<option>Biola University</option>
+											<option>Black Hills State University</option>
+											<option>Blanton-Peale Institute</option>
+											<option>Bloomsburg University of Pennsylvania</option>
+											<option>Bluffton University</option>
+											<option>Bob Jones University</option>
+											<option>Boise State University</option>
+											<option>Border Institute of Technology</option>
+											<option>Boston University</option>
+											<option>Bowie State University</option>
+											<option>Bowling Green State University</option>
+											<option>Bradley University</option>
+											<option>Brandeis University</option>
+											<option>Brandman University</option>
+											<option>Brenau University</option>
+											<option>Brescia University</option>
+											<option>Briar Cliff University</option>
+											<option>Brick Computer Science Institute</option>
+											<option>Bridgewater State University</option>
+											<option>Brigham Young University</option>
+											<option>Brigham Young University - Hawaii</option>
+											<option>Brigham Young University - Idaho</option>
+											<option>Bristol University</option>
+											<option>Brite Divinity School of Texas Christian University</option>
+											<option>Broadcasting Institute of Maryland</option>
+											<option>Broadview University - Layton</option>
+											<option>Broadview University - Orem</option>
+											<option>Broadview University - West Jordan</option>
+											<option>Brooklyn College of the City University of New York</option>
+											<option>Brooklyn Institute of Business Technology</option>
+											<option>Brooks Institute - Ventura</option>
+											<option>Brookside Business and Technical Institute</option>
+											<option>Brown Aveda Institute</option>
+											<option>Brown University</option>
+											<option>Bryan University</option>
+											<option>Bryan University at Springfield</option>
+											<option>Bryant University</option>
+											<option>Bucknell University</option>
+											<option>Buena Vista University</option>
+											<option>Burlington County Institute of Technology</option>
+											<option>Business Skills Institute - El Paso</option>
+											<option>Business Skills Institute</option>
+											<option>Business Skills Institute-Las Cruces</option>
+											<option>Butler University</option>
+											<option>CALC Institute of Technology</option>
+											<option>CDA Technical Institute</option>
+											<option>Cairn University</option>
+											<option>Cal America Education Institute</option>
+											<option>Caldwell University</option>
+											<option>Caliber Training Institute</option>
+											<option>California Baptist University</option>
+											<option>California Coast University</option>
+											<option>California Institute of Advanced Management</option>
+											<option>California Institute of Technology</option>
+											<option>California Intercontinental University</option>
+											<option>California International Business University</option>
+											<option>California Lutheran University</option>
+											<option>California Miramar University</option>
+											<option>California National University for Advanced Studies</option>
+											<option>California Northstate University</option>
+											<option>California Nurses Educational Institute</option>
+											<option>California Polytechnic State University-San Luis Obispo</option>
+											<option>California Southern University</option>
+											<option>California State Polytechnic University - Pomona</option>
+											<option>California State University - Bakersfield</option>
+											<option>California State University - Channel Islands</option>
+											<option>California State University - Chico</option>
+											<option>California State University - Dominguez Hills</option>
+											<option>California State University - East Bay</option>
+											<option>California State University - Fresno</option>
+											<option>California State University - Fullerton</option>
+											<option>California State University - Long Beach</option>
+											<option>California State University - Los Angeles</option>
+											<option>California State University - Monterey Bay</option>
+											<option>California State University - Northridge</option>
+											<option>California State University - Sacramento</option>
+											<option>California State University - San Bernardino</option>
+											<option>California State University - San Marcos</option>
+											<option>California State University - Stanislaus</option>
+											<option>California University of Management and Sciences</option>
+											<option>California University of Management and Sciences Virginia</option>
+											<option>California University of Pennsylvania</option>
+											<option>Cambridge Business Institute</option>
+											<option>Cambridge Technical Institute</option>
+											<option>Cameron University</option>
+											<option>Campbell University</option>
+											<option>Campbellsville University</option>
+											<option>Cannon Institute of Higher Learning</option>
+											<option>Cape Coral Institute of Technology</option>
+											<option>Cape May County Technical Institute</option>
+											<option>Capella University</option>
+											<option>Capilo Institute</option>
+											<option>Capital Education Institute</option>
+											<option>Capital University</option>
+											<option>Capitol Technology University</option>
+											<option>Cardean University</option>
+											<option>Cardiac & Vascular Institute of Ultrasound</option>
+											<option>Cardinal Stritch University</option>
+											<option>Carib Technological Institute</option>
+											<option>Caribbean University - Bayamon</option>
+											<option>Carlos Albizu University</option>
+											<option>Carlow University</option>
+											<option>Carnegie Institute</option>
+											<option>Carnegie Mellon University</option>
+											<option>Carroll University</option>
+											<option>Carson-Newman University</option>
+											<option>Casal Aveda Institute</option>
+											<option>Case Western Reserve University</option>
+											<option>Caspari Montessori Institute International</option>
+											<option>Catherine Hinds Institute of Esthetics</option>
+											<option>Catholic Distance University</option>
+											<option>Catholic University of America</option>
+											<option>Cedarville University</option>
+											<option>Centinela Desert Institute</option>
+											<option>Central Connecticut State University</option>
+											<option>Central Florida Institute - Palm Harbor</option>
+											<option>Central Methodist University</option>
+											<option>Central Michigan University</option>
+											<option>Central Pennsylvania Institute of Science and Technology</option>
+											<option>Central State University</option>
+											<option>Central Washington University</option>
+											<option>Centura Institute</option>
+											<option>Chaminade University of Honolulu</option>
+											<option>Chancellor University</option>
+											<option>Chapman University</option>
+											<option>Charleston Southern University</option>
+											<option>Chatham University</option>
+											<option>Cheyney University of Pennsylvania</option>
+											<option>Chicago ORT Technical Institute</option>
+											<option>Chicago State University</option>
+											<option>Childcare Education Institute</option>
+											<option>Children's Institute</option>
+											<option>Chowan University</option>
+											<option>Christian Brothers University</option>
+											<option>Christopher Newport University</option>
+											<option>Cincinnati Christian University</option>
+											<option>Cincinnati Eye Institute Residency in Ocular Disease</option>
+											<option>Cinta Aveda Institute</option>
+											<option>City College of New York of the City University of New York</option>
+											<option>City University of Seattle</option>
+											<option>City Vision University</option>
+											<option>Claflin University</option>
+											<option>Claremont Graduate University</option>
+											<option>Claremont Lincoln University</option>
+											<option>Clarion University of Pennsylvania</option>
+											<option>Clark Atlanta University</option>
+											<option>Clark University</option>
+											<option>Clarke University</option>
+											<option>Clarkson University</option>
+											<option>Clayton  State University</option>
+											<option>Cleary University</option>
+											<option>Clemson University</option>
+											<option>Cleveland Institute of Art</option>
+											<option>Cleveland Institute of Electronics</option>
+											<option>Cleveland Institute of Music</option>
+											<option>Cleveland State University</option>
+											<option>Cleveland University-Kansas City</option>
+											<option>Coastal Carolina University</option>
+											<option>Coleman University</option>
+											<option>Colgate University</option>
+											<option>College of Staten Island of the City University of New York</option>
+											<option>Colorado Christian University</option>
+											<option>Colorado Heights University</option>
+											<option>Colorado Mesa University</option>
+											<option>Colorado State University</option>
+											<option>Colorado State University - Global Campus</option>
+											<option>Colorado State University - Pueblo</option>
+											<option>Colorado Technical University</option>
+											<option>Columbia Central University</option>
+											<option>Columbia International University</option>
+											<option>Columbia Southern University</option>
+											<option>Columbia University in the City of New York</option>
+											<option>Columbus State University</option>
+											<option>Com-Tec Institute</option>
+											<option>Commonwealth Institute of Funeral Service</option>
+											<option>Commonwealth Technical Institute</option>
+											<option>Computer Institute of Technology</option>
+											<option>Computer Systems Institute</option>
+											<option>Computer Systems Institute - Gurnee</option>
+											<option>Computer Tutor Business and Technical Institute</option>
+											<option>Concord University</option>
+											<option>Concordia University</option>
+											<option>Concordia University Chicago</option>
+											<option>Concordia University Wisconsin</option>
+											<option>Concordia University at Austin</option>
+											<option>Concordia University</option>
+											<option>Connect English Language Institute</option>
+											<option>Cope Institute</option>
+											<option>Coppin State University</option>
+											<option>Corban University</option>
+											<option>Core Institute</option>
+											<option>Cornell University</option>
+											<option>Cornerstone University</option>
+											<option>Cortiva Institute - Boston</option>
+											<option>Cortiva Institute - Chicago</option>
+											<option>Cortiva Institute - Scottsdale</option>
+											<option>Cortiva Institute - Seattle</option>
+											<option>Cortiva Institute-Colorado</option>
+											<option>Court Reporting Institute</option>
+											<option>Court Reporting Institute - Seattle</option>
+											<option>Court Reporting Institute of Louisiana</option>
+											<option>Court Reporting Institute of St. Louis</option>
+											<option>Creighton University</option>
+											<option>Creighton University School of Dentistry Predoctoral Internship</option>
+											<option>Culinary Institute Alain and Marie LeNotre</option>
+											<option>Culinary Institute of America</option>
+											<option>Cumberland University</option>
+											<option>Curtis Institute of Music</option>
+											<option>Cybertex Institute of Technology</option>
+											<option>D'Mart Institute</option>
+											<option>D'Mart Institute - Corozal</option>
+											<option>D'Mart Institute - Ponce</option>
+											<option>D'Mart Institute - Vega Alta</option>
+											<option>Dakota State University</option>
+											<option>Dakota Wesleyan University</option>
+											<option>Dallas Baptist University</option>
+											<option>Dallas Institute of Funeral Service</option>
+											<option>Davenport University</option>
+											<option>DePaul University</option>
+											<option>DePauw University</option>
+											<option>DeSales University</option>
+											<option>DeVry University</option>
+											<option>Dean Institute of Technology</option>
+											<option>Defense Acquisition University</option>
+											<option>Defense Contract Audit Institute</option>
+											<option>Defense Equal Opportunity Management Institute</option>
+											<option>Defense Institute of Security Assistance Management</option>
+											<option>Defense Language Institute</option>
+											<option>Delaware Institute for Montessori Education</option>
+											<option>Delaware Valley University</option>
+											<option>Delta State University</option>
+											<option>Denison University</option>
+											<option>Denver Family Institute</option>
+											<option>Detroit Business Institute - Downriver</option>
+											<option>Dewey University - Hato Rey Campus</option>
+											<option>Dialysis Training Institute</option>
+											<option>Dickinson State University</option>
+											<option>DigiPen Institute of Technology</option>
+											<option>Dillard University</option>
+											<option>Diman Regional Technical Institute</option>
+											<option>Divers Institute of Technology</option>
+											<option>Divine Mercy University</option>
+											<option>Dolphin Technical Institute</option>
+											<option>Dominican University</option>
+											<option>Dominican University of California</option>
+											<option>Don Bosco Technical Institute</option>
+											<option>Dongguk University - Los Angeles</option>
+											<option>Douglas J Aveda Institute</option>
+											<option>Douglas J Aveda Institute Chicago</option>
+											<option>Drake University</option>
+											<option>Drew University</option>
+											<option>Drexel University</option>
+											<option>Drury University</option>
+											<option>Duke University</option>
+											<option>Duluth Business University</option>
+											<option>Dunlap-Stone University</option>
+											<option>Duquesne University</option>
+											<option>E.B. Cape Center - Corporate University</option>
+											<option>EC-Council University</option>
+											<option>ECPI University</option>
+											<option>ESL Program</option>
+											<option>EUCON International University</option>
+											<option>East Carolina University</option>
+											<option>East Central University</option>
+											<option>East Stroudsburg University of Pennsylvania</option>
+											<option>East Tennessee State University</option>
+											<option>East Texas Baptist University</option>
+											<option>East Valley Institute of Technology</option>
+											<option>East-West University</option>
+											<option>Eastern Connecticut State University</option>
+											<option>Eastern Illinois University</option>
+											<option>Eastern Kentucky University</option>
+											<option>Eastern Mennonite University</option>
+											<option>Eastern Michigan University</option>
+											<option>Eastern New Mexico University</option>
+											<option>Eastern New Mexico University - Roswell</option>
+											<option>Eastern Oregon University</option>
+											<option>Eastern University</option>
+											<option>Eastern Washington University</option>
+											<option>Ecumenical Institute for CPE</option>
+											<option>Edinboro University of Pennsylvania</option>
+											<option>Education and Technology Institute</option>
+											<option>Elim Bible Institute and College</option>
+											<option>Elite Language Institute</option>
+											<option>Elizabeth City State University</option>
+											<option>Ellis University</option>
+											<option>Elmira Business Institute</option>
+											<option>Elon University</option>
+											<option>Embry-Riddle Aeronautical University - Daytona Beach</option>
+											<option>Emerging Technologies Institute</option>
+											<option>Emory University</option>
+											<option>Empire State University</option>
+											<option>Emporia State University</option>
+											<option>English Language Institute</option>
+											<option>English Language and Culture Institute</option>
+											<option>English Studies Institute</option>
+											<option>English as a Second Language Services</option>
+											<option>English as a Second Language at Troy University</option>
+											<option>Environmental Technical Institute</option>
+											<option>Erie Institute of Technology Inc</option>
+											<option>Erikson Institute</option>
+											<option>Estelle Skin Care and Spa Institute</option>
+											<option>Esthetics Institute at Concord Academy</option>
+											<option>Evangel University</option>
+											<option>Evangelia University</option>
+											<option>Everblue Training Institute</option>
+											<option>Everest Institute</option>
+											<option>Everest Institute - Atlanta Downtown</option>
+											<option>Everest Institute - Brighton</option>
+											<option>Everest Institute - Cross Lanes</option>
+											<option>Everest Institute - Eagan</option>
+											<option>Everest Institute - Grand Rapids</option>
+											<option>Everest Institute - Hayward</option>
+											<option>Everest Institute - Pittsburgh</option>
+											<option>Everest Institute - Rochester</option>
+											<option>Everest Institute - San Antonio</option>
+											<option>Everest Institute - San Francisco</option>
+											<option>Everest Institute - San Jose</option>
+											<option>Everest Institute - South Plainfield</option>
+											<option>Everest Institute - Southfield</option>
+											<option>Everest University - North Orlando</option>
+											<option>Everest University Online - Tampa</option>
+											<option>Everglades University</option>
+											<option>Everglades University - Orlando</option>
+											<option>FLS International St. Peter's University</option>
+											<option>Fairfield University</option>
+											<option>Fairleigh Dickinson University</option>
+											<option>Fairmont State University</option>
+											<option>Fashion Institute of Technology</option>
+											<option>Faulkner University</option>
+											<option>Fayette Institute of Technology</option>
+											<option>Fayetteville State University</option>
+											<option>Ferris State University</option>
+											<option>Fielding Graduate University</option>
+											<option>Finishing Trades Institute of the Mid-Atlantic Region</option>
+											<option>Finishing Trades Institute of the Upper Midwest</option>
+											<option>Finlandia University</option>
+											<option>First Institute Inc</option>
+											<option>First Institute Inc - Aurora</option>
+											<option>Fisk University</option>
+											<option>Fitchburg State University</option>
+											<option>Florida Agricultural and Mechanical University</option>
+											<option>Florida Atlantic University</option>
+											<option>Florida Education Institute</option>
+											<option>Florida English Language Institute</option>
+											<option>Florida Gulf Coast University</option>
+											<option>Florida Institute of Montessori Studies</option>
+											<option>Florida Institute of Recording</option>
+											<option>Florida Institute of Technology-Melbourne</option>
+											<option>Florida International Training Institute</option>
+											<option>Florida International University</option>
+											<option>Florida Memorial University</option>
+											<option>Florida National University</option>
+											<option>Florida State University</option>
+											<option>Florida Vocational Institute</option>
+											<option>Focus Personal Training Institute</option>
+											<option>Fontbonne University</option>
+											<option>Fordham University</option>
+											<option>Forest Institute of Professional Psychology</option>
+											<option>Fort Hays State University</option>
+											<option>Fort Myers Institute of Technology</option>
+											<option>Fort Valley State University</option>
+											<option>Fortis Institute - Baltimore</option>
+											<option>Fortis Institute - Cookeville</option>
+											<option>Fortis Institute - Erie</option>
+											<option>Fortis Institute - Forty Fort</option>
+											<option>Fortis Institute - Mulberry</option>
+											<option>Fortis Institute - Scranton</option>
+											<option>Fortis Institute - Towson</option>
+											<option>Framingham State University</option>
+											<option>Francis Marion University</option>
+											<option>Franciscan University of Steubenville</option>
+											<option>Franklin Pierce University</option>
+											<option>Franklin University</option>
+											<option>Freed-Hardeman University</option>
+											<option>French Culinary Institute</option>
+											<option>Fresno Pacific University</option>
+											<option>Friends University</option>
+											<option>Frostburg State University</option>
+											<option>Full Sail University</option>
+											<option>Furman University</option>
+											<option>Future Tech Institute</option>
+											<option>GDS Institute</option>
+											<option>GECAC Training Institute</option>
+											<option>Gadsden Technical Institute</option>
+											<option>Gallaudet University</option>
+											<option>Gannon University</option>
+											<option>Garden State Science and Technology Institute</option>
+											<option>Gardner-Webb University</option>
+											<option>Gary Manuel Aveda Institute</option>
+											<option>Gemological Institute of America-Los Angeles</option>
+											<option>Gemological Institute of America-New York</option>
+											<option>George Fox University</option>
+											<option>George Mason University</option>
+											<option>George Mason University Psychology Internship</option>
+											<option>George Washington University</option>
+											<option>Georgetown University</option>
+											<option>Georgia Christian University</option>
+											<option>Georgia College and State University</option>
+											<option>Georgia Institute of Technology - Main Campus</option>
+											<option>Georgia Regents University</option>
+											<option>Georgia Southern University</option>
+											<option>Georgia Southwestern State University</option>
+											<option>Georgia State University</option>
+											<option>Georgian Court University</option>
+											<option>Global Business Institute - Far Rockaway</option>
+											<option>Global Institute</option>
+											<option>Global Language Institute at College of St. Scholastica</option>
+											<option>Global University</option>
+											<option>Globe Institute of Technology</option>
+											<option>Globe University</option>
+											<option>Globelle Technical Institute</option>
+											<option>Golden Gate University-San Francisco</option>
+											<option>Golden State University</option>
+											<option>Gonzaga University</option>
+											<option>Governors State University</option>
+											<option>Grace Mission University</option>
+											<option>Grace University</option>
+											<option>Graceland University</option>
+											<option>Graduate Institute of Applied Linguistics</option>
+											<option>Grambling State University</option>
+											<option>Grand Canyon University</option>
+											<option>Grand Valley State University</option>
+											<option>Grand View University</option>
+											<option>Grantham University</option>
+											<option>Great Lakes Institute of Technology</option>
+											<option>Gwynedd Mercy University</option>
+											<option>HARDI Home Study Institute</option>
+											<option>HRDE-Stanley Technical Institute - Hinton</option>
+											<option>HRDE-Stanley Technical Institute - Morgantown</option>
+											<option>HRDE-Stanley Technical Institute - Parkersburg</option>
+											<option>HVAC Technical Institute</option>
+											<option>Hadley Institute for the Blind and Visually Impaired</option>
+											<option>Hallmark Institute of Photography</option>
+											<option>Hallmark University</option>
+											<option>Hallmark University-College of Aeronautics</option>
+											<option>Hamline University</option>
+											<option>Hampton University</option>
+											<option>Hannibal-LaGrange University</option>
+											<option>Hardin-Simmons University</option>
+											<option>Harding University</option>
+											<option>Harris-Stowe State University</option>
+											<option>Harrisburg University of Science and Technology</option>
+											<option>Harrison Middleton University</option>
+											<option>Harvard University</option>
+											<option>Harvest English Institute - Long Branch</option>
+											<option>Harvest English Institute - Newark</option>
+											<option>Haskell Indian Nations University</option>
+											<option>Hawaii Pacific University</option>
+											<option>Hawaii Technology Institute</option>
+											<option>Heartwood Institute</option>
+											<option>Hebrew Union College - Jewish Institute of Religion - New York</option>
+											<option>Heidelberg University</option>
+											<option>Helena College University of Montana</option>
+											<option>Henderson State University</option>
+											<option>Henley-Putnam University</option>
+											<option>Herguan University</option>
+											<option>Heritage Christian University</option>
+											<option>Heritage Institute</option>
+											<option>Heritage Institute - Fort Myers</option>
+											<option>Heritage Institute - Jacksonville</option>
+											<option>Heritage University</option>
+											<option>Herzing University</option>
+											<option>High Point University</option>
+											<option>High-Tech Institute - Atlanta</option>
+											<option>Hodges University</option>
+											<option>Hofstra University</option>
+											<option>Hollins University</option>
+											<option>Holmes Institute</option>
+											<option>Holy Family University</option>
+											<option>Holy Names University</option>
+											<option>Hope International University</option>
+											<option>Hope Montessori Educational Institute</option>
+											<option>Horizon University</option>
+											<option>Hot Rod Institute</option>
+											<option>Houston Baptist University</option>
+											<option>Howard Payne University</option>
+											<option>Howard University</option>
+											<option>Huaqiao Yihu Institute</option>
+											<option>Human Resource Development & Employment - Stanley Technical Institute - Clarksburg</option>
+											<option>Humboldt State University</option>
+											<option>Hunter College of the City University of New York</option>
+											<option>Huntington University</option>
+											<option>Husson University</option>
+											<option>Huston-Tillotson University</option>
+											<option>Hypnosis Motivation Institute</option>
+											<option>ICC Technical Institute</option>
+											<option>IGlobal University</option>
+											<option>IMPAC University</option>
+											<option>INTRAX International Institute</option>
+											<option>ITT Technical Institute - Indianapolis</option>
+											<option>ITT Technical Institute - Spokane Valley</option>
+											<option>Idaho State University</option>
+											<option>Illinois Institute of Technology</option>
+											<option>Illinois State University</option>
+											<option>Illinois Wesleyan University</option>
+											<option>Immaculata University</option>
+											<option>Independence University</option>
+											<option>Indiana Institute of Technology</option>
+											<option>Indiana State University</option>
+											<option>Indiana University - Purdue University Fort Wayne</option>
+											<option>Indiana University - Purdue University Indianapolis</option>
+											<option>Indiana University Bloomington</option>
+											<option>Indiana University East</option>
+											<option>Indiana University Kokomo</option>
+											<option>Indiana University Northwest</option>
+											<option>Indiana University South Bend</option>
+											<option>Indiana University Southeast</option>
+											<option>Indiana University of Pennsylvania</option>
+											<option>Indiana Wesleyan University</option>
+											<option>Industrial Management & Training Institute</option>
+											<option>Innovative Detective Institute</option>
+											<option>Institute for Advanced Montessori Studies</option>
+											<option>Institute for Clinical Social Work</option>
+											<option>Institute for Guided Studies</option>
+											<option>Institute for Media and Entertainment</option>
+											<option>Institute for Multicultural Counseling and Education Services</option>
+											<option>Institute of Intensive English</option>
+											<option>Institute of Intensive English</option>
+											<option>Institute of Paper Science and Technology</option>
+											<option>Institute of Production and Recording</option>
+											<option>Institute of Taoist Education & Acupuncture</option>
+											<option>Institute of Technology - Redding</option>
+											<option>Institute of Technology - Salem</option>
+											<option>Institute of Technology - Tampa</option>
+											<option>Institute of Technology Inc</option>
+											<option>Institute of Ultrasound Diagnostics</option>
+											<option>Intensive English Program</option>
+											<option>Intensive English Program</option>
+											<option>Inter American University of Puerto Rico Aguadilla</option>
+											<option>Inter American University of Puerto Rico Arecibo</option>
+											<option>Inter American University of Puerto Rico Barranquitas</option>
+											<option>Inter American University of Puerto Rico Bayamon</option>
+											<option>Inter American University of Puerto Rico Fajardo</option>
+											<option>Inter American University of Puerto Rico Guayama</option>
+											<option>Inter American University of Puerto Rico Metropolitan Campus</option>
+											<option>Inter American University of Puerto Rico Ponce</option>
+											<option>Inter American University of Puerto Rico San German</option>
+											<option>Inter-American Institute for Social Development</option>
+											<option>InterAmerican Technical Institute</option>
+											<option>Interboro Institute</option>
+											<option>Intercultural Institute of California</option>
+											<option>International Christian Institute and Linguistics School</option>
+											<option>International Diving Institute</option>
+											<option>International English Institute</option>
+											<option>International Import-Export Institute</option>
+											<option>International Institute for Restorative Practices</option>
+											<option>International Institute of the Americas</option>
+											<option>International Language Institute of Massachusetts</option>
+											<option>International Polytechnic Institute</option>
+											<option>International Technological University</option>
+											<option>Iowa State University</option>
+											<option>Irene's Myomassology Institute</option>
+											<option>Irish American University</option>
+											<option>Island Drafting and Technical Institute</option>
+											<option>Iverson Institute</option>
+											<option>Jackson State University</option>
+											<option>Jacksonville State University</option>
+											<option>Jacksonville University</option>
+											<option>James Madison University</option>
+											<option>James Rumsey Technical Institute</option>
+											<option>Jay's Technical Institute</option>
+											<option>Jean Madeline Aveda Institute</option>
+											<option>John Brown University</option>
+											<option>John Carroll University</option>
+											<option>John F Kennedy University</option>
+											<option>John Jay College of Criminal Justice of the City University of New York</option>
+											<option>John L. Gildner Regional Institute for Children and Adolescents</option>
+											<option>John Paul the Great Catholic University</option>
+											<option>John Zink Institute</option>
+											<option>Johns Hopkins University</option>
+											<option>Johnson & Wales University</option>
+											<option>Johnson & Wales University - Charlotte</option>
+											<option>Johnson & Wales University - Denver</option>
+											<option>Johnson & Wales University - North Miami</option>
+											<option>Johnson C Smith University</option>
+											<option>Johnson University</option>
+											<option>Joint Special Operations University</option>
+											<option>Jones International University</option>
+											<option>Jose Maria Vargas University</option>
+											<option>Judson University</option>
+											<option>Kansas State University</option>
+											<option>Kansas Wesleyan University</option>
+											<option>Kaplan University</option>
+											<option>Kaplan University - Frederick</option>
+											<option>Kean University</option>
+											<option>Keck Graduate Institute</option>
+											<option>Keiser University</option>
+											<option>Kennesaw State University</option>
+											<option>Kent State University</option>
+											<option>Kentucky Christian University</option>
+											<option>Kentucky State University</option>
+											<option>Kettering University</option>
+											<option>Keystone Technical Institute</option>
+											<option>King University</option>
+											<option>Kings Park University</option>
+											<option>Kingston University</option>
+											<option>Knowledge Systems Institute</option>
+											<option>Kona University</option>
+											<option>Kussad Institute of Court Reporting</option>
+											<option>Kutztown University of Pennsylvania</option>
+											<option>La Salle University</option>
+											<option>La Sierra University</option>
+											<option>Laban/Bartenieff Institute of Movement Studies</option>
+											<option>Lake Area Technical Institute</option>
+											<option>Lake Superior State University</option>
+											<option>Lake Washington Institute of Technology</option>
+											<option>Lamar Institute of Technology</option>
+											<option>Lamar University</option>
+											<option>Lambuth University</option>
+											<option>Lamson Institute</option>
+											<option>Lander University</option>
+											<option>Langston University</option>
+											<option>Laurel Business Institute</option>
+											<option>Laurel Technical Institute - Sharon</option>
+											<option>Laurel University</option>
+											<option>Laurus Technical Institute</option>
+											<option>Laurus Technical Institute - Jonesboro</option>
+											<option>Lawrence Technological University</option>
+											<option>Lawrence University</option>
+											<option>LeTourneau University</option>
+											<option>Leadership Institute</option>
+											<option>Leadership Training Institute Dale Carnegie Training</option>
+											<option>Learning Institute of Texas</option>
+											<option>Lee Professional Institute</option>
+											<option>Lee Strasberg Theatre & Film Institute</option>
+											<option>Lee Strasberg Theatre and Film Institute</option>
+											<option>Lee University</option>
+											<option>Lehigh University</option>
+											<option>Lehman College of the City University of New York</option>
+											<option>Lenoir-Rhyne University</option>
+											<option>Lesley University</option>
+											<option>Lewis University</option>
+											<option>Lia Schorr Institute of Cosmetic Skin Care</option>
+											<option>Liberty Training Institute</option>
+											<option>Liberty University</option>
+											<option>Life University</option>
+											<option>Limon Institute</option>
+											<option>Lincoln Christian University</option>
+											<option>Lincoln Memorial University</option>
+											<option>Lincoln Technical Institute</option>
+											<option>Lincoln Technical Institute - Cromwell</option>
+											<option>Lincoln Technical Institute - East Windsor</option>
+											<option>Lincoln Technical Institute - Edison</option>
+											<option>Lincoln Technical Institute - Fern Park</option>
+											<option>Lincoln Technical Institute - Hamden</option>
+											<option>Lincoln Technical Institute - Hartford</option>
+											<option>Lincoln Technical Institute - New Britain</option>
+											<option>Lincoln Technical Institute - Shelton</option>
+											<option>Lincoln Technical Institute - South Plainfield</option>
+											<option>Lincoln Technical Institute - Whitestone Queens</option>
+											<option>Lincoln University</option>
+											<option>Lincoln University of Pennsylvania</option>
+											<option>Lindenwood University</option>
+											<option>Links English Language Institute</option>
+											<option>Lipscomb University</option>
+											<option>Lock Haven University of Pennsylvania</option>
+											<option>Logan University</option>
+											<option>Loma Linda University</option>
+											<option>Loma Linda University School of Dentistry Predoctoral Internship</option>
+											<option>Long Island Business Institute - Flushing</option>
+											<option>Long Island Nail and Skin Care Institute</option>
+											<option>Long Island University - C W Post Campus</option>
+											<option>Long Island University/C.W. Post Campus Dietetic Internship</option>
+											<option>Longwood University</option>
+											<option>Lorenzo Walker Institute of Technology</option>
+											<option>Louisiana Culinary Institute</option>
+											<option>Louisiana State University and A&M College</option>
+											<option>Louisiana State University at Alexandria</option>
+											<option>Louisiana State University at Eunice</option>
+											<option>Louisiana State University at Shreveport</option>
+											<option>Louisiana Tech University</option>
+											<option>Lourdes University</option>
+											<option>Loyola Marymount University</option>
+											<option>Loyola University Maryland</option>
+											<option>Loyola University New Orleans</option>
+											<option>Loyola University of Chicago</option>
+											<option>Lubbock Christian University</option>
+											<option>Lynn University</option>
+											<option>MBTI Business Training Institute</option>
+											<option>MCI Institute of Technology</option>
+											<option>Madison Media Institute</option>
+											<option>Madonna University</option>
+											<option>Maharishi University of Management</option>
+											<option>Maine Montessori Institute</option>
+											<option>Malone University</option>
+											<option>Manatee Technical Institute</option>
+											<option>Manchester University</option>
+											<option>Manhattan Institute</option>
+											<option>Manhattan Institute of Management</option>
+											<option>Mansfield University of Pennsylvania</option>
+											<option>Marian University</option>
+											<option>Marine Corps Institute</option>
+											<option>Marine Corps University</option>
+											<option>Maritime Institute</option>
+											<option>Marquette University</option>
+											<option>Marquette University School of Dentistry Advanced Education in General Dentistry 12 Months</option>
+											<option>Marquette University School of Dentistry Predoctoral Internship</option>
+											<option>Mars Hill University</option>
+											<option>Marshall University</option>
+											<option>Marshall University School of Pharmacy</option>
+											<option>Martin University</option>
+											<option>Marycrest International University</option>
+											<option>Maryland Institute College of Art</option>
+											<option>Marylhurst University</option>
+											<option>Marymount California University</option>
+											<option>Marymount College of Fordham University</option>
+											<option>Marymount University</option>
+											<option>Maryville University of Saint Louis</option>
+											<option>Marywood University</option>
+											<option>Marywood University Dietetic Internship</option>
+											<option>Marywood University Distance Education Dietetic Internship</option>
+											<option>Massachusetts Institute of Technology</option>
+											<option>May Institute</option>
+											<option>Mayaguez Institute of Technology</option>
+											<option>Mayville State University</option>
+											<option>McKendree University</option>
+											<option>McMurry University</option>
+											<option>McNeese State University</option>
+											<option>Med-Life Institute</option>
+											<option>Med-Life Institute - Pompano Beach</option>
+											<option>Medgar Evers College of the City University of New York</option>
+											<option>Mediatech Institute</option>
+											<option>Medtech Institute - Falls Church</option>
+											<option>Mentor Language Institute</option>
+											<option>Mercer University</option>
+											<option>Mercyhurst University</option>
+											<option>Meridian Institute</option>
+											<option>Meridian Institute of Surgical Assisting</option>
+											<option>Methodist University</option>
+											<option>Metro Auto Electronics Training Institute</option>
+											<option>Metropolitan Learning Institute</option>
+											<option>Metropolitan State University</option>
+											<option>Metropolitan State University of Denver</option>
+											<option>Miami International University of Art and Design</option>
+											<option>Miami University</option>
+											<option>Michigan Jewish Institute</option>
+											<option>Michigan State University</option>
+											<option>Michigan Technological University</option>
+											<option>Mid-America Christian University</option>
+											<option>Mid-American Montessori Teacher Training Institute</option>
+											<option>Mid-Atlantic Christian University</option>
+											<option>Mid-Continent University</option>
+											<option>MidAmerica Nazarene University</option>
+											<option>Middle Bucks Institute of Technology</option>
+											<option>Middle East Institute</option>
+											<option>Middle Georgia State University</option>
+											<option>Middle Tennessee State University</option>
+											<option>Middle Way Acupuncture Institute</option>
+											<option>Midland University</option>
+											<option>Midway University</option>
+											<option>Midwest Institute - Fenton</option>
+											<option>Midwest Technical Institute</option>
+											<option>Midwest Technical Institute - East Peoria</option>
+											<option>Midwest University</option>
+											<option>Midwestern State University</option>
+											<option>Midwestern University</option>
+											<option>Milan Institute - Palm Desert</option>
+											<option>Milan Institute - San Antonio</option>
+											<option>Milan Institute - Visalia</option>
+											<option>Millennia Atlantic University</option>
+											<option>Millennium Training Institute</option>
+											<option>Millersville University of Pennsylvania</option>
+											<option>Millikin University</option>
+											<option>Milwaukee Institute of Art Design</option>
+											<option>Minneapolis Media Institute</option>
+											<option>Minnesota State University - Mankato</option>
+											<option>Minnesota State University - Moorhead</option>
+											<option>Minot State University</option>
+											<option>Mirrer Yeshiva Central Institute</option>
+											<option>Misericordia University</option>
+											<option>Mississippi State University</option>
+											<option>Mississippi State University Dietetic Internship</option>
+											<option>Mississippi University for Women</option>
+											<option>Mississippi Valley State University</option>
+											<option>Missouri Baptist University</option>
+											<option>Missouri Southern State University</option>
+											<option>Missouri State University</option>
+											<option>Missouri State University - West Plains</option>
+											<option>Missouri University of Science and Technology</option>
+											<option>Missouri Western State University</option>
+											<option>Mitchell Technical Institute</option>
+											<option>Modern Institute of Technology</option>
+											<option>Monmouth University</option>
+											<option>Montana State University - Billings</option>
+											<option>Montana State University - Bozeman</option>
+											<option>Montana State University - Great Falls College of Technology</option>
+											<option>Montana State University - Northern</option>
+											<option>Montana Tech of the University of Montana</option>
+											<option>Montclair State University</option>
+											<option>Montessori Academy Training Institute</option>
+											<option>Montessori Education Institute/Pacific NW</option>
+											<option>Montessori Educational Institute of North America</option>
+											<option>Montessori Institute - New England</option>
+											<option>Montessori Institute Northwest</option>
+											<option>Montessori Institute of Advanced Studies</option>
+											<option>Montessori Institute of Milwaukee</option>
+											<option>Montessori Teacher Education Institute - Houston</option>
+											<option>Montessori Teacher Training Institute</option>
+											<option>Montessori Teacher Training Institute of South Carolina</option>
+											<option>Montessori Teachers Institute</option>
+											<option>Montgomery Montessori Institute</option>
+											<option>Moody Bible Institute</option>
+											<option>More Tech Institute</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td><input type="radio" class="matchBootstrap" id="otherInstitutionRad" name="institution" value="_otherInstitution" checked></td>
+									<td class="wide">
+										<table>
+											<tr>
+												<td class="wide"><input type="text" class="wide" id="otherInstitution" name="otherInstitution" placeholder="Other institution or leave blank" maxlength="255" size="63" oninput="onOtherInstitutionChanged(this);"></td>
+												<td class="diacriticsBootstrap"><button id="repairInstitutionDiacriticsBtn" onclick="return repairDiacritics(this, 'otherInstitution');">Repair Diacritics</button></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr id="departmentRow">
+						<td class="rowlabel matchBootstrap">Department:</td>
+						<td class="info">
+							<table class="info">
+								<tr>
+									<td class="wide">
+										<table>
+											<tr>
+												<td class="wide"><input class="wide" type="text" id="department" name="department" placeholder="Department or leave blank" maxlength="255" size="63"></td>
+												<td class="diacriticsBootstrap"><button id="repairDepartmentDiacriticsBtn" onclick="return repairDiacritics(this, 'department');">Repair Diacritics</button></td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"></td>
+						<td class="info"><button type="button" onclick="addAffiliation();">Add Affiliation</button></td>
+					</tr>
+					<tr>
+						<td class="rowlabel">&nbsp;</td>
+						<td class="info">&nbsp;</td>
+					</tr>
+					<tr>
+						<td class="rowlabel"><input id="submit" type="submit" value="Submit All"></td>
+						<td class="info">&nbsp;</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div class="floater">
+			<h2>Instructions</h2>
+			<ul>
+				<li>Verify by title that you are displaying the correct PDF.</li>
+				<li>If necessary, use the key to find the correct file.</li>
+				<li>Check to see if suggested email, or another one found, is correct.</li>
+				<li>If not, search for '@' in PDF and find correct email.</li>
+				<li>Enter email in Other line or leave blank if none.</li>
+				<li style="color: red;">
+					Be extra careful if the email contains a hyphen which may not paste,
+					especially if it appears at the end of a line.  You may have to manually
+					add it back in after checking that it is indeed required.
+				</li>
+				<li style="color: red;">
+					Some long emails span lines and aren't even hyphenated.  They will
+					sometimes be split at a dot.  In any case, make sure you have the second half.
+				</li>
+				<li>Check to see if one of the suggested institutions is correct.</li>
+				<li>If not, search in the combo box.</li>
+				<li>If still not, paste the correct one into Other line.</li>
+				<li>Find department in paper, copy, and paste.</li>
+				<li>Leave Other line selected but blank for missing affiliations.</li>
+			</ul>
+		</div>
+	</body>
+</html>

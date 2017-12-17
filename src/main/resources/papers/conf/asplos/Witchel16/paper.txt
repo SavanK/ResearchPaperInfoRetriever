@@ -1,0 +1,15 @@
+Programmer Poductivity in a World of Mushy Interfaces: Challenges of the Post-ISA Reality
+Moderator: Emmett Witchel
+The University of Texas at Austin witchel@cs.utexas.edu
+
+Abstract
+Since 1964, we had the notion that the instruction set architecture (ISA) is a useful and fairly opaque abstraction layer between hardware and software. Software rode hardware's performance wave while remaining gloriously oblivious to hardware's growing complexity. Unfortunately, the jig is up. We still have ISAs, but the abstraction no longer offers seamless portability-- parallel software needs to be tuned for different core counts, and heterogeneous processing elements (CPUs, GPUs, accelerators) further complicate programmability. We are better at building large-scale heterogeneous processors than we are at programming them. Maintaining software across multiple current platforms is difficult and porting to future platforms is also difficult. There have been many technical responses: virtual ISAs (e.g., NVIDIA's PTX), higher-level programming interfaces (e.g., CUDA or OpenCL), and latestage compilation and platform-specific tailoring (e.g., Android ART), etc.
+
+A team of opinionated experts, drawn from the three ASPLOS communities will examine the problem of programmer productivity in the post-ISA world, first from the perspective of their area of expertise and then noting the contributions from the other two communities. What research will save us and how? This wideranging debate will frame important research areas for future work while being grounded in frank discussion about what has succeeded in the past. Attendees can expect actionable insight into important research issues as well an entertaining discussion.
+Categories and Subject Descriptors C.0 [Computer Systems Organization]: General; D.3 [Software]: Programming languages; D.4 [Software]: Operating systems
+Keywords Programmer productivity, portability, instruction set architecture
+
+Permission to make digital or hard copies of part or all of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. Copyrights for thirdparty components of this work must be honored. For all other uses, contact the Owner/Author. ASPLOS '16 April 02-06, 2016, Atlanta, GA, USA ACM 978-1-4503-4091-5/16/04. DOI: http://dx.doi.org/10.1145/2872362.2876511
+591
+
+

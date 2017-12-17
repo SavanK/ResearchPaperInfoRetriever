@@ -1,0 +1,101 @@
+key,funding,nsfFunding
+conf/asplos/AbadalCAT16,"This work was supported in part by NSF under grants CCF-1012759, CNS-1116237, and CCF-1536795; by the Catalan Government under grant 2014SGR-1427; and by the Spanish State Ministry of Economy and Competitiveness under grant aid PCIN-2015-012",CCF-1012759 CNS-1116237 CCF-1536795
+conf/asplos/AwadMHSH16,,
+conf/asplos/BornholtKLKTW16,"This work was supported in part by NSF under grant #1064497, by DARPA under contract FA8750-16-2-0032, and by a gift from the VMware University Research Fund.",1064497
+conf/asplos/FanZL16,"This work is supported by NSF grants CCF-1149252 (CAREER), CCF-1337215 (XPS-CLCCA), SHF-1527610, and AF-1408784. This work is also supported by STARnet, a Semiconductor Research Corporation program, sponsored by MARCO and DARPA.",CCF-1149252 CCF-1337215 SHF-1527610 AF-1408784
+conf/asplos/KimKBNW16,"This research was supported by MKE/KEIT (No.10041608, Embedded System Software for New Memory based Smart Devices).",
+conf/asplos/LinCLMHXS16,"This research is supported by Natural Science Foundation of China under Grant No. 61170050, National Science and Technology Major Project of China (2012ZX01039-004),The National High Technology Research and Development Program of China(2015AA011505).",
+conf/asplos/MaoCXS16,"This research is supported by Natural Science Foundation of China under Grant No. 61170050, National Science and Technology Major Project of China (2012ZX01039-004) and the National High Technology Research and Development Program of China (2015AA011505).",
+conf/asplos/McKinley16,,
+conf/asplos/Williams16,,
+conf/asplos/Witchel16,,
+conf/iccad/AbusultanK16,,
+conf/iccad/BatselierCLW16,"This work is supported by the Hong Kong Research Grants Council under General Research Fund (GRF) Project 17212315, and the University Research Committee of The University of Hong Kong.",
+conf/iccad/ChenS16,,
+conf/iccad/HuangLKN16,"We thank a lot for the financial sponsorship to the 2016 CAD Contest from the industry, including Synopsys Taiwan Co., Ltd., Taiwan, Cadence Design Systems Inc., Taiwan, and MediaTek, Inc., Taiwan.",
+conf/iccad/KannanS16,,
+conf/iccad/KuDMRL16,,
+conf/iccad/PattisonAAGV16,,
+conf/iccad/PeanoRGNB16,"We thank the CINECA award under ISCRA (project IsC37), for the availability of HPC resources and support.",
+conf/iccad/SinhaZHRBC16,,
+conf/iccad/Topaloglu16,,
+conf/icml/GaoLZ16,,
+conf/icml/KawakitaT16,This work was partially supported by JSPS KAKENHI Grant Numbers (25870503) and the Okawa Foundation for Information and Telecommunications.,
+conf/icml/MnihR16,,
+conf/icml/NatarajanKRD16,"support of NSF via CCF-1320746 and IIS-1546459, and NIH via R01 GM117594-01 as part of the Joint DMS/NIGMS Initiative to Support Research at the Interface of the Biological and Mathematical Sciences.",CCF-1320746 IIS-1546459
+conf/icml/PuleoM16,"funding from the NSF grants IOS 1339388 and CCF 1527636, 1526875, 1117980. Research of the first author was supported by the IC Postdoctoral Program.",IOS-1339388 CCF-1527636 1526875 1117980
+conf/icml/Shalev-Shwartz16,The work is supported by ICRI-CI and by the European Research Council (TheoryDL project).,
+conf/icml/ShenLX16,"partially supported by NSF-Bigdata- 1419210, NSF-III-1360971 and AFOSR-FA9550-13-1- 0137. The research of H. Xu is partially supported by Agency for Science, Technology and Research (A*STAR) of Singapore through SERC PSF Grant R266000101305.",III-1360971 1419210
+conf/icml/SyrgkanisKS16,,
+conf/icml/XuZCL16,,
+conf/icml/YoonAHS16,supported by Air Force Dynamic Data-Driven Application Systems (DDDAS) Program.,
+conf/imc/AlcockMN16,,
+conf/imc/GhobadiM16,,
+conf/imc/HastingsFH16,"This material is based upon work supported by the National Science Foundation under grants CNS-1513671, CNS-1408734, and a gift from Cisco.",CNS-1513671 CNS-1408734
+conf/imc/KlickLW016,"This work was partly funded by grants from the German Federal Ministry of Education and Research (BMBF Grants No. 16KIS0254, 16KIS0528K).",
+conf/imc/KrencF16,This work was partially supported by Leibniz Price project funds of DFG/German Research Foundation (FKZ FE 570/4-1).,
+conf/imc/LeeS16,This research was supported in part by NSF grant CNS-1526635.,CNS-1526635
+conf/imc/LeungRCW16,"This work was partially supported by the Data Transparency Lab, and by NSF grants IIS-1408345 and IIS-1553088.",IIS-1408345 IIS-1553088
+conf/imc/LiuTZZZZ16,This project was supported by NSF grants CNS-1527939 and IIS-1321083.,CNS-1527939 IIS-1321083
+conf/imc/SenPPFSCG16,,
+conf/imc/VanderSlootABDB16,"This material is based upon work supported by the National Science Foundation under grants CNS-1345254,  CNS-1409505, CNS-1505790, CNS-1518741, CNS-1518888,CNS1530915, CNS-1528156, and ACI-1348077, by the Google Ph.D. Fellowship in Computer Security, and...",CNS-1345254 CNS-1409505 CNS-1505790 CNS-1518741 CNS-1518888 CNS-1530915 CNS-1528156 ACI-1348077
+conf/lics/BenediktBB16,"Benedikt’s work was sponsored by the Engineering and Physical Sciences Research Council of the United Kingdom (EPSRC), grants EP/M005852/1 and EP/L012138/1. Vanden Boom was partially supported by EPSRC grant EP/L012138/1. Bourhis was supported by CPER ...",
+conf/lics/BenediktBCP16,"Benedikt’s work was sponsored by the Engineering and Physical Sciences Research Council of the United Kingdom, grants EP/M005852/1 and EP/L012138/1. Bourhis was supported by CPER Nord-Pas de Calais/FEDER DATA Advanced data science and technologies 2015...",
+conf/lics/Chatterjee016,"This research was partially supported by Austrian Science Fund (FWF) NFN Grant No S11407-N23 (RiSE/SHiNE), ERC Start grant (279307: Graph Games), Vienna Science and Technology Fund (WWTF) through project ICT15-003, and European project Cassting (FP7-6011...",
+conf/lics/ChatterjeeHO16,"This research was funded in part by the European Research Council (ERC)undergrantagreement267989(QUAREM),by the Austrian Science Fund (FWF) projects S11402-N23 (RiSE) and Z211-N23 (Wittgenstein Award), FWF Grant No P23499- N23, FWF NFN Grant No S11407-N2...",
+conf/lics/Galicki16,,
+conf/lics/HerlihyM16,,
+conf/lics/HughesH16,,
+conf/lics/Kopczynski16,This work is supported by Poland’s National Science Centre grant 2013/11/D/ST6/03075.,
+conf/lics/Kozen16,Support from the National Science Foundation under grant CCF-1535952 is gratefully acknowledged.,CCF-1535952
+conf/lics/Kozik16,Research partially supported by National Science Center under grant DEC-2011/01/B/ST6/01006.,
+conf/micro/AlwaniCFM16,"This material is based upon work supported by the National Science Foundation (NSF) under Grants No. 1453460, No. 1452904, and No. 1533739. The experiments were conducted with equipment purchased through NSF CISE Research Infrastructure Grant No. 1405641.",1453460 1452904 1533739 1405641
+conf/micro/GogteKCDW16,"This work was supported by grants from ARM, Ltd.",
+conf/micro/JainHLKHLMTM16,"This research was supported by National Science Foundation under grants NSF-CAREER-1553485, CCF-XPS1438996, CCF-SHF-1302682 and CNS-CSR-1321047 and by the Swedish Research Council within UPMARC (Uppsala Programming for Multicore Architecture Research Cen...",CAREER-1553485 1438996 1302682 1321047
+conf/micro/JainLTM16,"This research was supported by National Science Foundation under grants NSF-CAREER-1553485, CCF-SHF1302682 and CNS-CSR-1321047.",1553485 1302682 1321047
+conf/micro/JeffreySAES16,"This work was supported in part by C-FAR, one of six SRC STARnet centers by MARCO and DARPA, and by NSF grants CAREER-1452994 and CCF1318384. Mark Jeffrey was partially supported by an NSERC postgraduate scholarship.",CAREER-1452994 CCF-1318384
+conf/micro/KallurkarS16,,
+conf/micro/Martonosi16,,
+conf/micro/SantriajiH16,"This project is funded by the U.S. Government under the DARPA BRASS program, by the Dept. of Energy under DOE DE-AC02-06CH11357, by the NSF under CCF 1439156, and by a DOE Early Career Award.",CCF-1439156
+conf/micro/YazdaniSAG16,This work is supported by the Spanish Ministry of Economy and Competitiveness and FEDER funds of the EU under contract TIN2013-44375-R.,
+conf/micro/ZhangCS16,"This work was supported in part by C-FAR, one of six SRC STARnet centers by MARCO and DARPA, and by NSF grant CAREER-1452994.",CAREER-1452994
+conf/naacl/BootenH16,,
+conf/naacl/FerreiraV16,,
+conf/naacl/GirleaGA16,,
+conf/naacl/KiritchenkoM16a,,
+conf/naacl/LacroixAWY16,This work has been partly funded by a DGA-RAPID project under grant agreement N.o1429060465 (Papyrus) and the French Direction générale de l’armement.,
+conf/naacl/Moosavi016,"This work has been funded by the Klaus Tschira Foundation, Heidelberg, Germany. The ﬁrst author has been supported by a Heidelberg Institute for Theoretical Studies PhD. scholarship.",
+conf/naacl/PaetzoldS16,,
+conf/naacl/SchwartzRR16,"This research was funded (in part) by the Intel Collaborative Research Institute for Computational Intelligence (ICRI-CI), the Israel Ministry of Science and Technology Center of Knowledge in Machine Learning and Artiﬁcial Intelligence (Grant number 3-...",
+conf/naacl/SennrichHB16,This project has received funding from the European Union’s Horizon 2020 research and innovation programme under grant agreement 644402 (HimL).,
+conf/naacl/SharmaGMBSMS16,,
+conf/sigsoft/Alimadadi16,,
+conf/sigsoft/Gullapalli16,,
+conf/sigsoft/Hammoudi16,,
+conf/sigsoft/Hilton16,,
+conf/sigsoft/Huang16,,
+conf/sigsoft/JacksonV16,,
+conf/sigsoft/Kurtz16,,
+conf/sigsoft/Mahmud16,,
+conf/sigsoft/Panchekha16,,
+conf/sigsoft/Sadowski16,,
+conf/vr/BeraKM16,"This work was supported by NSF awards 1117127, 1305286, ARO contract W911NF-14-1-0437, and a grant from the Boeing company.",1117127 1305286
+conf/vr/Bickmore16,,
+conf/vr/BodenheimerWMR16,This material is based upon work supported by the National Science Foundation under grant 1116988.,1116988
+conf/vr/HollererILS16,,
+conf/vr/Lin16,,
+conf/vr/LinJ16,,
+conf/vr/PeerP16,This work was supported in part by the University of Wisconsin -Madison Fall Research Competition.,
+conf/vr/TeofiloNSASN16,"Part of the results presented in this paper were obtained through research on project titled ”VR Accessibility”, sponsored by Samsung Eletrnica da Amaznia Ltda. under the terms of Brazilian federal law No. 8.387 (art. 2) / 91.",
+conf/vr/ZielaskoHFWK16,The research leading to these results has received funding from the European Union Seventh Framework Programme (FP7/2007-2013)under grant agreement n◦ 604102(HBP).,
+conf/vr/ZielinskiRPAK16,,
+conf/www/BensonKT16a,,
+conf/www/ChopraS16,support under the Science of Security Lablet.,
+conf/www/Fox16,,
+conf/www/Kawamae16,,
+conf/www/LemePV16,,
+conf/www/NobataTTMC16,,
+conf/www/RahmanW16,supported in part by a Yahoo Academic Career Enhancement Award and the National Science Foundation under grants IIS-1553568.,IIS-1553568
+conf/www/RitzeLOB16,,
+conf/www/YangIF16,"Peter Frazier was partially supported by NSF CAREER CMMI-1254298, NSF CMMI-1536895, NSF IIS-1247696, AFOSR FA9550-12-1-0200, AFOSR FA9550-15-1-0038.",CMMI-1254298 CMMI-1536895 IIS-1247696
+conf/www/Zurko16,,

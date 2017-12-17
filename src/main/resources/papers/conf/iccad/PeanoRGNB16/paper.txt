@@ -1,0 +1,552 @@
+Design Technology for Fault-Free and Maximally-Parallel Wavelength-Routed Optical Networks-on-Chip
+
+Andrea Peano
+University of Ferrara - Via Saragat 1, 44121 Ferrara, Italy
+andrea.peano@unife.it
+
+Luca Ramini
+University of Ferrara - Via Saragat 1, 44121 Ferrara, Italy
+luca.ramini@unife.it
+
+Marco Gavanelli
+University of Ferrara - Via Saragat 1, 44121 Ferrara, Italy
+marco.gavanelli@unife.it
+
+Maddalena Nonato
+
+Davide Bertozzi
+
+University of Ferrara - Via
+
+University of Ferrara - Via
+
+Saragat 1, 44121 Ferrara, Italy Saragat 1, 44121 Ferrara, Italy
+
+maddalena.nonato@unife.it davide.bertozzi@unife.it
+
+ABSTRACT
+The recent interest in emerging interconnect technologies is bringing the issue of a proper EDA support for them to the forefront, so to tackle the design complexity. A relevant case study is provided by wavelength-routed optical NoCs (WRONoCs), which add communication performance guarantees to the typical latency, throughput and power beneﬁts of an optical link, thus providing an appealing technology for the photonic integration of high-end embedded systems. Typically, only abstract WRONoC models are considered to ﬁgure out architecture-level performance, and logic connectivity patterns for the quantiﬁcation of the required signal strength (i.e., static power). However, this design practice overlooks the needed reﬁnement step, where key physical parameters are assigned such as wavelengths of the optical channels, and size of the optical ﬁlters. This step is unfortunately not decoupled from the architectural evaluation, since its main constraint (i.e., avoiding routing faults) turns out to be a key limiter for both the network scale and the achievable communication parallelism. By proposing a formal methodology to select WRONoC parameters while avoding the routing fault concern, this paper aims at maximizing the levels of connectivity and/or of bit parallelism that WRONoCs can achieve, while relating their upper bounds to the uncertainty of the manufacturing process.
+Categories and Subject Descriptors
+B.8.2 [PERFORMANCE AND RELIABILITY]: Performance Analysis and Design Aids; G.1.6 [NUMERICAL ANALYSIS]: Optimization—Constrained optimization
+Keywords
+WRONoC, Parallelism, Answer Set Programming
+Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for proﬁt or commercial advantage and that copies bear this notice and the full citation on the ﬁrst page. Copyrights for components of this work owned by others than ACM must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior speciﬁc permission and/or a fee. Request permissions from permissions@acm.org.
+ICCAD ’16, November 07-10, 2016, Austin, TX, USA
+c 2016 ACM. ISBN 978-1-4503-4466-1/16/11. . . $15.00 DOI: http://dx.doi.org/10.1145/2966986.2967023
+
+1. INTRODUCTION
+Networks-on-chip (NoCs) are today the mainstream communication architecture for all large-scale systems-on-chip (SoCs) in 45nm and below [5]. However, the uptake of the networking paradigm for on-chip communication started only when proper EDA support enabled to tackle the complexity challenge. This resulted in tools and methodologies that enabled design, veriﬁcation and test of NoCs across multiple levels of abstraction and complexity [1]. After a decade of research, NoC toolﬂows became capable of automatically transforming a high-level functional description of a NoC into a detailed geometric description [18].
+Today, methodologies and tools for designing chip-level communication architectures are again on the rise. The reason is that industry is urgently exploring beyond-silicon and beyond-CMOS device, interconnect and memory options, as well as heterogeneous, ”More-than-Moore” integration and packaging technologies, in order to maintain Moore’s-Law scaling of integration value. In particular, silicon photonics stands out as the most promising technology to overcome the limitations of electronic interconnects as the system scale increases. The intrinsic capability of light to transport information over large distances at very high data rates and low latency, with minor dynamic power dissipation, holds promise for scalable and power-eﬃcient optical networkson-chip (ONoCs) to interconnect future many-core system architectures. A relentless research eﬀort is currently underway to improve the maturity of CMOS-compatible silicon photonic technology, especially to cut down on its signiﬁcant static power overhead.
+However, awareness of the historical trend followed by electronic NoCs leads to think that the industrial uptake of ONoCs will be not only an issue of technology maturity. In fact, this will also coincide with a turning point for the Electronic Design Automation (EDA) ﬁeld, since designing with emerging interconnect technologies calls for (radically?) diﬀerent abstractions, algorithms, methodologies, and tools drawing from the interdisciplinary work of chemists, device physicists, electrical engineers, computer scientists, applied mathematicians, operations researchers, and optimization experts [8].
+A number of ONoC design issues is currently increasing the need for EDA support. On the one hand, the development of automatic synthesis approaches of optical circuits
+
+is still in the early stage, since they need to build on top of the speciﬁc basic primitives of the target emerging technology [4]. On the other hand, EDA support is required by the reﬁnement step of abstract ONoC models into their actual implementations, which calls for eﬀective solving strategies for the novel optimization problems that arise [21].
+This paper tackles one such novel design challenges that are emerging in the context of the latter category, and which has to do with the reﬁnement step of wavelength-routed optical NoCs (WRONoCs). Among the plethora of proposed protocols for optical on-chip communication, wavelength routing has unique characteristics, since it can deliver contention-free all-to-all connectivity. The key principle consists of allocating a reserved wavelength channel to each initiator-target pair, which selects a deterministic routing path across the network. Since optical technology supports the concurrent propagation of multiple optical channels, tuned to diﬀerent wavelengths, on the same waveguide (named wavelength division multiplexing, WDM), wavelength routing does not require any form of arbitration nor path selection. The predictable and guaranteed communication performance of WRONoCs comes at the cost of static power overhead, due to the use of multiple laser sources.
+WRONoCs currently deal with an unsolved design concern: the selection of their wavelength channels and of the optical ﬁlters that build up their optical paths. This is typically and incorrectly viewed as a further reﬁnement step during the implementation ﬂow, since the existence of the above parameters is just taken for granted during the architectural evaluation, which simply assumes the contention-free delivery of optical packets to their destination. Topologies are then diﬀerentiated based on their loss of optical power.
+Unfortunately, the reﬁnement step which selects the actual network parameters cannot be decoupled from WRONoC performance evaluation for two reasons. On the one hand, parameters of wavelength channels and of the ﬁlters that selectively route them to destination should be chosen in such a way that routing faults are avoided. This constraint limits the level of connectivity that can be achieved, which means that large-scale topologies may turn out not to be feasible under the routing fault-free condition. On the other hand, even when the connectivity of the target number of nodes is feasible, the routing fault concern limits the achievable level of communication parallelism. Overall, without proper emphasis on the topology reﬁnement step, system designers may consider WRONoC conﬁgurations for their architecture that later turn out to be practically infeasible, in terms of levels of connectivity and/or parallelism.
+Last but not least, WRONoC topology reﬁnement is the ﬁrst design step where the parameters of the manufacturing process at hand become visible. In fact, a high level of uncertainty in that process forces the designer to conservative design choices to meet the routing fault freedom constraint, which penalizesa the quality metrics to a signiﬁcant extent.
+To our knowledge, this paper for the ﬁrst time proposes a formal methodology to select WRONoC physical parameters while maximizing communication parallelism for a speciﬁc level of network connectivity. The paper aims at capturing the dependencies between the characteristics of the manufacturing process and the achievelable WRONoC performance, hence resulting in design curves that bridge the gap between the system level designer and the technology provider.
+
+2. RELATED WORK
+Among communication protocols, wavelength routing eliminates the need for electrical resource reservation, and the corresponding latency and area overhead. A number of wavelength-routed topologies has been proposed so far. While they all deliver the same performance (contentionfree all-to-all connectivity), they have diﬀerent connectivity patterns, which leads to diﬀerent physical properties, such as kinds of micro-ring resonators, and optical power losses.
+The λ−router [3] resembles multi-stage interconnection networks due to the cascaded stage organization. The GWOR topology [20] is built around a basic and symmetric 4x4 routing fabric, with precise generalization rules. The snake topology [16] exhibits a circuitous pattern inspired by pipes. The topology presented in [2] consists of a wavelength-routed optical ring. Finally, a hierarchical topology featuring regularity, vertex symmetry, and constant node degree is presented in [9].
+Wavelength routing has been compared with other methods in terms of performance and power. For 16-node systems, the static power overhead associated with the use of multiple laser sources is still lower than or comparable with the overhead for implementing optical arbitration [17]. For larger system sizes, the static power overhead is the price to pay for performance predictability.
+To our knowledge, the reﬁnement step that selects the physical parameters of the above topologies has never been addressed before. Such parameters are typically kept as generic in high-level evaluations (e.g., wavelength channels λi, optical ﬁlters tuned to λi), thus taking for granted that wavelengths in the band 1500-1600nm and the associated micro-ring resonators in the typical range 5 ÷ 20µm exist, and combined together yield topologies that do not incur the routing fault concern presented later. As we prove in this paper, this assumption is not always justiﬁed, thus motivating this work, that lowers the abstraction layer for WRONoC design. Wavelength routing design has been brought to this stage only in the context of generic ﬁber-based optical networks connecting large regions, where the routing and the wavelength assigment problem has been stated, but in completely diﬀerent terms due to the diﬀerent target environment [13]. For instance, in that domain wavelength conversion is an aﬀordable option, unlike an on-chip environment.
+3. BACKGROUND AND MOTIVATION
+3.1 Wavelength-Selective Routing
+Wavelength-routed optical NoCs (WRONoCs) rely on the principle of wavelength-selective routing, which associates a wavelength channel to each source-destination pair. In particular, master M 1 uses n wavelengths λ1 to λn to reach slaves S1 to Sn, respectively. However, instead of allocating an additional set of wavelengths for the communications of master M 2 to all the slaves, the initial set of n wavelengths is reused across masters. This wavelength reuse requirement gives rise to two design constraints for WRONoC topologies, which are engineered to make such reuse feasible:
+• Optical channels originating from diﬀerent masters and tuned to the same carrier wavelength should never overlap in WRONoC waveguides.
+• Each slave should receive wavelength channels from
+
+diﬀerent masters on diﬀerent carrier wavelengths, in order to avoid any signal conﬂict at the receiver side.
+Overall, wavelength-selective routing ends up delivering contention-free all-to-all connectivity, since signal contention for resources is avoided at design time rather than solved at run time. Therefore, no arbitration of ONoC resources is needed.
+
+λ2 in0 λ2 in1
+
+λ1
+λ1
+cross
+
+out0 λ1 in0 out1 λ1 in1
+
+λ1 out0
+λ1 out1 bar
+
+λ2 λ1
+
+Transmission
+
+λ
+Figure 1: (Top) Optical input signals that are oﬀ- vs. onresonance with the MRRs of an add-drop ﬁlter. (Bottom) Transmission characteristic of an MRR.
+
+3.2 Filtering of Wavelength Channels
+The building blocks of the most common WRONoC topologies consist of add-drop ﬁlters (ADFs). They add or remove narrow-band wavelengths of light from a broader optical signal being carried along a bus waveguide. They use micro-ring resonators (MRR) for this purpose, as illustrated in Fig.1. Essentially, when the input optical signal is onresonance with the MRR, the signal is deﬂected (bar function), otherwise it keeps propagating unaﬀected (cross function). The resonance eﬀect can be achieved by a proper sizing of the MRR radius. In fact, an MRR acts as a wavelength selecting ﬁlter with a periodic transmission characteristic, as pictorially illustrated at the bottom of Fig.1. One important parameter is the distance between resonance peaks, which is called the free spectral range (FSR), and gives information about the periodicity of the spectrum. The FSR depends on the ring radius: larger rings have denser peaks, while smaller rings have peaks that are far apart from one another. In order to carry out the bar and cross functions with λ1 and λ2, respectively, we need λ1 to be on-resonance with the MRRs, and λ2 to be oﬀ-resonance.
+
+From PDN λλλ213
+
+wavelength-routed topology
+λ1 λ2 λ3 λ1 λ2 to slave Sk
+
+Modulation stage Master Mr
+
+λ1 λ2 to slave Si to slave Sj
+
+(a) Drop function of a WRONoC.
+
+λ3 from master Mj
+
+λ1 from master Mi λ1
+
+λ2 from master Mk Receiver stage λ2 Slave Sr
+
+λ1 λ2
+
+Filters
+
+wavelength-routed topology
+
+PDs
+
+(b) Add function of a WRONoC.
+
+Figure 2: Logical tasks performed by a WRONoC.
+
+3.3 Wavelength Routing Operation
+The wavelength-selective routing function fulﬁlled by each WRONoC can be logically viewed as consisting of two subfunctions:
+• Drop function (Fig.2a). Each master receives from the power distribution network (PDN) a wavelengthdivision multiplexed (WDM) optical signal consisting of multiple carriers with wavelengths λ1 to λn. Each carrier is modulated and delivered to the network for routing to a speciﬁc and distinct slave. Then, the ﬁrst task the network should perform consists of resolving the individual wavelength-channels from the multiplexed compound signal, so that each resolved component can be routed to a diﬀerent destination. In practical terms, this task can be accomplished by using add/drop optical ﬁlters, which are tuned to a speciﬁc wavelength, and therefore split the associated optical channel from the compound signal.
+• Add function (Fig.2b). Resolved wavelength channels from the diﬀerent masters and heading to the same slave should be recombined together into a WDM optical signal propagating onto the output waveguide of that slave. This way, a selective ﬁltering stage can eject the desired wavelength channel and feed it to a photodetector (PD) stage. In practice, this task can be accomplished by using diﬀerent inputs of add/drop optical ﬁlters.
+In a WRONoC topology, the add and drop functions are tightly intertwined: as the WDM input signal from a given master propagates down the topology, its wavelength channels are progressively and selectively resolved and coupled with channels tuned on diﬀerent wavelengths and originating from diﬀerent masters. This process is illustrated in Figure 3 for the λ-router WRONoC topology case study [14].
+
+(1,2,3,4)A (1,2,3,4)B
+
+λ1
+
+(1)A(2,3,4)B
+
+λ3
+
+(1)C(2)A(3)B(4)D (1)A(3)D(2,4)B
+
+λ λ(1)B(2,3,4)A
+(1)C(2,3,4)D
+
+(1)C(2)A(3,4)D
+2 (1)B(2)D(3,4)A
+
+(1)D(2)C(3)A(4)B
+4 (1)A(2)B(3)D(4)C
+
+(1,2,3,4)C (1,2,3,4)D
+
+λ1
+
+λ(1)D(2,3,4)C
+
+3
+
+(1)D(3)A(2,4)C (1)B(2)D(3)C(4)A
+
+Figure 3: The tightly-intertwined add and drop functions at work in a λ-router WRONoC topology. Numbers refer to wavelength identiﬁers (IDs), while letters refer to master/slave IDs. Therefore, (1, 2)A refers to wavelength channels λ1 and λ2 originating from initiator A.
+
+3.4 WRONoC Reﬁnement
+A WRONoC topology is ultimately speciﬁed by two key design parameters: a) the number of wavelength channels used by each initiator; b) the number and kind of add-drop ﬁlters in the topology; In order to understand the relation between these parameters, let us provide an abstract representation for a generic WRONoC topology.
+The topology can be viewed as the combination of basic primitives, which are 1x2 selective ﬁlter operators (SFOs), with one input and two outputs. This operator selectively ejects a predeﬁned wavelength channel from one of its outputs, while forwarding the other channels to the other output. In a WRONoC topology, the WDM input signal from
+
+any master undergoes the drop function by going through n − 1 SFOs, when assuming the connectivity of n masters with n slaves. This process is pictorially illustrated in a wavelength resolution graph (WRG), reported in Fig.4a for a generic 4x4 WRONoC topology. On each row, properly tuned SFOs eject wavelength channels λx, λy, λz, λt from the bundle, thus prompting them for the next add phase. The resolution pattern may diﬀer in each row, as illustrated in the ﬁgure, therefore the drop order of wavelength channels for master A can be diﬀerent from that of master B, and so on.
+The ﬁnal topology needs to map the SFOs to real devices. All WRONoC topologies reported in the open literature so far make use of the 2x2 add-drop ﬁlters (ADFs) previously illustrated in Fig.1. Therefore, technology mapping implies the pairwise grouping of the 1x2 SFOs into compact 2x2 ADFs. The grouping presented in Fig.4b, completed by the assignment step of the exact ADF resonant wavelengths (Fig.4c), gives rise to the λ-router WRONoC topology of Fig.3. While wavelength assignment can be made based on diﬀerent criteria, the only (obvious) requirement is that each component of the input WDM signal is ﬁltered only once on each row. Further details on this synthesis process are reported in [19], which proves that by varying the technology mapping and performing a legal wavelength assignment onto it, each WRONoC design point can be materialized.
+Overall, the synthesis of an n × n WRONoC topology requires: a) a number of wavelength channels which is equal to the number of targets n. Each initiator uses a diﬀerent wavelength channel to reach each target. b) several kinds of ADFs, each tuned to a diﬀerent resonant wavelength, depending on the wavelength assignment step in Fig.4c.
+For what this paper is concerned, it is worth recalling that although the steps in Fig.4b and Fig.4c enable to diﬀerentiate a topology with respect to all other ones, the exact value of the wavelength channels λi and the exact size and resonant wavelengths of the MRRs inside the ADFs are still speciﬁed as symbols, and left unspeciﬁed. This is the level of abstraction which is typically used in the literature for WRONoC evaluation, and this is the starting point of this paper.
+As a result, this paper moves from the assumption that the topology connectivity pattern has been speciﬁed by the system designer, and addresses the further reﬁnement step which is needed for the complete deﬁnition of the topology. Therefore, the paper searches for: a) the exact value of the n wavelengths used by each initiator, which are typically chosen in the frequency band 1500nm-1600nm. b) the exact radius length of the MRRs inside ADFs, determining the FSR and the periodic resonant wavelengths characteristics.
+3.5 The Routing Fault Concern
+The two design decisions above are tightly interrelated. In fact, a wavelength channel must be positioned in the frequency band of interest so to be a resonant wavelength of one kind of ADFs, the one that drops (adds) that channel from (to) the input (output) WDM signal. This is pictorially illustrated in Fig.5(a) by means of an example, together with a possible inconvenient. Without lack of generality, wavelength channel λ2 is placed on one peak of the transmission characteristic of the larger MRR with radius R2, while a
+
+smaller MRR with radius R1 is selected for tuning on the λ1 channel. The two MRRs have diﬀerent FSRs, since they depend on the MRR’s radius length. Therefore, two resonant peaks from the two MRRs might overlap, as illustrated in the ﬁgure. As a consequence, if λ1 were chosen to coincide with the overlapped peaks, a routing fault would occur in the network: channel λ1 would incorrectly perform the bar function when entering an ADF tuned to λ2, instead of the correct cross function. While the problem can be easily solved in the example of Fig.5(a) by selecting another resonant wavelength of the small MRR, it can become a serious concern when increasing the network size. In fact, the proliferation of ADFs and of wavelength channels may limit the availability of non-overlapped transmission peaks, which causes the topology to be practically infeasible.
+Even for a ﬁxed network size, the routing fault concern turns out to be a fundamental limiter for communication parallelism. In fact, the examples seen so far assume that each initiator sends one bit at a time to each target on a speciﬁc wavelength channel. In fact, optical interconnect technology requires serialization of bit-parallel electronic words, which is only partially compensated by the high transmission rates of at least 10 Gbit/s. Communication parallelism could be increased by allocating multiple wavelength channels to each I/O connection, provided that they are allocated to the resonant peaks of the same ADF, in order to properly perform the add and drop functions. Fig.5(b) extends the routing fault concern to a higher communication parallelism. In the ﬁgure, the 6 (7) resonances of R1 (R2) are shown, however at most 4 bits of parallelism can be guaranteed. Denote by Λr = {λr,j } the resonances of the MRR with radius length Rr (we will also use λrj for brevity). Since λ1,2 conﬂicts with λ2,2 and λ1,6 conﬂicts with λ2,7, routing fault prevention impedes selecting any of these four; now at most 4 (5) peaks in R1 (R2) can be used at the same time. In this case, the minimum parallelism that can be sustained by both wavelength channels is 4.
+The above problems are further exacerbated by the uncertainties of both the manufacturing process and of the device parameters (see section 3.6), which cause even resonant peaks that are just close enough not to be available for the routing of any wavelength channel.
+This paper tackles the problem of selecting both ADF sizes and wavelength channels in such a way that the connectivity is guaranteed (i.e., all wavelength channels are placed in non-overlapped peaks) and the communication parallelism is maximized, while avoiding routing faults.
+The approach proposed hereby is not topology-speciﬁc, in the sense that it holds for any generic WRONoC topology.
+3.6 The Role of Parameter Uncertainty
+This section addresses the eﬀect of two important parameter uncertainties that can not be ignored when designing WRONoCs for routing fault avoidance; this way, we try to capture the fundamental dependency of architecture performance on the manufacturing process.
+The ﬁrst uncertainty is due to the MRRs’ fabrication process. Depending on the lithography, up to 10 nm of variation is expected for MRRs using rib-waveguides that underwent a full CMOS process ﬂow [10], i.e., given the tolerance Rtol = 10nm and the nominal radius Rr, the manufactured MRR will be between Rr− = Rr − Rtol and Rr+ = Rr + Rtol; Rtol identiﬁes the maximum gap between the nominal value
+
+λi ≡ λi
+
+A λx
+(x,y,z,t)A
+
+λy
+(y,z,t)A
+
+(z,t)A
+
+λz (t)A
+
+B λz
+(x,y,z,t)B
+
+(x,y,t)A
+
+λt
+
+(x,y)A
+
+λy
+(x)A
+
+C
+
+λi ≡
+
+λi
+
+λi λi
+
+A
+
+B
+
+C
+
+λi ≡
+
+λi
+
+λi λi
+
+A λ1
+
+λ2
+
+B λ1
+
+λ3
+
+C λ1
+
+λ3
+
+λ3 λ4 λ4
+
+D (a) Generic wavelength resolution graph.
+
+D (b) Technology mapping example.
+
+D λ1
+
+λ2 λ3
+
+(c) Technology mapping example.
+
+Figure 4: Three-step synthesis methodology of a WRONoC topology.
+
+Transmission Transmission
+
+YES
+
+R2 R1
+
+(a)
+
+λ2
+
+YES NO λ1 λ
+
+(b)
+
+λ1,1 λ2,1
+
+λ1,2 λ2,2
+
+λ1,3 λ2,3
+
+λ1,4
+
+λ1,5
+
+λ2,4
+
+λ2,5
+
+λ2,6
+
+λ1,6 λ2,7
+
+λ
+
+Figure 5: The routing fault concern: (a) constraining wavelength channel selection; (b) limiting parallelism.
+
+at design time and the actual one. The transmission response of the manufactured MRR will vary according to its actual radius. Figure 6 shows the optical spectrums for R1 and its maximum variations, say Λ−1 , Λ1, and Λ+1 ; in particular, the most noticeable eﬀect is that the resonances are shifted from the nominal ones to the left (right) for a neg-
+ative (positive) radius variation. The greatest peak-to-peak
+
+Transmission
+
+σ1,1
+
+σ1,2
+
+Λ−1 Λ1 Λ+1
+
+λ
+
+Figure 6: Relation between Rtol and σ for a radius R1.
+
+distance (nm) between the nominal λ1,j and its variations is σ1,j . Since a small radius variation slightly aﬀects the FSR in general σr,j = σr,h for j = h (σ1,1 = σ1,2 in the ﬁgure). To translate the variation Rtol into the many σr,j we developed a two-step procedure: i) an Electromagnetic Model [15] (EM) computes the three transmission responses Λ−r , Λr, Λ+r , then ii) the responses are passed to a synthesizer that processes them and returns the σ values. This process is shown within the block I of Figure 7.
+The other uncertainty is due to the variation of the central operating wavelength of the laser, caused by variation in temperature and driving current; we set this value to ∆λ =
+
+0.5nm1. Since laser selectivity is independent from radius variation, ∆λ is considered in addition to σ and accordingly this quantity is processed in the block I of Figure 7.
+Given R1, R2, Rtol, and ∆λ, the resonances λ1,j and λ2,h may vary within the intervals
+I1,j = [λ1,j − σ1,j − ∆λ, λ1,j + σ1,j + ∆λ]
+I2,h = [λ2,h − σ2,h − ∆λ, λ2,h + σ2,h + ∆λ]
+In the most conservative hypothesis, λ1,j and λ2,h should never conﬂict, i.e., I1,j ∩ I2,h = ∅. Obviously, the larger the intervals, the higher the chance of overlapping, and the lower the number of available oﬀ-resonances for other radius values, to the detriment of potential parallelism.
+Rtol and ∆λ mainly depend on the fabrication technology and the laser selectivity. Section 5 shows how technology improvements can enhance WRONoCs scalability and communication parallelism.
+
+4. PROBLEM FORMULATION
+
+All topologies appear in the form of Figure 4c from which the relevant inputs to our optimization problems can be derived, i.e., the network size n × n and the number s of ADF types. Notice that the ADF types diﬀer on the MRR’s radius length and each ADF can be instantiated multiple times in the topology. The problem is to compute for each ADF type the radius length and its subset of resonances so that the communication parallelism is maximized under the most conservative assumption, i.e., the selected wavelengths never overlap, whatever is the variation scenario.
+The choice of the s radius lengths and their wavelength channels is made from a lookup table TR where the r-th row contains the resonances λrj of radius Rr. The radius values are given by the discrete set
+
+R
+
+=
+
+{Rmin
+
++
+
+r
+
+∗
+
+Rstep ,
+
+∀r
+
+∈
+
+[0,
+
+...,
+
+Rmax − Rmin Rstep
+
+]}
+
+where the fabrication options Ropt = {Rmin, Rstep, Rmax} are the minimum radius length, the incremental step, and the maximum radius length, respectively. The resonances and their variations are computed as in block I in Figure 7. Table 1 is built with Ropt = {5, 1, 8}µm and reports the σ values along with the resonances, with Rtol = 0.01µm. Ropt = {5, 1, 25} yields 21 rows and about 290 resonances.
+
+1thorlabs.com/thorcat/21000/SFL1550S-Manual.pdf, p.7
+
+Table 1: TR with Ropt = {5, 1, 8} µm, Rtol = 0.01 µm, and ∆λ = 0.5 nm
+
+r Rr [µm] |{λr,j }| λi,1 σi,1 + ∆λ , λi,2 σi,2 + ∆λ , · · ·
+
+[nm]
+
+15 26 37 48
+
+5 1496.4 3.5 , 1521.3 3.6 , 1547.1 3.6 , 1573.8 3.6 , 1601.4 3.6 6 1500.5 3.0 , 1521.3 3.0 , 1542.7 3.1 , 1564.8 3.1 , 1587.5 3.3 , 1610.8 3.3 6 1503.4 2.6 , 1521.3 2.6 , 1539.6 2.7 , 1558.4 2.7 , 1577.7 2.7 , 1597.4 2.8 7 1505.6 2.2 , 1521.3 2.2 , 1537.3 2.2 , 1553.7 2.2 , 1570.4 2.0 , 1587.5 2.0 , 1604.9 2.0
+
+R
+Rtol ∆λ
+
+Rr− Rr
+
+Rr+
+
+EM EM EM
+
+Λ−r Λr
+
+Λ+r
+
+σ synthesizer
+
+λ±σ ∆λ +
+
+∀Rr ∈ R
+
+λ ± σ + ∆λ
+
+TR
+
+s COP solver
+
+II
+
+R∗(s), Λ∗(s) P (s)
+
+Figure 7: Solving architecture
+
+I
+
+Ropt = {5, 0.25, 30} yields 104 rows and about 1850 resonances (28 in the longest row).
+Once TR is computed, the optimal sets of radius lengths R∗ and of wavelength channels Λ∗ are chosen in order to maximize the parallelism. These choices are made on discrete sets; this highlights a combinatorial structure of the problem, meaning that the number of possible choices increases exponentially with the table size and the number of resonances. Since not any combination is feasible, due to routing fault prevention, we are faced with a Constrained Optimization Problem (COP).
+A COP consists of an input, a set of decision variables, a set of constraints, and an objective function. The inputs are the lookup table TR and the number s of ADF types. The core decisions concern which resonances should be selected from TR. To model this decision we use the boolean variable xrj ∈ {0, 1} to state whether λrj is selected. The COP is formally deﬁned as follows:
+
+P (s) = max : min {qr | qr > 0} s.t.
+r∈1..|R|
+
+(1)
+
+qr =
+
+xrj
+
+λrj ∈Λr
+
+∀ r ∈ 1..|R| (2)
+
+sr =
+
+0 1
+
+qr = 0 qr > 0
+
+∀ r ∈ 1..|R| (3)
+
+sr = s
+r∈1..|R|
+
+(4)
+
+The objective function (1) maximizes the parallelism in the selected row (Rr) with the least parallelism, since the global network parallelism is bounded by the channel with lowest parallelism. In practice, we maximize the minimum parallelism that can be sustained by all of the wavelength channels. Constraints (2) deﬁne the number qr of selected elements in row r. Constraints (3) deﬁne whether row r (the radius Rr) is selected (sr = 1) or not (sr = 0). Constraints (4) impose to select exactly s rows (ADF’s radius lengths). Finally, the following logical constraint is imposed for any λrj
+
+and r′ = r for which λrj is conﬂicting with some elements in row r′ (∃λr′g | Irj ∩ Ir′g = ∅) and it prevents routing faults:
+
+xrj = 1 ⇒ qr′ = 0
+
+(5)
+
+Constraints (5) either i) allow the non-conﬂicting elements in rows r and r′ to be selected at the same time or ii) prevent any element in row r′ to be selected when a conﬂicting element in row r has already been selected.
+The COP (1)–(5) can be reformulated by way of wellknown declarative technologies in Operation Research, e.g., Mixed Integer Linear Programming [12], and in Artiﬁcial Intelligence, e.g., Answer Set Programming (ASP) [7], and others. The resulting mathematical/logic programs can be solved through oﬀ-the-shelf solvers (e.g., Clasp [6] for ASP), which either return a provably optimal solution (in our case R∗, Λ∗, and P (s)) or prove no solution exists. When nonidealities are involved, the solution consists of those radius lengths and resonances that ensure the parallelism P (s) in whatever post-manufacturing condition.
+Given TR, the scalability analysis is performed for increasing values of s, until P (s) = 0; for each s, the COP solver is called, as shown in the block II in Figure 7, and P (s) is returned. Section 5 provides an experimental evaluation about how i) non-idealities, ii) fabrication options, and ii) the network size aﬀect the maximum optical parallelism.
+
+5. RESULTS
+We used the optimization framework for WRONoC reﬁnement and parameter selection in Figure 7 to test how the maximum communication parallelism P (s) scales with respect to: i) the number of ADF types s, ii) the fabrication options Ropt, iii) the non-idealities Rtol and ∆λ.
+The ﬁrst test sheds light on the intrinsic scalability of diﬀerent connectivity patterns, since in general a higher network size requires also a higher number of ﬁlter types s, although the exact value of the latter parameter is also topology-speciﬁc. As an example, speciﬁc conﬁgurations of the well-known GWOR and λ−router WRONoC topologies will be considered, by extracting their s requirements. The second and the third tests give some technological drivers to improve the scalability of the topologies.
+We programmed the COP in ASP and solved it with Clasp. We solved the ASP programs in the Cineca’s Galileo HPC2. We used 16 threads and 8GB of RAM in each solver call. The whole experimental platform consisted of about 450 ASP programs (solver calls), the single computing time varied from 0s to 70,000s, for a total of about 58 days of computing time on a single CPU.
+For the ﬁrst test we set Ropt = {5, 1, 25}µm [11], and ﬁnally Rtol = 0.01µm, ∆λ = 0.5nm to model worst-case variations (see Section 3.6). The ideal manufacturing process is
+2www.hpc.cineca.it/hardware/galileo
+
+P (s) P (s)
+
+4x4 GWOR
+
+ideal
+
+20
+
+4x4 λ-Rout.
+
+worst
+
+8x8 GWOR
+
+8x8 λ-Rout
+10 non-idealities
+
+0 0
+
+4x4 GWOR
+4x4 λ-Rout. 8x8 GWOR
+
+A
+
+8x8 λ-Rout
+
+5 s
+
+10
+
+15
+
+Figure 8: Maximum parallelism P (s) as a function of the number of ﬁlter types, with fabrication options Ropt = {5, 1, 25}
+
+when both Rtol and ∆λ are 0. The chart in Figure 8 shows a ﬁrst analytical result: the
+bit parallelism is larger than one (P (s) > 1), i.e., wavelength routing is feasible, only for a very limited range of the s parameter (i.e., for overly small network sizes), when worstcase conditions are considered. To make the outcome more tangible, let us associate actual topology conﬁgurations to their values of s. In fact, s = 2 and s = 4 correspond to a 4x4 GWOR and a 4x4 λ−router, respectively, since they use diﬀerent numbers of MRRs types3. While the GWOR enables 7-bit parallelism, the larger number of MRR types limits the λ−router parallelism to zero, which means the topology is infeasible. Both 8x8 topologies (with s = 6 and s = 8, respectively) turn out to be infeasible. In the ideal case, the higher number of MRR types of the λ−router is reﬂected into a relative drop in achievable parallelism by 9.5% for a 4x4 WRONoC, and by 25% for an 8x8 one with respect to GWOR. In this latter case, GWOR has a potential parallelism of 16 bits: the improvement with respect to the worst-case variations is impressive, which denotes the key limiting role played by the non-idealities of the manufacturing process. There is a huge inaccessible “performance” gap (see grey area A) that improvements in fabrication technology and laser selectivity can reduce. This topic is further discussed later on.
+Increasing Rmax, as well as decreasing Rmin and Rstep, means to increase the number of the available radius lengths and resonances in TR, eventually with a beneﬁt on the parallelism. Not necessarily this makes sense from a physical design viewpoint, since a lower ring radius causes a higher sensitivity to process variations, and impairs the manufacturing yield. In contrast, large rings take up more space. Finally, the step parameter depends on the litography.
+In order to express the theoretical bounds, the chart in Figure 9 adds to the chart in 8 the maximum parallelism P (s) curves obtained with Ro′ pt = {5, 1, 30}µm (ideal) and with Ro′′pt = {5, 0.25, 30}µm (ideal and worst variation case). In practice, the impact of the litography resolution is assessed. This chart suggests three main facts: i) P (s) with Ro′′pt (ideal) is much better than Ro′ pt (ideal), in fact area C ≫ B, meaning that the resolution Rstep is
+3The ultimate reason is because the λ−router provides selfcommunication, while the GWOR does not.
+
+30
+
+Rs′′tep
+
+Ro′′pt ideal Ro′ pt ideal
+
+20
+
+Rm′ ax
+
+Ropt ideal Ro′′pt worst Ropt worst
+
+10 non-idealities & fabrication options
+
+non-idealities
+
+0 AB
+
+C
+
+0 10 20 30 40 50 s
+
+Figure 9: Maximum parallelism achievable with fabrication options Ro′ pt = {5, 1, 30} compared with Ro′′pt = {5, 0.25, 30}
+
+a better driver to increase the parallelism with respect to making available more resonant wavelengths through larger rings (the TR table in input contains many more radii and wavelengths in the former case than in the latter one). ii) With Ro′′pt (ideal) P (s) is much higher than with Ropt (ideal) and the area B + C ≫ A, meaning that the combination of multiple fabrication options yields a signiﬁcant improvement of parallelism and connectivity (especially through the Rstep parameter;) iii) In the worst variation case, both Ro′′pt and Ropt yield the same parallelism, meaning that WRONoC performance is highly sensitive to the uncertainty of the manufacturing process. In fact, making available multiple wavelength channel selection options is useless if the uncertainty ranges are not reduced accordingly. For instance, with Ro′′pt a 32x32 λ−router yields 14-bit parallelism in the ideal case, which technology maturity can try to materialize over time.
+Having ﬁxed Ropt = {5, 0.25, 30} and s = 20 (roughly 20 interconnected cores with generic topologies), we tested how Rtol and ∆λ variations, w.r.t. the state of the art in the literature, can improve the parallelism. This relation is shown in Figure 10. It can be noticed that with common Rtol and ∆λ values, in the worst variation case P (20) is pretty much 0, whereas in the ideal case it can peak at 20 bits of parallelism. Lower values of Rtol and ∆λ, i.e., technological
+
+11 4
+
+1 0.5
+
+8
+
+∆λ (ηm)
+
+4
+
+8
+
+0
+
+20 0
+
+2 Rtol (µm)
+
+4 ·10−3
+
+20
+
+Figure 10: Maximum parallelism P (20) for 20 ﬁlter types, expressed as a parameter when varying Rtol and ∆λ
+
+improvement in the fabrication process and in the laser pre-
+
+cision, can clearly increase the WRONoC parallelism. The engineering curve with P (20) = 1 in the chart draws the required values of Rtol and ∆λ to guarantee the minimum working parallelism of 1 bit, i.e., the topology is feasible.
+6. CONCLUSIONS
+In this paper we target the typically overlooked reﬁnement step of WRONoC topologies that completely speciﬁes their physical parameters. This signiﬁcantly impacts the achieved levels of connectivity and/or communication parallelism, due to the constraint of avoiding routing faults. Our optimization framework demonstrates the huge gap existing between ideal fabrication assumptions and the consideration of worst-case process parameter variations. In principle, even 32x32 WRONoCs can achieve 14-bit parallelism, while in practice worst-case variations limit even the 1-bit parallelism case to WRONoCs smaller than 8 nodes. We show that the resolution in setting the radius of MRRs is the highest-impact technology parameter. Finally, our optimization framework can support the designer in placing uncertainty requirements to the technology provider in order to materialize a predeﬁned level of parallelism. In future work, we will consider statistic distribution of parameter variations in order to limit the severity of process uncertainty and to introduce the notion of yield.
+7. ACKNOWLEDGMENTS
+We thank the CINECA award under ISCRA (project IsC37), for the availability of HPC resources and support.
+8. REFERENCES
+[1] D. Bertozzi, A. Jalabert, S. Murali, R. Tamhankar, S. Stergiou, L. Benini, and G. D. Micheli. Noc synthesis ﬂow for customized domain speciﬁc multiprocessor systems-on-chip. IEEE Transactions on Parallel and Distributed Systems, 16(2):113–129, 2005.
+[2] S. L. Beux, J. Trajkovic, I. O’Connor, G. Nicolescu, G. Bois, and P. Paulin. Optical ring network-on-chip (ornoc): Architecture and design methodology. In 2011 Design, Automation Test in Europe, pages 1–6, 2011.
+[3] M. Briere, B. Girodias, Y. Bouchebaba, G. Nicolescu, F. Mieyeville, F. Gaﬃot, and I. O’Connor. System level assessment of an optical noc in an mpsoc platform. In 2007 Design, Automation Test in Europe Conference Exhibition, pages 1–6, April 2007.
+[4] A. Deb, R. Wille, O. Kesz¨ocze, S. Hillmich, and R. Drechsler. Gates vs. splitters: Contradictory optimization objectives in the synthesis of optical circuits. J. Emerg. Technol. Comput. Syst., 13(1):11:1–11:13, June 2016.
+[5] J. Flich and D. Bertozzi. Designing Network On-Chip Architectures in the Nanoscale Era. Chapman & Hall/CRC, 2010.
+[6] M. Gebser, B. Kaufmann, and T. Schaub. Conﬂict-driven answer set solving: From theory to practice. Artiﬁcial Intelligence, 187-188:52–89, 2012.
+[7] M. Gelfond. Answer sets. In F. van Harmelen, V. Lifschitz, and B. Porter, editors, Handbook of Knowledge Representation, chapter 7, pages 285–316. Elsevier Science, 2008.
+
+[8] A. B. Kahng and F. Koushanfar. Evolving eda beyond its e-roots: An overview. In Proceedings of the IEEE/ACM International Conference on Computer-Aided Design, ICCAD ’15, pages 247–254, Piscataway, NJ, USA, 2015. IEEE Press.
+[9] S. Koohi, M. Abdollahi, and S. Hessabi. All-optical wavelength-routed noc based on a novel hierarchical topology. In Networks on Chip (NoCS), 2011 Fifth IEEE/ACM International Symposium on, pages 97–104, May 2011.
+[10] A. V. Krishnamoorthy, X. Zheng, G. Li, J. Yao, T. Pinguet, A. Mekis, H. Thacker, I. Shubin, Y. Luo, K. Raj, and J. E. Cunningham. Exploiting cmos manufacturing to reduce tuning requirements for resonant optical devices. IEEE Photonics Journal, 3(3):567–579, June 2011.
+[11] D. Liang and J. E. Bowers. Recent progress in lasers on silicon. Nat Photon, 4(8):511–517, Aug 2010.
+[12] R. Martin. Large Scale Linear and Integer Optimization: A Uniﬁed Approach. Springer US, 1999.
+[13] K. Miliotis, G. Papadimitriou, and A. Pomportsis. Design alternatives for wavelength routing networks. Optics & Laser Technology, 35(2):137 – 154, 2003.
+[14] I. O’Connor, M. Bri`ere, E. Drouard, A. Kazmierczak, F. Tissaﬁ-Drissi, D. Navarro, F. Mieyeville, J. Dambre, D. Stroobandt, J.-M. Fedeli, Z. Lisik, and F. Gaﬃot. Towards reconﬁgurable optical networks on chip, 2005.
+[15] A. Parini, L. Ramini, G. Bellanca, and D. Bertozzi. Abstract modelling of switching elements for optical networks-on-chip with technology platform awareness. In Proceedings of the Fifth International Workshop on Interconnection Network Architecture: On-Chip, Multi-Chip, INA-OCMC ’11, pages 31–34, New York, NY, USA, 2011. ACM.
+[16] L. Ramini, P. Grani, S. Bartolini, and D. Bertozzi. Contrasting wavelength-routed optical noc topologies for power-eﬃcient 3d-stacked multicore processors using physical-layer analysis. In Design, Automation Test in Europe Conference Exhibition (DATE), 2013, pages 1589–1594, March 2013.
+[17] L. Ramini, M. Tala, and D. Bertozzi. Exploring communication protocols for optical networks-on-chip based on ring topologies. In Asia Communications and Photonics Conference 2014, page ATh3A.165. Optical Society of America, 2014.
+[18] Sonics, Inc. SonicsStudio: Next Generation Development Environment. http://sonicsinc.com/products/developmenttools/sonicsstudio-director/.
+[19] M. Tala, M. Castellari, D. Bertozzi, M. Balboni, and L. Ramini. Populating and exploring the design space of wavelength-routed optical network-on-chip topologies by leveraging the add-drop ﬁltering primitive. In Int. Network-on-Chip Symposium, 2016.
+[20] X. Tan, M. Yang, L. Zhang, Y. Jiang, and J. Yang. On a scalable, non-blocking optical router for photonic networks-on-chip designs. In Symposium on Photonics and Optoelectronics (SOPO), pages 1–4, May 2011.
+[21] A. von Beuningen and U. Schlichtmann. Platon: A force-directed placement algorithm for 3d optical networks-on-chip. In ISPD 2016: 27-34.
+
+

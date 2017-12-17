@@ -1,0 +1,299 @@
+key,authorIndex,name,thenEmail,thenEmailWhat
+conf/asplos/AbadalCAT16,0,Sergi Abadal,abadal@ac.upc.edu,FindAuthor
+conf/asplos/AbadalCAT16,1,Albert Cabellos-Aparicio,acabello@ac.upc.edu,NullEmail
+conf/asplos/AbadalCAT16,2,Eduard Alarcón,eduard.alarcon@upc.edu,NullEmail
+conf/asplos/AbadalCAT16,3,Josep Torrellas,torrella@illinois.edu,NullEmail
+conf/asplos/AwadMHSH16,0,Amro Awad,ajawad@ncsu.edu,FindAuthor
+conf/asplos/AwadMHSH16,1,Pratyusa K. Manadhata,pratyusa.k.manadhata@hpe.com,FindAuthor
+conf/asplos/AwadMHSH16,2,Stuart Haber,stuart.haber@hpe.com,FindAuthor
+conf/asplos/AwadMHSH16,3,Yan Solihin,solihin@ncsu.edu,FindAuthor
+conf/asplos/AwadMHSH16,4,William Horne,william.horne@hpe.com,FindAuthor
+conf/asplos/BornholtKLKTW16,0,James Bornholt,bornholt@cs.washington.edu,FindAuthor
+conf/asplos/BornholtKLKTW16,1,Antoine Kaufmann,antoinek@cs.washington.edu,FindAuthor
+conf/asplos/BornholtKLKTW16,2,Jialin Li,lijl@cs.washington.edu,FindAuthor
+conf/asplos/BornholtKLKTW16,3,Arvind Krishnamurthy,arvind@cs.washington.edu,FindAuthor
+conf/asplos/BornholtKLKTW16,4,Emina Torlak,emina@cs.washington.edu,FindAuthor
+conf/asplos/BornholtKLKTW16,5,Xi Wang,xi@cs.washington.edu,FindAuthor
+conf/asplos/FanZL16,0,Songchun Fan,songchun.fan@duke.edu,FindAuthor
+conf/asplos/FanZL16,1,Seyed Majid Zahedi,seyedmajid.zahedi@duke.edu,FindAuthor
+conf/asplos/FanZL16,2,Benjamin C. Lee,benjamin.c.lee@duke.edu,FindAuthor
+conf/asplos/KimKBNW16,0,Wook-Hee Kim,okie90@unist.ac.kr,FindAuthor
+conf/asplos/KimKBNW16,1,Jinwoong Kim,jwkim@unist.ac.kr,FindAuthor
+conf/asplos/KimKBNW16,2,Woongki Baek,wbaek@unist.ac.kr,FindAuthor
+conf/asplos/KimKBNW16,3,Beomseok Nam,bsnam@unist.ac.kr,FindAuthor
+conf/asplos/KimKBNW16,4,Youjip Won,yjwon@hanyang.ac.kr,FindAuthor
+conf/asplos/LinCLMHXS16,0,Xiaofeng Lin,jerrylin.lxf@gmail.com,FindAuthor
+conf/asplos/LinCLMHXS16,1,Yu Chen,yuchen@mail.tsinghua.edu.cn,FindAuthor
+conf/asplos/LinCLMHXS16,2,Xiaodong Li,xiaodong2@staff.sina.com.cn,FindAuthor
+conf/asplos/LinCLMHXS16,3,Junjie Mao,maojj12@mails.tsinghua.edu.cn,FindAuthor
+conf/asplos/LinCLMHXS16,4,Jiaquan He,objectkuan@gmail.com,FindAuthor
+conf/asplos/LinCLMHXS16,5,Wei Xu,weixu@tsinghua.edu.cn,FindAuthor
+conf/asplos/LinCLMHXS16,6,Yuanchun Shi,shiyc@tsinghua.edu.cn,FindAuthor
+conf/asplos/MaoCXS16,0,Junjie Mao,maojj12@mails.tsinghua.edu.cn,FindAuthor
+conf/asplos/MaoCXS16,1,Yu Chen,yuchen@mail.tsinghua.edu.cn,FindAuthor
+conf/asplos/MaoCXS16,2,Qixue Xiao,xqx12@mails.tsinghua.edu.cn,FindAuthor
+conf/asplos/MaoCXS16,3,Yuanchun Shi,shiyc@tsinghua.edu.cn,FindAuthor
+conf/asplos/McKinley16,0,Kathryn S. McKinley,mckinley@microsoft.com,FindAuthor
+conf/asplos/Williams16,0,R. Stanley Williams,stan.williams@hpe.com,FindAuthor
+conf/asplos/Witchel16,0,Emmett Witchel,witchel@cs.utexas.edu,FindAuthor
+conf/iccad/AbusultanK16,0,Monther Abusultan,abusultan@montana.edu,NullEmail
+conf/iccad/AbusultanK16,1,Sunil P. Khatri,sunilkhatri@tamu.edu,NullEmail
+conf/iccad/BatselierCLW16,0,Kim Batselier,kimb@eee.hku.hk,FindAuthor
+conf/iccad/BatselierCLW16,1,Zhongming Chen,zmchen@eee.hku.hk,FindAuthor
+conf/iccad/BatselierCLW16,2,Haotian Liu,haotian@cadence.com,FindAuthor
+conf/iccad/BatselierCLW16,3,Ngai Wong,nwong@eee.hku.hk,FindAuthor
+conf/iccad/ChenS16,0,Quan Chen,quanchen@eee.hku.hk,FindAuthor
+conf/iccad/ChenS16,1,Wim Schoenmaker,wim.schoenmaker@magwel.com,FindAuthor
+conf/iccad/HuangLKN16,0,Shih-Hsu Huang,shhuang@cycu.edu.tw,FindAuthor
+conf/iccad/HuangLKN16,1,Rung-Bin Lin,csrlin@cs.yzu.edu.tw,FindAuthor
+conf/iccad/HuangLKN16,2,Myung-Chul Kim,mckima@us.ibm.com,FindAuthor
+conf/iccad/HuangLKN16,3,Shigetoshi Nakatake,nakatake@kitakyu-u.ac.jp,FindAuthor
+conf/iccad/KannanS16,0,Parivallal Kannan,parik@xilinx.com,FindAuthor
+conf/iccad/KannanS16,1,Satish Sivaswamy,ssivasw@xilinx.com,FindAuthor
+conf/iccad/KuDMRL16,0,Bon Woong Ku,bwku@gatech.edu,FindAuthor
+conf/iccad/KuDMRL16,1,Peter Debacker,peter.debacker@imec.be,NullEmail
+conf/iccad/KuDMRL16,2,Dragomir Milojevic,dragomir.milojevic@ulb.ac.be,NullEmail
+conf/iccad/KuDMRL16,3,Praveen Raghavan,,NullEmail
+conf/iccad/KuDMRL16,4,Sung Kyu Lim,sklim@ece.gatech.edu,FindAuthor
+conf/iccad/PattisonAAGV16,0,Ryan Pattison,rpattiso@uoguelph.ca,FindAuthor
+conf/iccad/PattisonAAGV16,1,Ziad Abuowaimer,abuowaiz@uoguelph.ca,FindAuthor
+conf/iccad/PattisonAAGV16,2,Shawki Areibi,sareibi@uoguelph.ca,FindAuthor
+conf/iccad/PattisonAAGV16,3,Gary Gréwal,ggrewal@uoguelph.ca,FindAuthor
+conf/iccad/PattisonAAGV16,4,Anthony Vannelli,vannelli@uoguelph.ca,FindAuthor
+conf/iccad/PeanoRGNB16,0,Andrea Peano,andrea.peano@unife.it,FindAuthor
+conf/iccad/PeanoRGNB16,1,Luca Ramini,luca.ramini@unife.it,FindAuthor
+conf/iccad/PeanoRGNB16,2,Marco Gavanelli,marco.gavanelli@unife.it,FindAuthor
+conf/iccad/PeanoRGNB16,3,Maddalena Nonato,maddalena.nonato@unife.it,FindAuthor
+conf/iccad/PeanoRGNB16,4,Davide Bertozzi,davide.bertozzi@unife.it,FindAuthor
+conf/iccad/SinhaZHRBC16,0,Debjit Sinha,debjit.sinha@us.ibm.com,NullEmail
+conf/iccad/SinhaZHRBC16,1,Vladimir Zolotov,zolotov@us.ibm.com,NullEmail
+conf/iccad/SinhaZHRBC16,2,Jin Hu,jinhu@umich.edu,NullEmail
+conf/iccad/SinhaZHRBC16,3,Sheshashayee K. Raghunathan,shesha.raghunathan@in.ibm.com,NullEmail
+conf/iccad/SinhaZHRBC16,4,Adil Bhanji,,NullEmail
+conf/iccad/SinhaZHRBC16,5,Christine M. Casey,,NullEmail
+conf/iccad/Topaloglu16,0,Rasit Onur Topaloglu,rasit@us.ibm.com,FindAuthor
+conf/icml/GaoLZ16,0,Chao Gao,CHAO.GAO@YALE.EDU,FindAuthor
+conf/icml/GaoLZ16,1,Yu Lu,YU.LU@YALE.EDU,FindAuthor
+conf/icml/GaoLZ16,2,Dengyong Zhou,DENGYONG.ZHOU@MICROSOFT.COM,FindAuthor
+conf/icml/KawakitaT16,0,Masanori Kawakita,KAWAKITA@INF.KYUSHU-U.AC.JP,FindAuthor
+conf/icml/KawakitaT16,1,Jun'ichi Takeuchi,TAK@INF.KYUSHU-U.AC.JP,FindAuthor
+conf/icml/MnihR16,0,Andriy Mnih,AMNIH@GOOGLE.COM,FindAuthor
+conf/icml/MnihR16,1,Danilo Jimenez Rezende,DANILOR@GOOGLE.COM,FindAuthor
+conf/icml/NatarajanKRD16,0,Nagarajan Natarajan,t-nanata@microsoft.com,FindAuthor
+conf/icml/NatarajanKRD16,1,Oluwasanmi Koyejo,SANMI@ILLINOIS.EDU,FindAuthor
+conf/icml/NatarajanKRD16,2,Pradeep Ravikumar,PRADEEPR@CS.UTEXAS.EDU,FindAuthor
+conf/icml/NatarajanKRD16,3,Inderjit S. Dhillon,INDERJIT@CS.UTEXAS.EDU,FindAuthor
+conf/icml/PuleoM16,0,Gregory J. Puleo,PULEO@ILLINOIS.EDU,FindAuthor
+conf/icml/PuleoM16,1,Olgica Milenkovic,MILENKOV@ILLINOIS.EDU,FindAuthor
+conf/icml/Shalev-Shwartz16,0,Shai Shalev-Shwartz,SHAIS@CS.HUJI.AC.IL,FindAuthor
+conf/icml/ShenLX16,0,Jie Shen,JS2007@RUTGERS.EDU,FindAuthor
+conf/icml/ShenLX16,1,Ping Li,PINGLI@STAT.RUTGERS.EDU,FindAuthor
+conf/icml/ShenLX16,2,Huan Xu,ISEXUH@NUS.EDU.SG,FindAuthor
+conf/icml/SyrgkanisKS16,0,Vasilis Syrgkanis,VASY@MICROSOFT.COM,MakeSurveyPageForAdmin
+conf/icml/SyrgkanisKS16,1,Akshay Krishnamurthy,AKSHAYKR@CS.CMU.EDU,MakeSurveyPageForAdmin
+conf/icml/SyrgkanisKS16,2,Robert E. Schapire,SCHAPIRE@MICROSOFT.COM,MakeSurveyPageForAdmin
+conf/icml/XuZCL16,0,Zhiqiang Xu,XUZQ@I2R.A-STAR.EDU.SG,FindAuthor
+conf/icml/XuZCL16,1,Peilin Zhao,ZHAOP@I2R.A-STAR.EDU.SG,FindAuthor
+conf/icml/XuZCL16,2,Jianneng Cao,CAOJN@I2R.A-STAR.EDU.SG,FindAuthor
+conf/icml/XuZCL16,3,Xiaoli Li,XLLI@I2R.A-STAR.EDU.SG,FindAuthor
+conf/icml/YoonAHS16,0,Jinsung Yoon,JSYOON0823@UCLA.EDU,FindAuthor
+conf/icml/YoonAHS16,1,Ahmed M. Alaa,AHMEDMALAA@UCLA.EDU,FindAuthor
+conf/icml/YoonAHS16,2,Scott Hu,SCOTTHU@MEDNET.UCLA.EDU,FindAuthor
+conf/icml/YoonAHS16,3,Mihaela van der Schaar,MIHAELA@EE.UCLA.EDU,FindAuthor
+conf/imc/AlcockMN16,0,Shane Alcock,salcock@waikato.ac.nz,FindAuthor
+conf/imc/AlcockMN16,1,Jean-Pierre Möller,jp.moller78@gmail.com,FindAuthor
+conf/imc/AlcockMN16,2,Richard Nelson,richardn@waikato.ac.nz,FindAuthor
+conf/imc/GhobadiM16,0,Monia Ghobadi,mgh@microsoft.com,FindAuthor
+conf/imc/GhobadiM16,1,Ratul Mahajan,ratul@microsoft.com,FindAuthor
+conf/imc/HastingsFH16,0,Marcella Hastings,mhast@cis.upenn.edu,FindAuthor
+conf/imc/HastingsFH16,1,Joshua Fried,fjosh@cis.upenn.edu,FindAuthor
+conf/imc/HastingsFH16,2,Nadia Heninger,nadiah@cis.upenn.edu,FindAuthor
+conf/imc/KlickLW016,0,Johannes Klick,johannes.klick@fu-berlin.de,FindAuthor
+conf/imc/KlickLW016,1,Stephan Lau,stephan.lau@fu-berlin.de,FindAuthor
+conf/imc/KlickLW016,2,Matthias Wählisch,m.waehlisch@fu-berlin.de,FindAuthor
+conf/imc/KlickLW016,3,Volker Roth,volker.roth@fu-berlin.de,FindAuthor
+conf/imc/KrencF16,0,Thomas Krenc,tkrenc@inet.tu-berlin.de,FindAuthor
+conf/imc/KrencF16,1,Anja Feldmann,anja@inet.tu-berlin.de,FindAuthor
+conf/imc/LeeS16,0,Youndo Lee,ydlee@cs.umd.edu,FindAuthor
+conf/imc/LeeS16,1,Neil Spring,nspring@cs.umd.edu,FindAuthor
+conf/imc/LeungRCW16,0,Christophe Leung,tophe@ccs.neu.edu,FindAuthor
+conf/imc/LeungRCW16,1,Jingjing Ren,renjj@ccs.neu.edu,FindAuthor
+conf/imc/LeungRCW16,2,David R. Choffnes,choffnes@ccs.neu.edu,FindAuthor
+conf/imc/LeungRCW16,3,Christo Wilson,cbw@ccs.neu.edu,FindAuthor
+conf/imc/LiuTZZZZ16,0,Qingyun Liu,qingyun_liu@cs.ucsb.edu,FindAuthor
+conf/imc/LiuTZZZZ16,1,Shiliang Tang,shiliang_tang@cs.ucsb.edu,FindAuthor
+conf/imc/LiuTZZZZ16,2,Xinyi Zhang,xyzhang@cs.ucsb.edu,FindAuthor
+conf/imc/LiuTZZZZ16,3,Xiaohan Zhao,xiaohanzhao@cs.ucsb.edu,FindAuthor
+conf/imc/LiuTZZZZ16,4,Ben Y. Zhao,ravenben@cs.ucsb.edu,FindAuthor
+conf/imc/LiuTZZZZ16,5,Haitao Zheng,htzheng@cs.ucsb.edu,FindAuthor
+conf/imc/SenPPFSCG16,0,Rijurekha Sen,rijurekha@mpi-sws.org,NullEmail
+conf/imc/SenPPFSCG16,1,Hasnain Ali Pirzada,,NullEmail
+conf/imc/SenPPFSCG16,2,Amreesh Phokeer,aphokeer@cs.uct.ac.za,NullEmail
+conf/imc/SenPPFSCG16,3,Zaid Ahmed Farooq,,NullEmail
+conf/imc/SenPPFSCG16,4,Satadal Sengupta,satadal.sengupta.nit@gmail.com,NullEmail
+conf/imc/SenPPFSCG16,5,David R. Choffnes,choffnes@ccs.neu.edu,NullEmail
+conf/imc/SenPPFSCG16,6,Krishna P. Gummadi,gummadi@mpi-sws.org,NullEmail
+conf/imc/VanderSlootABDB16,0,Benjamin VanderSloot,benvds@umich.edu,FindAuthor
+conf/imc/VanderSlootABDB16,1,Johanna Amann,johanna@icir.org,FindAuthor
+conf/imc/VanderSlootABDB16,2,Matthew Bernhard,matber@umich.edu,FindAuthor
+conf/imc/VanderSlootABDB16,3,Zakir Durumeric,zakir@umich.edu,FindAuthor
+conf/imc/VanderSlootABDB16,4,Michael Bailey,mdbailey@illinois.edu,FindAuthor
+conf/imc/VanderSlootABDB16,5,J. Alex Halderman,jhalderm@umich.edu,FindAuthor
+conf/lics/BenediktBB16,0,Michael Benedikt,michael.benedikt@cs.ox.ac.uk,NullEmail
+conf/lics/BenediktBB16,1,Pierre Bourhis,pierre.bourhis@univ-lille1.fr,NullEmail
+conf/lics/BenediktBB16,2,Michael Vanden Boom,michael.vandenboom@cs.ox.ac.uk,NullEmail
+conf/lics/BenediktBCP16,0,Michael Benedikt,michael.benedikt@cs.ox.ac.uk,MakeSurveyPageForAide
+conf/lics/BenediktBCP16,1,Pierre Bourhis,pierre.bourhis@univ-lille1.fr,MakeSurveyPageForAide
+conf/lics/BenediktBCP16,2,Balder ten Cate,btencate@ucsc.edu,MakeSurveyPageForAide
+conf/lics/BenediktBCP16,3,Gabriele Puppis,gabriele.puppis@gmail.com,MakeSurveyPageForAide
+conf/lics/Chatterjee016,0,Krishnendu Chatterjee,krish.chat@ist.ac.at,FindAuthor
+conf/lics/Chatterjee016,1,Laurent Doyen,doyen@lsv.fr,FindAuthor
+conf/lics/ChatterjeeHO16,0,Krishnendu Chatterjee,krishnendu.chatterjee@ist.ac.at,MakeSurveyPageForAdmin
+conf/lics/ChatterjeeHO16,1,Thomas A. Henzinger,tah@ist.ac.at,MakeSurveyPageForAdmin
+conf/lics/ChatterjeeHO16,2,Jan Otop,jotop@cs.uni.wroc.pl,MakeSurveyPageForAdmin
+conf/lics/Galicki16,0,Alex Galicki,agal629@auckland.ac.nz,FindAuthor
+conf/lics/HerlihyM16,0,Maurice Herlihy,mph@cs.brown.edu,FindAuthor
+conf/lics/HerlihyM16,1,Mark Moir,mark.moir@oracle.com,FindAuthor
+conf/lics/HughesH16,0,Dominic J. D. Hughes,,NullEmail
+conf/lics/HughesH16,1,Willem Heijltjes,w.b.heijltjes@bath.ac.uk,NullEmail
+conf/lics/Kopczynski16,0,Eryk Kopczynski,erykk@mimuw.edu.pl,FindAuthor
+conf/lics/Kozen16,0,Dexter Kozen,kozen@cs.cornell.edu,FindAuthor
+conf/lics/Kozik16,0,Marcin Kozik,marcin.kozik@uj.edu.pl,FindAuthor
+conf/micro/AlwaniCFM16,0,Manoj Alwani,malwani@cs.stonybrook.edu,FindAuthor
+conf/micro/AlwaniCFM16,1,Han Chen,han.chen.2@stonybrook.edu,FindAuthor
+conf/micro/AlwaniCFM16,2,Michael Ferdman,mferdman@cs.stonybrook.edu,FindAuthor
+conf/micro/AlwaniCFM16,3,Peter Milder,peter.milder@stonybrook.edu,FindAuthor
+conf/micro/GogteKCDW16,0,Vaibhav Gogte,vgogte@umich.edu,FindAuthor
+conf/micro/GogteKCDW16,1,Aasheesh Kolli,akolli@umich.edu,FindAuthor
+conf/micro/GogteKCDW16,2,Michael J. Cafarella,michjc@umich.edu,FindAuthor
+conf/micro/GogteKCDW16,3,Loris D'Antoni,loris@cs.wisc.edu,FindAuthor
+conf/micro/GogteKCDW16,4,Thomas F. Wenisch,twenisch@umich.edu,FindAuthor
+conf/micro/JainHLKHLMTM16,0,Animesh Jain,anijain@umich.edu,FindAuthor
+conf/micro/JainHLKHLMTM16,1,Parker Hill,parkerhh@umich.edu,FindAuthor
+conf/micro/JainHLKHLMTM16,2,Shih-Chieh Lin,shihclin@umich.edu,FindAuthor
+conf/micro/JainHLKHLMTM16,3,Muneeb Khan,muneeb.khan@it.uu.se,FindAuthor
+conf/micro/JainHLKHLMTM16,4,Md E. Haque,mdhaque@umich.edu,FindAuthor
+conf/micro/JainHLKHLMTM16,5,Michael A. Laurenzano,mlaurenz@umich.edu,FindAuthor
+conf/micro/JainHLKHLMTM16,6,Scott A. Mahlke,mahlke@umich.edu,FindAuthor
+conf/micro/JainHLKHLMTM16,7,Lingjia Tang,lingjia@umich.edu,FindAuthor
+conf/micro/JainHLKHLMTM16,8,Jason Mars,profmars@umich.edu,FindAuthor
+conf/micro/JainLTM16,0,Animesh Jain,anijain@umich.edu,FindAuthor
+conf/micro/JainLTM16,1,Michael A. Laurenzano,mlaurenz@umich.edu,FindAuthor
+conf/micro/JainLTM16,2,Lingjia Tang,lingjia@umich.edu,FindAuthor
+conf/micro/JainLTM16,3,Jason Mars,profmars@umich.edu,FindAuthor
+conf/micro/JeffreySAES16,0,Mark C. Jeffrey,mcj@csail.mit.edu,FindAuthor
+conf/micro/JeffreySAES16,1,Suvinay Subramanian,suvinay@csail.mit.edu,FindAuthor
+conf/micro/JeffreySAES16,2,Maleen Abeydeera,maleen@csail.mit.edu,FindAuthor
+conf/micro/JeffreySAES16,3,Joel S. Emer,emer@csail.mit.edu,FindAuthor
+conf/micro/JeffreySAES16,4,Daniel Sanchez,sanchez@csail.mit.edu,FindAuthor
+conf/micro/KallurkarS16,0,Prathmesh Kallurkar,prathmesh.kallurkar@cse.iitd.ac.in,FindAuthor
+conf/micro/KallurkarS16,1,Smruti R. Sarangi,srsarangi@cse.iitd.ac.in,FindAuthor
+conf/micro/Martonosi16,0,Margaret Martonosi,martonosi@princeton.edu,NullEmail
+conf/micro/SantriajiH16,0,Muhammad Husni Santriaji,muhammad.santriaji@surya.ac.id,FindAuthor
+conf/micro/SantriajiH16,1,Henry Hoffmann,hankhoffmann@uchicago.edu,FindAuthor
+conf/micro/YazdaniSAG16,0,Reza Yazdani,ryazdani@ac.upc.edu,FindAuthor
+conf/micro/YazdaniSAG16,1,Albert Segura,asegura@ac.upc.edu,FindAuthor
+conf/micro/YazdaniSAG16,2,Jose-Maria Arnau,jarnau@ac.upc.edu,FindAuthor
+conf/micro/YazdaniSAG16,3,Antonio Gonzalez,antonio@ac.upc.edu,FindAuthor
+conf/micro/ZhangCS16,0,Guowei Zhang,zhanggw@csail.mit.edu,FindAuthor
+conf/micro/ZhangCS16,1,Virginia Chiu,vchiu@csail.mit.edu,FindAuthor
+conf/micro/ZhangCS16,2,Daniel Sanchez,sanchez@csail.mit.edu,FindAuthor
+conf/naacl/BootenH16,0,Kyle Booten,kbooten@berkeley.edu,FindAuthor
+conf/naacl/BootenH16,1,Marti A. Hearst,hearst@berkeley.edu,FindAuthor
+conf/naacl/FerreiraV16,0,William Ferreira,,NullEmail
+conf/naacl/FerreiraV16,1,Andreas Vlachos,a.vlachos@sheffield.ac.uk,NullEmail
+conf/naacl/GirleaGA16,0,Codruta Gîrlea,girlea2@illinois.edu,FindAuthor
+conf/naacl/GirleaGA16,1,Roxana Girju,girju@illinois.edu,FindAuthor
+conf/naacl/GirleaGA16,2,Eyal Amir,eyal@illinois.edu,FindAuthor
+conf/naacl/KiritchenkoM16a,0,Svetlana Kiritchenko,svetlana.kiritchenko@nrc-cnrc.gc.ca,FindAuthor
+conf/naacl/KiritchenkoM16a,1,Saif M. Mohammad,saif.mohammad@nrc-cnrc.gc.ca,FindAuthor
+conf/naacl/LacroixAWY16,0,Ophélie Lacroix,ophelie.lacroix@limsi.fr,FindAuthor
+conf/naacl/LacroixAWY16,1,Lauriane Aufrant,lauriane.aufrant@limsi.fr,FindAuthor
+conf/naacl/LacroixAWY16,2,Guillaume Wisniewski,guillaume.wisniewski@limsi.fr,FindAuthor
+conf/naacl/LacroixAWY16,3,François Yvon,francois.yvon@limsi.fr,FindAuthor
+conf/naacl/Moosavi016,0,Nafise Sadat Moosavi,nafise.moosavi@h-its.org,FindAuthor
+conf/naacl/Moosavi016,1,Michael Strube,michael.strube@h-its.org,FindAuthor
+conf/naacl/PaetzoldS16,0,Gustavo Paetzold,ghpaetzold1@sheffield.ac.uk,FindAuthor
+conf/naacl/PaetzoldS16,1,Lucia Specia,l.specia@sheffield.ac.uk,FindAuthor
+conf/naacl/SchwartzRR16,0,Roy Schwartz,roys02@cs.huji.ac.il,FindAuthor
+conf/naacl/SchwartzRR16,1,Roi Reichart,roiri@ie.technion.ac.il,FindAuthor
+conf/naacl/SchwartzRR16,2,Ari Rappoport,arir@cs.huji.ac.il,FindAuthor
+conf/naacl/SennrichHB16,0,Rico Sennrich,rico.sennrich@ed.ac.uk,FindAuthor
+conf/naacl/SennrichHB16,1,Barry Haddow,bhaddow@inf.ed.ac.uk,FindAuthor
+conf/naacl/SennrichHB16,2,Alexandra Birch,a.birch@ed.ac.uk,FindAuthor
+conf/naacl/SharmaGMBSMS16,0,Arnav Sharma,arnav.s@research.iiit.ac.in,FindAuthor
+conf/naacl/SharmaGMBSMS16,1,Sakshi Gupta,sakshi.gupta@research.iiit.ac.in,FindAuthor
+conf/naacl/SharmaGMBSMS16,2,Raveesh Motlani,raveesh.motlani@research.iiit.ac.in,FindAuthor
+conf/naacl/SharmaGMBSMS16,3,Piyush Bansal,piyush.bansal@research.iiit.ac.in,FindAuthor
+conf/naacl/SharmaGMBSMS16,4,Manish Shrivastava,m.shrivastava@iiit.ac.in,FindAuthor
+conf/naacl/SharmaGMBSMS16,5,Radhika Mamidi,radhika@iiit.ac.in,FindAuthor
+conf/naacl/SharmaGMBSMS16,6,Dipti Misra Sharma,dipti@iiit.ac.in,FindAuthor
+conf/sigsoft/Alimadadi16,0,Saba Alimadadi,saba@ece.ubc.ca,FindAuthor
+conf/sigsoft/Gullapalli16,0,Sachith Gullapalli,sachith.gullapalli@yale.edu,FindAuthor
+conf/sigsoft/Hammoudi16,0,Mouna Hammoudi,mouna@cse.unl.edu,FindAuthor
+conf/sigsoft/Hilton16,0,Michael Hilton,hiltonm@eecs.oregonstate.edu,FindAuthor
+conf/sigsoft/Huang16,0,Shan Shan Huang,ssh@logicblox.com,FindAuthor
+conf/sigsoft/JacksonV16,0,Daniel Jackson,dnj@mit.edu,FindAuthor
+conf/sigsoft/JacksonV16,1,Mandana Vaziri,mvaziri@us.ibm.com,FindAuthor
+conf/sigsoft/Kurtz16,0,Bob Kurtz,rkurtz2@gmu.edu,FindAuthor
+conf/sigsoft/Mahmud16,0,Gazi Mahmud,gmahmud@sonatype.com,FindAuthor
+conf/sigsoft/Panchekha16,0,Pavel Panchekha,pavpan@cs.uw.edu,FindAuthor
+conf/sigsoft/Sadowski16,0,Caitlin Sadowski,supertri@google.com,FindAuthor
+conf/vr/BeraKM16,0,Aniket Bera,ab@cs.unc.edu,FindAuthor
+conf/vr/BeraKM16,1,Sujeong Kim,sujeong@cs.unc.edu,FindAuthor
+conf/vr/BeraKM16,2,Dinesh Manocha,dm@cs.unc.edu,FindAuthor
+conf/vr/Bickmore16,0,Timothy W. Bickmore,bickmore@ccs.neu.edu,NullEmail
+conf/vr/BodenheimerWMR16,0,Bobby Bodenheimer,bobby.bodenheimer@vanderbilt.edu,FindAuthor
+conf/vr/BodenheimerWMR16,1,Yiming Wang,yiming.wang@vanderbilt.edu,FindAuthor
+conf/vr/BodenheimerWMR16,2,Divine Maloney,malond0@sewanee.edu,FindAuthor
+conf/vr/BodenheimerWMR16,3,John J. Rieser,j.rieser@vanderbilt.edu,FindAuthor
+conf/vr/HollererILS16,0,Tobias Höllerer,holl@cs.ucsb.edu,NullEmail
+conf/vr/HollererILS16,1,Victoria Interrante,interran@umn.edu,NullEmail
+conf/vr/HollererILS16,2,Anatole Lécuyer,anatole.lecuyer@inria.fr,NullEmail
+conf/vr/HollererILS16,3,Evan A. Suma,,NullEmail
+conf/vr/Lin16,0,Ming Lin,lin@cs.unc.edu,NullEmail
+conf/vr/LinJ16,0,Lorraine Lin,lorrain@clemson.edu,FindAuthor
+conf/vr/LinJ16,1,Sophie Jörg,sjoerg@clemson.edu,FindAuthor
+conf/vr/PeerP16,0,Alex Peer,alex.peer@wisc.edu,FindAuthor
+conf/vr/PeerP16,1,Kevin Ponto,kbponto@wisc.edu,FindAuthor
+conf/vr/TeofiloNSASN16,0,Mauro Teófilo,mauro.t@samsung.com,FindAuthor
+conf/vr/TeofiloNSASN16,1,Josiane Nascimento,josiane.p@samsung.com,FindAuthor
+conf/vr/TeofiloNSASN16,2,Jonathan Santos,js.santos@samsung.com,FindAuthor
+conf/vr/TeofiloNSASN16,3,Yves Albuquerque,yves.ja@samsung.com,FindAuthor
+conf/vr/TeofiloNSASN16,4,Andre L. Souza,alsouza@ua.edu,FindAuthor
+conf/vr/TeofiloNSASN16,5,Daniel Nogueira,daniel.nog@samsung.com,FindAuthor
+conf/vr/ZielaskoHFWK16,0,Daniel Zielasko,zielasko@vr.rwth-aachen.de,FindAuthor
+conf/vr/ZielaskoHFWK16,1,Sven Horn,sven.horn@rwth-aachen.de,FindAuthor
+conf/vr/ZielaskoHFWK16,2,Sebastian Freitag,freitag@vr.rwth-aachen.de,FindAuthor
+conf/vr/ZielaskoHFWK16,3,Benjamin Weyers,weyers@vr.rwth-aachen.de,FindAuthor
+conf/vr/ZielaskoHFWK16,4,Torsten W. Kuhlen,kuhlen@vr.rwth-aachen.de,FindAuthor
+conf/vr/ZielinskiRPAK16,0,David J. Zielinski,djziein@duke.edu,FindAuthor
+conf/vr/ZielinskiRPAK16,1,Hrishikesh Rao,hrishikesh.rao@duke.edu,FindAuthor
+conf/vr/ZielinskiRPAK16,2,Nick Potter,npotter@duaa.duke.edu,FindAuthor
+conf/vr/ZielinskiRPAK16,3,Lawrence G. Appelbaum,lawrence.appelbaum@duke.edu,FindAuthor
+conf/vr/ZielinskiRPAK16,4,Regis Kopper,regis.kopper@duke.edu,FindAuthor
+conf/www/BensonKT16a,0,Austin R. Benson,arbenson@stanford.edu,FindAuthor
+conf/www/BensonKT16a,1,Ravi Kumar,ravi.k53@gmail.com,FindAuthor
+conf/www/BensonKT16a,2,Andrew Tomkins,atomkins@gmail.com,FindAuthor
+conf/www/ChopraS16,0,Amit K. Chopra,a.chopra1@lancaster.ac.uk,FindAuthor
+conf/www/ChopraS16,1,Munindar P. Singh,mpsingh@ncsu.edu,FindAuthor
+conf/www/Fox16,0,Martha Lane Fox,,NullEmail
+conf/www/Kawamae16,0,Noriaki Kawamae,kawamae@gmail.com,FindAuthor
+conf/www/LemePV16,0,Renato Paes Leme,renatoppl@google.com,FindAuthor
+conf/www/LemePV16,1,Martin Pál,mpal@google.com,FindAuthor
+conf/www/LemePV16,2,Sergei Vassilvitskii,sergeiv@google.com,FindAuthor
+conf/www/NobataTTMC16,0,Chikashi Nobata,chikashi@yahoo-inc.com,MakeSurveyPageForAdmin
+conf/www/NobataTTMC16,1,Joel R. Tetreault,tetreaul@yahoo-inc.com,MakeSurveyPageForAdmin
+conf/www/NobataTTMC16,2,Achint Thomas,achint@embibe.com,MakeSurveyPageForAdmin
+conf/www/NobataTTMC16,3,Yashar Mehdad,ymehdad@yahoo-inc.com,MakeSurveyPageForAdmin
+conf/www/NobataTTMC16,4,Yi Chang,yichang@yahoo-inc.com,MakeSurveyPageForAdmin
+conf/www/RahmanW16,0,Md Mustafizur Rahman,mr4xb@virginia.edu,FindAuthor
+conf/www/RahmanW16,1,Hongning Wang,hw5x@virginia.edu,FindAuthor
+conf/www/RitzeLOB16,0,Dominique Ritze,dominique@informatik.uni-mannheim.de,FindAuthor
+conf/www/RitzeLOB16,1,Oliver Lehmberg,oli@informatik.uni-mannheim.de,FindAuthor
+conf/www/RitzeLOB16,2,Yaser Oulabi,yaser@informatik.uni-mannheim.de,FindAuthor
+conf/www/RitzeLOB16,3,Christian Bizer,chris@informatik.uni-mannheim.de,FindAuthor
+conf/www/YangIF16,0,Pu Yang,py75@cornell.edu,FindAuthor
+conf/www/YangIF16,1,Krishnamurthy Iyer,kriyer@cornell.edu,FindAuthor
+conf/www/YangIF16,2,Peter I. Frazier,pf98@cornell.edu,FindAuthor
+conf/www/Zurko16,0,Mary Ellen Zurko,mez@alum.mit.edu,FindAuthor

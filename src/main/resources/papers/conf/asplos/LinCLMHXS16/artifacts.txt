@@ -1,0 +1,17 @@
+http://dx.doi.org/10.1145/2872362.2872391
+https://github.com/fastos/fastsocket
+http://haproxy.1wt.eu/
+http://www
+http://tools
+https://git.kernel.org/cgit/
+http://lwn.net/Articles/
+http://lwn.net/Articles/
+http://lwn.net/
+http://www.intel.com/content/www/us/en/
+http://web.mit.edu/cron/documentation/
+http://www.solarflare.com/content/userfiles/
+http://lwn
+http://savannah.nongnu.org/projects/lwip/
+http://www.scn.rain.com/
+http://www.watson.org/~robert/freebsd/netperf/
+http://www.cs.rice.edu/CS/

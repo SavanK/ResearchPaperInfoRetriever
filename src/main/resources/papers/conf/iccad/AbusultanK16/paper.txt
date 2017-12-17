@@ -1,0 +1,466 @@
+A Flash-based Digital Circuit Design Flow
+
+Monther Abusultan
+
+Sunil P. Khatri
+
+ECE Department, Texas A&M University, College Station, TX 77843.
+
+ABSTRACT
+Traditionally, ﬂoating gate (ﬂash) transistors have been used exclusively to implement non-volatile memory in its various forms. Recently, we showed that ﬂash transistors can be used to implement digital circuits as well. In this paper, we present the details on the realization and characteristics of the block-level ﬂash-based digital design. The current work describes the synthesis ﬂow to decompose a circuit block into a network of interconnected FCs. The resulting network is characterized with respect to timing, power and energy, and the results are compared with a standard-cell based realization of the same block (obtained using commercial tools). We obtain signiﬁcantly improved delay (0.59×), power (0.35×) and cell area (0.60×) compared to a traditional CMOS standard-cell based approach, when averaged over 12 standard benchmarks. It is generally rare that a circuit methodology yields results that are better than existing commercial standard-cell based ﬂows in terms of delay, area, power and energy, and in this sense, we submit that our results are signiﬁcant. Additional beneﬁts of a ﬂash-based digital design is that it allows for precision speed binning in the factory, and also enables in-ﬁeld re-programmability (we note that our ﬂash-based design is not an FPGA, but rather an ASIC style design) to counteract the speed degradation of a design due to aging. These beneﬁts arise from the fact that the threshold voltage of ﬂash devices can be controlled with precision.
+Keywords: Flash-based Circuits; Logic Synthesis.
+1. INTRODUCTION
+Flash transistors are effectively dual-gate ﬁeld effect transistors (FET) devices. The two gates are referred to as a control gate and a ﬂoating gate. The control gate is similar to a regular transistor’s gate both physically and functionally. The ﬂoating gate is buried within the device structure, between the substrate and the control gate. The ﬂoating gate is never contacted, and hence it is never driven directly. Figure 1(a) shows the cross section of a ﬂash transistor. The phenomenon by which electrons tunnel through a barrier is referred to as Fowler-Nordheim (FN) tunneling [1]. In our approach, we only utilize two threshold voltages (the erase threshold voltage (V T0 in Figure 1(b)) and a program threshold voltage (V T1 in Figure 1(b)) to implement digital circuits. Note that V T1 is approximately V DD/2.
+Programming a ﬂash transistor is performed by holding the bulk, source and drain terminals at ground and applying a high voltage (1020 Volts) to the control gate terminal of the ﬂash transistor. This creates an electric ﬁeld that forces electrons to tunnel from the substrate into the ﬂoating gate, which causes an increase in the threshold voltage of the ﬂash transistor. The value of the resulting threshold voltage is dependent on the number of electrons that tunnel into the ﬂoating gate, which is in turn dependent on the duration of the programming pulse. Once electrons are trapped in the ﬂoating gate, they remain trapped
+Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for proﬁt or commercial advantage and that copies bear this notice and the full citation on the ﬁrst page. Copyrights for components of this work owned by others than ACM must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior speciﬁc permission and/or a fee. Request permissions from permissions@acm.org. ICCAD ’16, November 07-10, 2016, Austin, TX, USA Copyright 2016 ACM. ISBN 978-1-4503-4466-1/16/11 ...$15.00 DOI: http://dx.doi.org/10.1145/2966986.2966990
+
+Floating Control Dielectric Gate Gate
+
+Drain N+
+
+e e e ee
+
+Source N+
+
+VDD
+
+V IH
+
+V T1
+
+GND
+
+V IL
+
+P Substrate
+(a) Cross Section
+
+V T0
+(b) VT levels
+
+Figure 1: Floating Gate (Flash) Transistor Structure and VT Levels
+
+for several years [2, 3], or until removed by an erase operation. A ﬂash transistor is erased by holding the control gate voltage at ground, ﬂoating the drain and source terminals, and applying a high voltage at the bulk of the transistor. This results in an electric ﬁeld that forces the electrons to tunnel from the ﬂoating gate back into the substrate. Whereas programming can be done for a speciﬁc transistor by driving the programming voltage to its control gate, erasing is performed on many transistors at once (all the ﬂash transistors that share the same bulk node are erased at once, provided their drain, source and gate are connected as mentioned above).
+In this paper, we brieﬂy describe the circuit structure of the FC, while omitting ﬁner electrical details regarding programming and erasing of the transistors of the FCs. This is done so as to familiarize the reader with our ﬂash-based design approach.
+In this paper, we show through the circuit simulations, that our ﬂashbased digital circuit design approach, yields signiﬁcantly improved delay (0.59×), power (0.35×) and area (0.60×) characteristics compared to a traditional CMOS standard cell-based approach, when averaged over 12 standard benchmark designs.
+It is very important to note that the proposed ﬂash-based design is not an FPGA-like reprogrammable structure. Rather, it targets an ASIC or custom/semi-custom design ﬂow. The FC structure is not fully programmable because the metalization of the design is ﬁxed (i.e. interconnects are hardwired and not adjustable after fabrication). Also, we note that the ﬂash fabrication process is inherently compatible with the CMOS fabrication process. In fact, ﬂash memories use both ﬂash and CMOS transistors simultaneously on the same die [4]. In ﬂash memories, the CMOS devices are used for the controller, addressing logic, driver logic, and analog functions such as program voltage pulse generation. Our work assumes that both ﬂash and CMOS devices are present on the same die.
+The market need for dense and compact ﬂash memory has fueled the advancement in ﬂash technology. The technology node of ﬂash devices has recently been able to track the CMOS technology node. Currently memory devices are being fabricated at sub-20nm minimum feature dimensions similar to CMOS technology node [5, 6, 7, 8]. In this work, we only explore our design approach with a 45nm technology to ensure that our results are realistic. Electrical characteristics for ﬂash transistors at lower technology nodes are not easily available.
+Our ﬂash-based digital design ﬂow has some key advantages over standard cells. The ability to perform ﬁne adjustments to the device threshold voltage will allow the manufacturer to perform ﬁne grained speed binning at the factory. Also, as the IC ages, and the transistors slow down as a result, another round of ﬁne grained threshold voltage adjustment can be performed, to bring the IC performance back within speciﬁcations. In addition, by leaving a portion of ﬂash devices unprogrammed, our circuit has the ability to support post-manufacturing engineering change orders (ECOs). This is not possible in present day
+
+A C
+
+D
+
+AD
+
+Primary Inputs
+
+B
+
+Primary Primary E Outputs Inputs
+
+B
+
+C
+
+Primary Outputs
+
+E
+
+(a) Technology Independent Logic Circuit
+
+(b) Flash-based Digital Circuit
+
+Figure 2: Converting a Binary Netlist into a Flash-based Design
+
+CMOS technology, since ECOs in CMOS technology require metal mask changes, which can be expensive. Also, in present day CMOS, speed binning is a function of the process variations. Finally, in-ﬁeld performance adjustment (to counteract aging problems) is not possible in present-day CMOS designs.
+Flash transistors have a ﬁnite number of write cycles (1K to 100K) [2, 3], which is an issue for ﬂash memory devices. However, this will not be an issue when using ﬂash transistors to implement digital circuits. This is because the number of write cycles needed to realize the desired digital circuit will be very limited (a handful at most). In our approach, the ﬂash devices will be programmed after fabrication (in the factory), and then again to possibly adjust for aging effects (in the ﬁeld).
+The key contributions of this paper are:
+• To the best of the authors’ knowledge, this is the ﬁrst paper to present a ﬂash transistor-based synthesis ﬂow to implement digital circuits.
+• The electrical behavior of the ﬂash-based circuit blocks realized by our ﬂow are characterized using circuit level simulations, and we demonstrate signiﬁcantly improved delay, area, power and energy characteristics when compared to a commercial CMOS standard cell based approach.
+• The reasons for this improvement are an extremely dense layout and reduced gate capacitance.
+• Our approach supports ﬁne-grained in-factory programmability, allowing the manufacturer to perform precise speed binning.
+• By re-programming the threshold voltages of the transistors inﬁeld, our scheme provides the ability to mitigate effects like aging.
+• With the ﬂash-based digital design ﬂow, engineering change orders (ECOs) can be achieved easily, because ﬂash transistors are re-programmable post-manufacturing. In CMOS designs, ECOs invariably require metal mask changes.
+The remainder of this paper is organized as follows. Section 2 discusses some previous work in the area of ﬂash technology. Section 3 describes our ﬂash-based circuit design ﬂow, while Section 4 reports the results of experiments we performed to compare our design with a standard-cell based equivalent. We conclude our paper in Section 5.
+2. PREVIOUS WORK
+There have been several research efforts which study the ﬂash devices and their use in memory. A short list includes [9, 10]. These papers report details of ﬂash devices and their characterization. However, they do not describe the use of ﬂash transistors for logic circuits.
+A good deal of work in ﬂash has been reported in the area of architectural techniques to increase ﬂash memory endurance. Some representative works include those on wear leveling techniques, which are used in ﬂash-based memory blocks [11], to compensate for the fact that ﬂash transistors typically have a ﬁnite (10k - 100k) number of times they can be written [2, 3]. In traditional ﬂash memory, wear leveling is performed at the architectural level to spread the wear of the cells.
+The authors of [12] present a ﬂash-based design approach to implement ternary-valued logic circuits. The use of ternary-valued logic in [12] is aimed towards reducing the number of transistors connected in series in each NAND stack. However, the use of multiple threshold
+
+voltages results in reduced Vgs values, which results in increased delays. Another factor that contributes to the increased delays in [12] is the large number of transistors in each NAND stack (8 ﬂash transistors for a 4-input ternary-valued function). In contrast, our implementation uses 6 ﬂash transistors in series for a 6 input binary-valued function, which is a reduction of 2× for each input. We use single-level cells (SLC) cells instead of multi-level cells (MLC) cells (which were used in [12]) to implement our ﬂash-based digital circuits. This makes our design more immune to read and write disturbs. The work in [12] reported a 3× delay penalty compared to a CMOS standard cell-based implementation. In our work, we achieve improved delays at the celllevel (16% faster) as well as the block-level (41% faster) compared to a CMOS standard cell-based implementation.
+In [13], the authors exploit the ability to control the threshold voltage of ﬂash transistors to implement binary-valued digital circuits. The circuit topology utilized is a cluster of unprogrammed ﬂash transistors arranged in a NAND conﬁguration (Flash Clusters (FCs)), which are programmed in the factory to implement the desired logic function. The work in [13] overcomes the delay hit shown in [12] and achieves a delay improvement (16% faster) when compared to CMOS standard cellbased implementation. The improvement in [13] is mainly due to limiting the number of VT levels to 2 instead of 3 VT levels (in [12]). The work of [13] only describes the design, electrical details and circuitlevel characterization results for an FC. An FC implements a logic function of a small number of inputs (up to 6 in [13]) and outputs (up to 3 in [13]). In contrast, the current paper focuses on the design of large circuit blocks which are comprised of 1000s of interconnected FCs.
+To the best of our knowledge, there has been no work prior to the current paper which describes the synthesis, mapping and electrical characterization of digital circuits implemented as a network of ﬂash-based circuit elements (FCs).
+3. APPROACH
+3.1 Overview
+In this section we ﬁrst discuss the top level ﬂow that we use in this paper to convert a technology-independent digital circuit design into an equivalent (dynamic) ﬂash-based digital circuit design (Section 3.2). The resulting ﬂash-based design consists of several ﬂash clusters (FCs). Each FC implements an (up to) n-output function with up to m inputs. The circuit structure of an FC is brieﬂy described in Section 3.3. In our implementation, we chose the number of outputs (n ≤ 3), and the number of inputs (m ≤ 6). Each FC consists of several Flash Logic Arrays (FLAs), which in turn are made up of several Flash Logic Bundles (FLBs). A working overview of these components will be discussed in Section 3.3.
+3.2 Flash-based Design Conversion
+Figure 2 illustrates the conversion of a technology-independent digital circuit into a ﬂash-based digital circuit. Starting with a technologyindependent logic circuit (Figure 2(a)), we cluster the circuit nodes (in the dotted circles of Figure 2(a)). The input to this conversion step can alternately be technology dependent as well. The resulting clusters are multi-input, multi-output structures (with up to m inputs and n outputs), and are shown as solid circles in Figure 2(b). The solid circles in Fig-
+
+ure 2(b) are referred to as Flash Clusters (FCs). The ﬂash-based digital circuit implements the logic function of each cluster (dotted circles in Figure 2(a)) as an FC (solid circle in Figure 2(b)). In other words, each FC implements an up to n-output logic function of up to m inputs. We refer to this function as Fm,n. The solid circles labeled A, B, C, D and E in the ﬂash-based digital circuit of Figure 2(b) have the same functionality and connectivity as the dashed ovals A, B, C, D and E in the technology independent digital circuit of Figure 2(a). The design of the FC is brieﬂy discussed in the next section.
+Note that this paper focuses on ﬂash-based implementation of a digital design using an interconnected network of FCs. We describe the synthesis, mapping and electrical characterization of the resulting design, and compare the delay, area, power and energy with a CMOS standard-cell based realization of the same design (obtained using commercial tools). We touch upon the design of the FC only to the extent that it makes the rest of the paper comprehensible.
+3.3 Flash Cluster Circuit Design
+In our ﬂash-based digital design ﬂow, we construct the ﬂash-based digital netlist by ﬁrst identifying clusters of nodes in the technology independent design. Each cluster implements a logic function Fm,n with n-outputs and m inputs. In particular, n ≤ 3 and m ≤ 6, for electrical reasons. Each such cluster is then mapped and implemented as an FC. An FC is a generic circuit structure that is capable of implementing any logic function with m inputs and n outputs (Fm,n). FCs are also equipped with the required logic for programming the threshold voltages of their ﬂoating gate devices. In this paper, we omit details about programming, on account of brevity.
+Figure 3 shows the block diagram of any FC. The FC is a dynamic circuit, and is precharged during the low phase of the clk signal.
+
+clk Primary Inputs
+
+out put_generation_circuit
+FLBout1,k FLBout1,0
+
+Primary Outputs
+
+FLA0 FLA1
+
+FLA6
+
+Figure 3: Flash Cluster (FC)
+
+Internally, the FC consists of multiple ﬂash logic arrays (FLAs) and
+an output generation circuit as shown in Figure 3. An FLA is a group
+of NAND ﬂash-like pulldown stack structures. Each pulldown structure implements a logic cube of Fm,n. Each FLA (there are 2n − 1 FLAs in all in every FC) implements a group of input cubes that correspond to
+an output minterm of Fm,n. For example, if the FC output < 010 > has 2 input cubes < 011011 > and < 110 − 11 >, then FLA2 implements these two input cubes. In other words, only one FLA output pulls down when any input is applied to the FC. For the ith FLA, we refer to the
+number of cubes that this FLA implements as its cubes per array or
+CPAi. In the example of this paragraph, CPA2 = 2. The outputs of the FLAs are connected to the output generation circuit in the FC such that
+when the output of FLAi pulls down, the output generation circuit produces the n-bit output vector i. For example, if n = 3 and if FLA5 pulls down during evaluation, then the output generation circuit produces the
+3-bit output < 101 >. Note that the FC is a dynamic circuit, so its default (precharged) output state is 2n − 1 ( or < 111 > for n = 3). Hence
+we do not need to implement FLA(2n−1), and only need to implement 2n − 1 FLAs (shown as FLA0, FLA1, · · · , FLA6 in Figure 3, for n = 3).
+
+3.3.1 Flash Logic Array
+
+Each FLA consists of multiple ﬂash logic bundles (FLBs). The num-
+
+ber
+
+of
+
+FLBs
+
+that
+
+exist
+
+in
+
+F LAi
+
+is
+
+⌈
+
+CPAi CPB
+
+⌉,
+
+where
+
+CPAi
+
+is
+
+the
+
+number
+
+of
+
+cubes in FLAi, and CPB is the maximum number of cubes that can be
+
+implemented in any single FLB. Notice that while CPAi is determined
+
+by the logic function Fm,n, CPB is an electrical parameter that can be optimized to improve circuit delay, power, energy and physical area.
+
+A large CPB means increased capacitance and delay, so the choice of
+
+CPB is an important variable. The optimal value of CPB was found to
+
+be 3. The number of outputs of FLAi is equal to the number of FLBs in
+
+F LAi ,
+
+namely
+
+(⌈
+
+CPAi CPB
+
+⌉).
+
+Exactly
+
+one
+
+of
+
+the
+
+FLB
+
+outputs
+
+(F LBouti,k )
+
+is
+
+pulled down when an input combination is applied to the FLA inputs.
+
+3.3.2 Flash Logic Bundles
+
+X0 X1 clk Mpch
+
+Mx,0 a
+
+Mx,1
+
+Fa,0(V T1)
+
+Fa,1(V T1)
+
+a¯
+
+b
+
+b¯
+
+Fb,0(V T1)
+
+Fb,1(V T1)
+
+c
+
+Fc,0(V T0)
+
+Fc,1(V T1)
+
+c¯
+
+d
+
+Fd,0(V T0)
+
+Fd,1(V T1)
+
+d¯
+
+e
+
+Fe,0(V T1)
+
+Fe,1(V T0)
+
+e¯
+
+f
+
+Ff ,0(V T1)
+
+Ff ,1(V T0)
+
+f¯
+
+V SP0
+
+V SP1
+
+Xq F LBouti,k
+Mx,q Fa,q(V T1) Fb,q(V T1) Fc,q(V T1) Fd,q(V T1) Fe,q(V T1) Ff ,q(V T1) V SPq
+
+Figure 4: Flash Logic Bundle i, k (FLBi,k)
+
+Figure 4 shows the circuit structure of a ﬂash logic bundle (FLB).
+An FLB consists of a number of NAND ﬂash-like pulldown structures
+(stacks) that share the same output. Each pulldown stack implements
+one cube of Fm,n. The maximum number of NAND ﬂash like pulldown stacks in each FLB is CPB, as described earlier.
+Each pulldown stack has m ﬂash transistors and 1 regular NMOS
+transistor (as shown in Figure 4), where m is the number of inputs of
+the function Fm,n. The ﬂash transistors are programmed to implement cubes of Fm,n. The shared regular PMOS transistor shown at the top of Figure 4 (Mpch), serves as the precharge transistor for all pulldown structures of the FLB. It pulls up FLBouti,k (the kth FLB of the ith FLA) during the precharge (low) phase of the clock signal (clk). The
+lines V SP0 to V SPq are connected to ground during operation, to allow the NAND stacks to pull down when they evaluate. They are also uti-
+lized during the programming operation of the ﬂash NAND stack. The regular NMOS transistors (Mxi ) shown in Figure 4 serve dual purposes. During regular operation they are used as the evaluate transistors which
+are off during the precharge (low) phase of clk and only turn on during
+the evaluate (high) phase of clk, to allow the pulldown stack to evaluate the output FLBouti,k. The NMOS transistors (Mxi ) are also utilized during the programming operation of the NAND ﬂash stack.
+The left-most stack of Figure 4 implements the cube abe f . Note that
+transistors Fc,0 and Fd,0 are programmed to a threshold voltage V T0 (erase threshold) which is below GND (see Figure 1(b)). Therefore,
+these two transistors are on irrespective of the values of the signals
+c and d. Now, transistors Fa,0, Fb,0, Fe,0 and Ff,0 are programmed to a threshold voltage V T1, which is between V DD and GND (see Figure 1(b)). This means that these devices turn on only when their gate
+signals (respectively a, b, e and f ) are greater than V T1. As a consequence, the left-most stack of Figure 4 implements the cube abe f .
+
+3.3.3 Output Logic
+Each FLA in the FC drives an output generation circuit that generates the ﬁnal outputs of the FC, as shown in Figure 3. Figure 5 shows the circuit of the output generation circuit. Each output of the function Fm,n is driven by an output buffer (sized to drive a fan-out of 3 FC input loads). The unbuffered outputs of the output logic are represented using
+
+a horizontal line which is precharged by a PMOS transistor (shown
+at the left side of the output line). The precharge PMOS transistor is
+driven by the clock signal (clk). Each of the unbuffered output lines is
+pulled down based on which FLAi output (FLBouti,k) is pulled down. Note that exactly one FLBouti,k pulls down for any applied input to the FC. Since the outputs of the FLAs are active low, we insert an inverter
+for each FLBouti,k before driving the gate of pulldown NMOS devices in the output logic.
+For example, if any of FLBout0,i pull down, then all three f , g and h will pull down. If any of FLBout3,i pull down, on the other hand, then the output needs to be < f , g, h > = < 011 >, assuming that f is the
+most signiﬁcant output bit. In this case, there will be NMOS devices
+pulling down the output of f in the output logic, and no NMOS devices
+connected to g and h, which will stay precharged, resulting in the output
+minterm < f , g, h > = < 011 > being produced. Finally, the output
+minterm < 111 > does not need to be produced, and therefore all input
+cubes mapping to the output minterm < 111 > are never implemented.
+
+vdd minterm0 vdd vdd
+
+mintermP
+
+f g h
+
+clk outputs
+
+FLBout0,0 FLBout0,n
+
+F LBout p,0
+
+Figure 5: Flash Output Generation Circuit
+3.4 FC-based CAD Flow
+The CAD ﬂow to convert an input logic netlist is described next. The input logic netlist is technology independent in our experiments, but it could be technology dependent as well. There are several steps in the ﬂow, which are brieﬂy described next, and then explained in detail.
+First, the input netlist is clustered into FCs (where FCi implements Fmi ,n), with a goal of minimizing the wiring between FC’s. In our experiments, m ≤ 6 and n ≤ 3. After this, we obtain a multi-level netlist of interconnected FCs.
+Next, the layout of each FC is generated. The FCs, FLAs and FLBs are extremely regular in their physical characteristics, making them amenable to the on-the-ﬂy physical synthesis ﬂow that we use. Based on the fanout load of the ith output of FCj, additional buffers are added for that output.
+To quantify the utility of our ﬂash-based circuit design ﬂow, the same input netlist is synthesized and mapped using commercial standard-cell based CAD tools. The resulting designs (ﬂash-based and standard-cell based) are compared in terms of their delay, area, power and energy, over a number of designs.
+3.4.1 FC-based Clustering
+Problem Deﬁnition: Given an arbitrary logic netlist η, cluster η into a multi-level network η∗ of FCs, subject to the following constraints: • the network η∗ is acyclic. • each FCi ∈ η∗ has a logic function Fsi,t where s ≤ m and t ≤ n.
+Algorithm 1 outlines our clustering strategy. We ﬁrst decompose η into a network of nodes with at most p inputs. If this was not done, we could encounter a situation where the number of inputs to some node in η is greater than m, making it impossible to create the multi-level FC-based netlist. We choose p < m, and in particular we found that p = 3 yielded good results. Now η is sorted in a depth-ﬁrst manner. The resulting array of nodes is sorted in topological1 order, and placed into an array L.
+1Primary inputs are assigned a level 0, and other nodes are assigned a level which is one larger than the maximum level of all their fanins
+
+Algorithm 1 Clustering a logic netlist into a multi-level network of FCs
+η = decompose_network(η, p) L = dfs_and_levelize_nodes(η) FC∗ = 0 η∗ = 0 while get_next_element(L) != NIL do
+FC∗ = FC∗ ∪ get_next_element(L) if (num_input(FC∗) ≤ m) && (num_output(FC∗) ≤ n) then
+continue else
+Q = remove_last_element(FC∗) η∗ = η∗ ∪ FC∗ FC∗ = Q end if end while η∗ = wiring_recovery(η∗ )
+Now we greedily construct the logic in each FC, by successively grouping nodes from L such that the resulting implementation of the grouped nodes FC∗ does not violate the input or output cardinality constraints for the FCs. If so, we attempt to include another node into FC∗, otherwise we append the last FC satisfying the constraints to the result η∗.
+In order to reduce the wiring between FCs, the get_next_element routine preferentially returns nodes in the fanout of the nodes of FC∗, provided that the inclusion of such a node into FC∗ would not result in a cyclic dependency between the FCs of η∗. If such nodes are not available, the ﬁrst un-mapped node from L is returned. At every step of the construction of η∗, we verify that the graph induced by the multilevel network of FCs is acyclic.
+After the clustering step is completed, we invoke a procedure called wiring_recovery. This is a ﬁnal effort in reducing the wiring between FCs. This procedure attempts to move individual nodes in L to a different FC than their currently assigned FC. If a wiring gain is realized by such a move, the move is made. If no more nodes can be gainfully moved, or if a speciﬁed number of iterations have been made through L, the procedure returns. On average, the wiring_recovery procedure is able to reduce wiring by about 9.6%. We note the following about this procedure:
+• It is possible that a node n in L is the only node in some FC X, and if n can be moved to another FC, then FC X can be eliminated from η∗. We came across a few instances where an FC was removed in this manner.
+• wiring_recovery returns when no node can be moved without increasing the wiring cost of the multi-level network of FCs. At this point, it is still possible that more than one node can simultaneously be moved to realize a gain in wiring. However, this condition is not checked.
+The functional correctness of the resulting multi-level network of FCs was veriﬁed at the end of the clustering step.
+3.4.2 On-the-ﬂy Layout Synthesis
+Once the multi-level netlist of FCs is generated in the previous step, we next generate the layout for each FCi ∈ η∗. First, we construct a table of all the 2n output minterms op and their corresponding input cubes Cp = Σcp,q. The set of cubes {Cp} form a partition of the points in Bm, where B = {0, 1}. This is inexpensive in practice, since m and n are small (6 and 3 respectively in our experiments).
+This table is constructed from the truth table of Fmi ,n, simply by grouping all the input minterms for each output minterm. Now the input minterms for each output minterm are minimized using Espresso [14]. The output minterm which has the largest number of cubes is not implemented, and is mapped to the default output of the FC when it is precharged.
+Table 1, shows the number of input minterms (and cubes) that correspond to each output minterm for a representative function Fm,n with m = 6 and n = 3. The cubes corresponding to the ’7’ output are not implemented, since the number of cubes for this output is the largest, and can be mapped to the default output of the FC, since it is a precharged circuit.
+
+Output minterm # Input minterms
+# Input cubes
+
+0 1 2 3 4 5 6 7 Total 8 5 8 11 6 7 7 12 64 8 3 5 4 6 6 3 9 44
+
+Table 1: Example of Minterm Distribution for Fm,n
+For each FCi ∈ η∗, our layout synthesis algorithm adds larger output buffers for output x whenever the fanout load (measured in terms of the total number of pulldown stack devices that x drives) exceeds a particular value.
+
+4. EXPERIMENTS
+4.1 Simulation Environment
+The designs presented in this paper are implemented in a 45nm process technology. The CMOS standard cell based digital circuits are synthesized and mapped using a 45nm Nangate FreePDK45 Open Cell Library [15, 16] using Synopsys Design Compiler [17]. The delay, power and area of the CMOS standard cell based digital circuits are extracted using Design Compiler. We used custom scripts to generate the ﬂash-based digital circuit. For CMOS devices, we used a 45nm PTM process [18]. For the ﬂash devices, we derived the 45nm ﬂash device models from the measurements results presented in [9] and validated our models using [19]. We also calculated the gate capacitance of the ﬂash transistor and found it 20× smaller than the gate capacitance of the corresponding regular NMOS transistor, and validated this reduction with existing literature which reported reductions of ∼25-30× for a 45nm technology node [20].
+The target programmed threshold voltages used in our designs are (V T0 = -0.5 V) and (V T1 = 0.5 V). We simulated the ﬂash-based FCs in HSPICE and also veriﬁed the correct logical operation of the ﬂashbased digital circuit, realized as a network of interconnected FCs. Custom layouts for the FCs were generated using Cadence Virtuoso [21] to compare the physical area of the ﬂash-based digital circuits to their standard-cell based counterparts. The layout of our FCs used design rules for ﬂash devices that were obtained from the ITRS [22].
+4.2 Flash-based Analysis Details
+Section 3.4 described the conversion of an input logic netlist η into a multi-level netlist of FCs η∗, and also discussed how the layout of each FC was generated. In this section, we describe the methodology we used to extract the delay, power and area of our multi-level ﬂash-based design.
+We ﬁrst characterized a generalized FC, and generated delay, power and area models for the FC in terms of m, n, and several other parameters of the FC. We use these models to estimate the delay, power and area of the mapped multi-level network of FCs.
+In our ﬂash-based methodology, any FCi can realize a logic function of up to n outputs and m inputs. The main factors that determine the delay, power and area of FCi are:
+• The total number of cubes Ctiot implemented in the FC (i.e. total number of pulldown stacks over all the FLAs in FCi).
+• The maximum number of cubes CFi LB in any FLB of FCi (this number is bounded by CPB)
+• The number of outputs Ni of the FCi. The delay of FCi is proportional to both the total number of cubes in the FC (Ctiot ) and the maximum number of cubes over the FLBs of FCi (CFi LB). The power of FCi is proportional to the total number of cubes (Ctiot ) and the number of output of FCi (Ni). The area of the layout of FCi depends on all the three factors. We ﬁx the number of inputs of the FC (m) to 6 in order to preserve the regularity of the FC and make it easier to place and route. To characterize the delay, area and power of an FC, we constructed a library of FCs with number of outputs (Ni) varying from 1 to 3, and number of cubes per FC (Ctiot ) ranging from 1 up to 56 (this is the maximum number of cubes for a 6 input function, assuming that we perform the on-the-ﬂy layout synthesis which maps the output minterm with the
+
+largest number of cubes to the default output minterm < 111 >), and the CFi LB varying from 1 to CPB (which is 3 in our work).
+4.2.1 Delay Characterization and Estimation
+For delay characterization, we measure the delays of FCs with Ctiot ranging from 1 up to 56, and for CFi LB varying between 1 and CPB (which is 3). The latter condition corresponds to the case when the output of the FCi is discharged through an FLB with 1, 2 or 3 cubes respectively. We also measure the maximum precharge delay DPch across all the FCi conﬁgurations. The following equation explain how the delay of the ﬂash-based design is computed.
+
+∑Delay = DmPcahx +
+
+DFC Ctiot ,CFi LB + (DOB) × αi
+
+FCi∈Π
+
+(1)
+
+Equation 1 summarizes the critical path delay calculation methodology. DmPcahx is the pre-characterized maximum precharge delay for all the FCs. For all the FCi on the critical path Π, we look up the delay DFC of the FC itself, and the delay DOB of the output driver (if the FC drives a load greater than a threshold). Ctiot is the total number of cubes (pulldown stacks) in FCi and CFi LB is the maximum number of cubes among all the FLBs in FCi. DOB is the delay of the output buffer, which is only added if the fanout of FCi exceeds a certain threshold. The binary variable αi is set to 1 when the fanout of FCi exceeds the threshold, and αi = 0 otherwise. In any FC, the output generation circuit is capable of driving an equivalent load of a 4×-5× buffer (which is equivalent to driving up to 100 gates of ﬂash transistors in pulldown stacks). Recall
+that the ﬂash transistor has 20× smaller input capacitance than a regular MOSFET, as discussed earlier. During layout synthesis, our CAD
+tool inserts an output buffer for each FC that has one or more outputs
+with a load higher than 96 ﬂash transistor gates. This output buffer is a 4× buffer, which is capable of driving a load equivalent to the input load of a CMOS buffer of size 16×-20×, effectively guaranteeing that our output buffer is strong enough to drive about 400 ﬂash transistor
+gates, which is larger than any load encountered in our experiments.
+The total delay is equal to the summation of the delays of the FCs in the critical path Π, the maximum precharge delay, and the sum of the
+delays of the inserted output buffers. The critical path delay is found
+by running a static timing analysis tool which we implemented, using a
+dynamic programming model.
+
+4.2.2 Power Characterization and Estimation
+We ﬁrst characterize the power of any FC, computing the power (precharge as well as evaluate) for general FC conﬁgurations. The conﬁgurations varied Ctiot from 1 to 56 and Ni from 1 to 3. The results of these characterization runs are stored in a lookup table.
+Equation 2 shows the details of how power estimation is performed. Here, AF is the logic activity factor, which is taken to be 15%, a representative number for logic designs. Ni is the number of outputs in FCi. The total power is computed as the sum of the power of all the FCs in the design.
+
+∑Power = AF ∗
+
+P(Ctiot , Ni) + (POB) × αi
+
+∀FCi
+
+(2)
+
+4.3 Results and Analysis
+
+We evaluated our ﬂash-based digital circuit design approach by implementing a set of 12 of the largest benchmarks from ISCAS89 [23], ITC99 [24] and EFPL [25] benchmark suites. We compare the delay, power and area results of the ﬂash-based implementation to a CMOS standard-cell based implementation of the benchmarks. Table 2 shows the benchmark name (Column 1), the number of cells used to implement the design using a traditional CMOS standard-cell based approach (Column 2), the number of FCs used to implement the design using the ﬂash-based approach (Column 3), the average number of inputs over all the FCs (Column 4), the average number of outputs of the FCs (Column 5), the average number of cubes in the FCs (Column 6), the CMOS
+
+Benchmark
+b17 b20 b21 b22 s13207 s15850 s35932 s38417 s38584 multiplier voter square
+Average
+
+CMOS No. Stdcells
+47500 22983 23324 34693 2828 3735 10661 10771 13895 46363 22453 38009
+23101
+
+No. FCs
+6658 2901 2963 4362 460 594 1290 1593 2077 5821 2708 5109
+3045
+
+Flash mAvg nAvg
+5.61 2.32 5.60 2.32 5.62 2.32 5.61 2.33 5.60 2.38 5.50 2.30 5.24 2.60 5.68 2.22 5.59 2.16 5.67 2.48 5.38 2.53 5.63 2.49
+5.56 2.37
+
+Avg No. Cubes
+5.49 6.02 6.03 5.97 4.83 4.90 6.62 5.04 4.93 6.56 6.10 5.61
+5.68
+
+CMOS Delay (ns)
+7.67 6.11 6.11 6.16 1.88 2.63 0.74 1.48 2.03 18.80 5.91 18.26
+6.48
+
+Flash Delay Ratio
+0.90× 0.50× 0.49× 0.47× 0.43× 0.67× 0.29× 0.89× 0.90× 0.47× 0.58× 0.49×
+0.59×
+
+CMOS Power (mW)
+25.97 30.80 30.93 43.67 0.98 1.82 12.06 6.82 6.19 105.41 37.93 63.05
+30.47
+
+Flash Power Ratio
+0.49× 0.18× 0.18× 0.19× 0.91× 0.62× 0.22× 0.43× 0.61× 0.11× 0.14× 0.16×
+0.35×
+
+CMOS Cell Area (µm)2
+56964.97 27114.98 27521.69 40926.49 3365.70 4357.35 12964.31 12256.22 16048.05 56460.10 26738.59 46558.78
+27606.43
+
+FLASH Cell Area Ratio
+0.67× 0.60× 0.61× 0.60× 0.67× 0.65× 0.51× 0.60× 0.60× 0.57× 0.56× 0.58×
+0.60×
+
+Table 2: Delay, Power, Energy and Cell Area Ratios of Flash-based Digital Circuits Relative to their CMOS Standard Cell-based Counterparts
+
+delay and the ﬂash-based design delay ratio (Columns 7 and 8), the CMOS power and the ﬂash-based design power ratio (Columns 9 and 10), the CMOS area and the ﬂash-based design area ratio (Columns 11 and 12). The delay, power and area ratios of the ﬂash-based designs are relative to their CMOS standard-cell based counterparts.
+Comparing the average number of standard cells to the average number of FCs across all the benchmarks we observe that on average, each FC is equivalent to ∼7.6× standard cells. These FCs have an average of 5.56 inputs and 2.37 outputs, which are close to the maximum number of inputs (6) and outputs (3) in our design. The average number of cubes implemented in each FC, however, is low (5.68) compared to the maximum possible number of cubes for a 6-input logic function.
+Table 2 shows that the ﬂash-based design approach is ∼41% faster operation and consumes ∼65% lower power on average, compared to a traditional CMOS standard-cell based design approach. This is a signiﬁcant improvement, and results in an energy improvement of ∼5× over the standard-cell based approach.
+The key reasons for the reduced delay are:
+• Lowered gate capacitance of the ﬂash FET (20× lower than a regular MOSFET).
+• The increased parasitics of the standard cells (due to the use of NMOS as well as PMOS devices).
+• The use of shared (un-contacted) diffusions in the NAND stack reduces parasitics signiﬁcantly, thus reducing delays.
+• The FCs used to implement the benchmarks have relatively small sizes (the average number of cubes implemented in each FC is 5.68, which reduces the input capacitive loads).
+It is well known that dynamic designs consume greater power than static CMOS designs. Our FC based design consumes less power for several reasons. Despite being dynamic, the number of nodes being precharged is smaller than a CMOS (domino or other dynamic) approach. Further, the long transistor stacks (since we choose m = 6) result in smaller evaluation currents, reducing power further. Also, in our design, exactly one FLB pulls down during every evaluation, reducing switching activity and hence power consumption. Finally, the Ids of a 45nm ﬂash FET is lower than that of our 45nm MOSFET, which results in a lower power consumption.
+We also report the area ratio of both implementations. The area reported for the CMOS standard cell based implementation is the sum of cell layout areas, while the area of our ﬂash-based approach is the sum of the layout areas of all the FCs in the design. Design rules for ﬂash were obtained from the ITRS 45nm ﬂash technology node [22]. Digital circuits implemented in an FC use 0.6× the physical area of a CMOS-based design, on average.
+5. CONCLUSION
+Flash transistors are the workhorse technology for non-volatile data storage applications today. It was recently shown how ﬂash transistors can be used to implement digital circuits in an ASIC-like manner. However, the focus was on a single ﬂash cluster (FC) which implements a function with a small number of inputs and outputs.
+
+This paper, in contrast, is the ﬁrst, to the best of the authors’ knowledge, to use ﬂash transistors to implement complete digital circuit blocks, in the form of an interconnected network of FCs. The focus of this paper is on logic clustering, on-the-ﬂy physical synthesis of all the FCs of a design, and the automatic characterization of the delay, power and area of the resulting circuit.
+Our characterization results show that, averaged over 12 large designs, our approach yields 0.59× the delay, 0.35× the power, and 0.60× the area of the equivalent circuit implemented using CMOS standard cell-based design. It is generally rare that a circuit methodology yields results that are better than existing commercial standard-cell based ﬂows in terms of delay, area, power and energy, and in this sense, we submit that our results are signiﬁcant.
+The threshold voltage of ﬂash devices can be modiﬁed at a ﬁne granularity during programming, which results in several advantages. First, speed binning at the factory can be done with precision. Secondly, an IC can be re-programmed in the ﬁeld (we note that our ﬂash-based design is not an FPGA, but rather an ASIC style design), to diminish or eradicate effects such as aging.
+6. REFERENCES [1] R. Fowler and L. Nordheim, “Electron emission in intense electric ﬁelds,” Proceedings of the Royal Society of London. Series A, Containing Papers of a Mathematical and Physical Character, vol. 119, pp. 173–181, May 1928. [2] D. Jung, Y.-H. Chae, H. Jo, J.-S. Kim, and J. Lee, “A group-based wear-leveling algorithm for large-capacity ﬂash memory storage systems,” in Proceedings of the 2007 International Conference on Compilers, Architecture, and Synthesis for Embedded Systems, CASES ’07, pp. 160–164, ACM, 2007. [3] S. Boboila and P. Desnoyers, “Write endurance in ﬂash drives: Measurements and analysis,” in Proceedings of the 8th USENIX Conference on File and Storage Technologies, FAST’10, (Berkeley, CA, USA), pp. 9–9, 2010. [4] K. Takeuchi, “Novel co-design of NAND ﬂash memory and NAND ﬂash controller circuits for sub-30 nm low-power high-speed solid-state drives (SSD),” Solid-State Circuits, IEEE Journal of, vol. 44, pp. 1227–1234, April 2009. [5] S. L. et al., “A 128Gb 2b/cell NAND ﬂash memory in 14nm technology with tPROG=640us and 800MB/s I/O rate,” in 2016 IEEE International Solid-State Circuits Conference (ISSCC), pp. 138–139, Jan 2016. [6] D. L. et al., “A 64Gb 533Mb/s DDR interface MLC NAND ﬂash in sub-20nm technology,” in Solid-State Circuits Conference Digest of Technical Papers (ISSCC), 2012 IEEE International, pp. 430–432, Feb 2012. [7] K.-T. P. et al., “A 7MB/s 64Gb 3-bit/cell DDR NAND ﬂash memory in 20nm-node technology,” in Solid-State Circuits Conference Digest of Technical Papers (ISSCC), 2011 IEEE International, pp. 212–213, Feb 2011. [8] J.-R. H. et al., “20nm gate bulk-FinFET SONOS ﬂash,” in Electron Devices Meeting, 2005. IEDM Technical Digest. IEEE International, pp. 154–157, Dec 2005. [9] H. An, K. Kim, S. Jung, H. Yang, K. Kim, and Y. Song, “The threshold voltage ﬂuctuation of one memory cell for the scaling-down NOR ﬂash,” in 2nd IEEE Int’l Conf. on Network Infrastructure and Digital Content, Sept 2010. [10] E. Choi and S. Park, “Device considerations for high density and highly reliable 3D NAND ﬂash cell in near future,” in
+IEEE International Electron Devices Meeting (IEDM), (San Francisco, CA), pp. 9.4.1 – 9.4.4, Dec 2012. [11] M. K. Qureshi, J. Karidis, M. Franceschini, V. Srinivasan, L. Lastras, and B. Abali, “Enhancing lifetime and security of
+PCM-based main memory with start-gap wear leveling,” in Proceedings of the 42Nd Annual IEEE/ACM International Symposium on Microarchitecture, MICRO 42, (New York, NY, USA), pp. 14–23, ACM, 2009. [12] M. Abusultan and S. Khatri, “A ternary-valued, ﬂoating gate transistor-based circuit design approach,” in IEEE Computer Society Annual Symposium on VLSI (ISVLSI), July 2016. [13] M. Abusultan and S. Khatri, “Implementing low power digital circuits using ﬂash devices,” in Computer Design (ICCD), 2016 34nd IEEE International Conference on, October 2016. [14] R. K. Brayton, A. L. Sangiovanni-Vincentelli, C. T. McMullen, and G. D. Hachtel, Logic Minimization Algorithms for VLSI Synthesis. Norwell, MA, USA: Kluwer Academic Publishers, 1984. [15] J. Stine, I. Castellanos, M. Wood, J. Henson, F. Love, W. Davis, P. Franzon, M. Bucher, S. Basavarajaiah, J. Oh, and R. Jenkal, “FreePDK: An open-source variation-aware design kit,” in IEEE International Conference on Microelectronic Systems Education (MSE), pp. 173–174, June 2007. [16] “NanGate Library Optimization website.” http://www.nangate.com/. [17] “Synopsys website.” http://www.synopsys.com/. [18] “PTM website.” http://www.ptm.asu.edu/. [19] K. Zaitsu, K. Tatsumura, M. Matsumoto, M. Oda, S. Fujita, and S. Yasuda, “Flash-based nonvolatile programmable switch for low-power and high-speed FPGA by adjacent integration of MONOS/logic and novel programming scheme,” in VLSI Technology (VLSI-Technology): Digest of Technical Papers, 2014 Symposium on, pp. 1–2, June 2014. [20] S. G. Jung, K. W. Lee, K. S. Kim, S. W. Shin, S. S. Lee, J. C. Om, G. H. Bae, and J. H. Lee, “Modeling of Vth shift in NAND ﬂash-memory cell device considering crosstalk and short-channel effects,” IEEE Transactions on Electron Devices, vol. 55, pp. 1020–1026, April 2008. [21] “Cadence Design Systems website.” http://www.cadence.com/. [22] “ITRS website.” http://www.itrs.net/. [23] F. Brglez, D. Bryan, and K. Kozminski, “Combinational proﬁles of sequential benchmark circuits,” in Circuits and Systems, 1989., IEEE International Symposium on, pp. 1929–1934 vol.3, May 1989. [24] F. Corno, M. S. Reorda, and G. Squillero, “Rt-level itc’99 benchmarks and ﬁrst atpg results,” IEEE Design Test of Computers, vol. 17, pp. 44–53, Jul 2000. [25] “The EPFL Combinational Benchmark Suite Webpage.” http://lsi.epfl.ch/benchmarks.
+
+

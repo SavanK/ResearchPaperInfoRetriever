@@ -1,0 +1,1168 @@
+Mean Field Equilibria for Competitive Exploration in Resource Sharing Settings
+
+Pu Yang Krishnamurthy Iyer Peter I. Frazier
+School of Operations Research and Information Engineering, Cornell University Ithaca, NY, 14850
+{py75, kriyer, pf98}@cornell.edu
+
+ABSTRACT
+We consider a model of nomadic agents exploring and competing for time-varying location-specific resources, arising in crowdsourced transportation services, online communities, and in traditional location-based economic activity. This model comprises a group of agents, and a set of locations each endowed with a dynamic stochastic resource process. Each agent derives a periodic reward determined by the overall resource level at her location, and the number of other agents there. Each agent is strategic and free to move between locations, and at each time decides whether to stay at the same node or switch to another one. We study the equilibrium behavior of the agents as a function of dynamics of the stochastic resource process and the nature of the externality each agent imposes on others at the same location. In the asymptotic limit with the number of agents and locations increasing proportionally, we show that an equilibrium exists and has a threshold structure, where each agent decides to switch to a different location based only on their current location's resource level and the number of other agents at that location. This result provides insight into how system structure affects the agents' collective ability to explore their domain to find and effectively utilize resourcerich areas. It also allows assessing the impact of changing the reward structure through penalties or subsidies.
+Categories and Subject Descriptors
+J.4 [Social and Behavorial Sciences]: Economics
+General Terms
+Economics, Theory
+Keywords
+Resource Sharing; Mean Field Equilibrium; Exploration
+Copyright is held by the International World Wide Web Conference Committee (IW3C2). IW3C2 reserves the right to provide a hyperlink to the author's site if the Material is used in electronic media. WWW 2016, April 11­15, 2016, Montréal, Québec, Canada. ACM 978-1-4503-4143-1/16/04. http://dx.doi.org/10.1145/2872427.2883011.
+
+1. INTRODUCTION
+We consider a model of nomadic agents exploring and competing for time-varying stochastic location-specific resources. Such multi-agent systems arise in crowdsourced transportation services like Uber and Lyft where drivers position themselves to be close to demand; in online communities like Twitch and Reddit where webizens choose in which subcommunities to participate; and in location-specific activity in the traditional economy, such as food trucks choosing where to position themselves, fisherman choosing where to fish, and pastoralists choosing where to graze their animals. In each of these examples, overall social welfare is determined both by agents' willingness to explore their domain to find and exploit resource-rich locations, the level of antagonism or synergy inherent to having multiple agents at the same location, and the equilibrium distribution of agents across locations that these factors induce.
+The model we study comprises a set of locations and a group of agents. Each location has a resource level that varies randomly with time. Each agent periodically derives resource from the location at which she currently resides, whose amount is determined by the number of other agents currently residing there, and the location's current overall resource level. Based on these quantities, the agent then decides whether to stay at the same location or switch to another. The agents are fully strategic and seek to maximize their total rewards over their lifetime.
+We study the equilibrium behavior of the agents in this system as a function of dynamics of the spatio-temporal resource process and the level of synergy or antagonism in the agents' sharing of resources. We analyze the system under the limit where the number of agents and locations both increase proportionally, using the methodology of a mean field equilibrium. We show that an equilibrium exists, and the agents' optimal strategy has a simple threshold structure, in which it is optimal to leave a location when the number of other agents exceeds a threshold that depends on the resource level at that location. In the limit as the system grows large, this induces a joint probability distribution over the number of agents and level of resource at each location.
+Our results allow us to obtain economic insights into how the nature of the externality agents impose on others at the same location affects the exploration of the locations for resources, and consequently the overall welfare of the economy. In particular, our methodology allows us to analyze settings where the overall reward at a location either increases or decreases with the number of agents at the location, and how these two settings affect the equilibrium exploration.
+
+177
+
+Furthermore, our methodology allows us to evaluate engineering interventions, such as providing subsidies to or imposing costs on agents to promote or discourage exploration to improve welfare.
+Examples.
+The model we study is a simplified version of systems appearing in real-world settings. It arises in the shared economy, in crowdsourced transportation services such as Uber and Lyft, in which drivers choose neighborhoods, and then earn money (reward) based on the number of riders requesting service within that neighborhood (the overall resource level), and the number of other drivers working there. This overall resource level varies stochastically over time in a neighborhood-specific way as demand rises and falls, and the resource derived by a driver decreases with the number of other drivers working in her neighborhood.
+This model also arises in the internet economy, in online communities such as Reddit and Twitch, in which participants choose sub-communities, and then derive enjoyment depending both on some underlying but transitory societal interest in the sub-community's topic of focus (the overall resource) and the number of other participants in the subcommunity. When the number of other participants is too small, lack of social interaction prevents enjoyment; when the number of other participants is too large, crowding diminishes the sense of community.
+This model also arises in the traditional economy, for example in food trucks deciding in which neighborhoods to locate, in pastoralists deciding where to graze their livestock, and in fishermen deciding where to fish. In these examples, the level of resource derived by each agent from their location (whether profit from hungry passers by; or food for livestock provided by the range-land; or profit from the catch) depends both on the number of other agents at the location, and on the location's overall and stochastically varying resource level.
+This model even arises among scientific researchers, who must choose a research area in which to work, and derive value from this choice based both on the underlying level of societal interest and funding in their chosen area, and in the number of other researchers working in it. As with online communities, the number of other researchers should be neither too large nor too small too maximize the value derived.
+Related Work.
+Our paper adds to the growing literature on mean field equilibrium [1, 16, 19, 21, 26], that studies complex systems under a large system limit and obtains insights about agent behavior that are hard to obtain from analyzing finite models. The main insight behind this line of literature, that in the large system limit, agents' behavior are characterized by their (private) state and an aggregate distribution of the rest of system, has been used to study settings that include industry dynamics and oligopoly models [15, 26, 25], repeated dynamics auctions [5, 18], online labor markets [2], and queueing systems [27].
+Our model can be seen as an extension of the Kolkata Paise Restaurant Problem [7]. In this game, each agent chooses (simultaneously) a restaurant to visit, and earns a reward that depends both on the restaurant's rank, which is common across agents, and the number of other agents
+
+at that restaurant. This reward is inversely proportional to the number of agents visiting the restaurant.
+The Kolkata Paise Restaurant Problem is itself a generalization of the El Farol bar problem [3, 8]. The Kolkata Paise Restaurant Problem is studied both in the one-shot and repeated settings, with results on the limiting behavior of myopic [7] and other strategies [12], although we are not aware of existing results on mean-field equilibria in this model. Our model is both more general, in that we allow general reward functions and allow location's resource to vary stochastically, and more specific, in that our locations are homogeneous. Our model also differs in that our agents' decisions are made asynchronously.
+Our model is also related to congestion games [22, 24], in which agents choose paths on which to travel, and then incur costs that depend on the number of other agents that have chosen the same path. One may view paths as being synonymous with locations in our model, and observe that in both cases the utility/cost derived from a path/location depends on the number of other agents using that path, or portion thereof. The main difference between our model and congestion games is the stochastic time-varying nature of our overall level of resource (making our model more complex), and the lack of interaction between locations contrasting with the interaction between paths (making our model simpler).
+Our model has within it an exploration vs. exploitation tradeoff, in which an agent faces the decision of whether to stay at his current node, exploiting its resource and obtaining a known reward, or to leave and go to another randomly chosen location with unknown reward. Visiting this new location provides information upon which future decisions may be based. Similar tradeoffs between exploration and exploitation appear widely, and have been studied extensively in the single-agent setting [4, 13, 20, 23]. Exploration and learning in multi-agent settings has been considered by [9, 17].
+2. MODEL
+We consider a setting with N agents, each situated at each time t  0 in one of K locations. Each location k has a stochastic dynamic resource process, denoted by {Zt(k) : t  0}, that determines the reward obtained by each agent at that location, as we describe below. We assume that each process {Zt(k) : t  0} is a finite state continuous time Markov chain, that is distributed identically and independently from the rest of the system. For the purpose of analysis, we assume that each Zt(k) takes values in {0, 1}, with holding time at state z  {0, 1} distributed as Exp(µz,1-z) for some fixed µz,1-z > 0.
+Agents may switch between locations to explore for resources. Formally, each agent i has an associated independent Poisson process Xti with rate  > 0, at whose jump times {T i :  0} the agent makes the decision to either stay in her current location or switch instantaneously to a different location that is chosen uniformly at random. Let kti denote the location of agent i at time t  0 and let Nt(k) denote the number of agents at location k at time t.
+The agents in the model are short-lived, and at each jump time T i, the agent i departs the system with probability 1 -  > 0. Thus, each agent i lives in the system for a random time  i which is distributed according to Exp((1 - )). For each agent i that leaves the system, a new agent
+
+178
+
+(with the same label i) arrives at a location chosen uniformly
+
+at random. We make this modeling assumption to ensure
+
+that the number of agents in the system is always positive;
+
+this assumption can be relaxed to allow for random arrivals
+
+and departures, with the arrival rate equal to the departure
+
+rate.
+
+We now describe the decision problem faced by an agent i in more detail. At each jump time t = T i, an agent i
+
+at location k = kti receives a reward Rti = F (Zt(k), Nt(k)) that depends on the state of the resource process Zt(k) and the overall number of agents Nt(k) at the location k. In
+the following, we assume that the function F governing the
+
+reward at each location is given by F (z, n) = zf (n) for
+
+some
+
+function
+
+f
+
+:
+
+N
+
+
+
++
+R
+
+that
+
+is
+
+non-increasing
+
+in
+
+n,
+
+with
+
+limn+ f (n) = 0. Essentially, this implies that the reward
+
+at a location at any time is zero if the resource process is in
+
+state 0, and it is equal to f (n) if the resource process is in
+
+state 1, if there are n agents at that location. Furthermore,
+
+this reward f (n) decreases to zero as the number of agents
+
+at a location increases. Given this setting, each agent i at
+
+any time prefers to be at a location with resource process
+
+state equal to 1, and where the number of other agents is
+
+small.
+
+Within this setting, we will focus on three cases: (1) for
+
+each n  N, we have nf (n) = 1. In this case the (unit)
+
+resource, if available at a location, is shared equally among
+
+the agents at that location; (2) nf (n) is non-decreasing in n.
+
+In this case adding agents to a location increases the total
+
+reward earned, either through synergy, or because a small
+
+number of agents cannot fully utilize a location's resource;
+
+and (3) nf (n) is non-increasing in the number of agents n
+
+at that location. In this case antagonism or overutilization
+
+causes the total reward earned to decrease as agents are
+
+added.
+
+Next, we discuss the information each agent i has while
+
+making their decision to stay or switch. We assume that an
+
+agent i has access to the states of the resource process Zt(k) and the number of agents Nt(k) of a location k during the time she is present at the location k, i.e., when kti = k. We
+further assume that agents have perfect recall, and hence, at a jump time t = T i, each agent i bases her decision to switch or stay on the entire history hit she has observed until
+time t, namely the resource process states and the number
+
+of agents at each location she has visited during the time
+
+period she visited that location:
+
+hit = (Zs(ksi ), Ns(ksi )) : s  t .
+
+Thus, a strategy i for an agent i, specifies a (mixed) action between stay and switch at each jump time t = T i of her associated Poisson process Xti, based on her history hit.
+Given this informational assumption, each agent i seeks to maximize the total expected reward accrued over her lifetime, given by
+
+E RTi i I{ i  T i} .
+=0
+Observe that since the agent departs the system with probability (1 - ) at each jump time independently, the total
+
+expected reward can be equivalently written as
+
+E  RTi i .
+=0
+Thus, each agent's decision problem is equivalent to maximizing her total discounted expected reward assuming she persists in the system.
+Since the reward at any location is determined by the number of agents at that location, each agent's decision to stay in her current location or to switch to a new one depends on all the other agents' behavior. Consequently, the interaction among the agents is a dynamic game, and analyzing the agents' behavior requires an equilibrium analysis.
+The standard equilibrium concept to analyze the induced dynamic game is a perfect Bayesian equilibrium (PBE). A PBE consists of a strategy i and a belief system µi for each player i. A belief system µi for agent i specifies a belief µi(hit) after any history hit over all aspects of the system that she is uncertain of and that influence her expected payoff. A PBE then requires two conditions to hold: (1) each agent i's strategy i is a best response after any history hit, given their belief system and given all other agents' strategies; and (2) each agent i's beliefs µi(hit) are updated via Bayes' rule whenever possible (see [10, 11] for more details).
+Observe that a PBE supposes a complex model of agent behavior. It requires each player i to keep track of her entire history, and maintain complex beliefs about the rest of the system. While this may be plausible in small settings, this behavioral model seems implausible for large systems. On the contrary, in such settings, it is more plausible that each agent would base her decision to stay or switch solely on the current state of the location she is in -- specifically on its level of resource, and the number of other agents there-- and on the aggregate features of the entire system. Moreover, we expect that if an agent were to base her decision only on this information, then she would pursue a "threshold" strategy: she would stay in her current location if the number of agents at that location is low, and switch to a different location if that number is high, with the threshold used depending on that location's level of resource.
+Below, we seek to uncover this intuitive behavioral model as an equilibrium in large systems by letting the number of agents and the number of location both increase proportionally to infinity, and studying the limiting infinite system.
+3. LIMITING INFINITE SYSTEM
+In this section, we consider an infinite system that is obtained as the limit of the finite system as the number of location K and the number of agents N both tend to infinity, with N = K, for some fixed  > 0. In the limiting system, there are infinite number of locations and agents, with the expected number of agents per location fixed at  > 0. In such a limit, given certain consistency conditions that bind the mean dynamics of all the locations, the dynamics of each location essentially decouples from the rest of the system. Under such a decoupling, instead of focusing on the entire limiting system, it suffices to focus on the dynamics of a single location, as well as the empirical distribution of the states of all the locations. We begin with the description of the dynamics of a single location in such an infinite system.
+
+179
+
+3.1 Location dynamics
+To analyze the agents' behavior in the infinite system, we fix a location k and focus on the decision problem faced by an agent i at location k about when to switch to a different location. Let Xti denote the Poisson process with rate  > 0 associated with agent i, with jump times T i for l  0. As before, let Zt(k) denote the state of the resource process at location k and let Nt(k) denote the number of agents at location k at time t. We assume that agents arrive at location k according to a Poisson arrival process with rate  > 0. Note that these arriving include new agents arriving to the system (following a departure), as well as existing agents who have chosen to switch from their current location.
+Inspired by the discussion at the end of the preceding section, we focus on a family of threshold strategies for the agents. A threshold strategy is characterized by a pair (n0, n1)  [0, +)2. In a threshold strategy (n0, n1), an agent at a location with resource level z  {0, 1} chooses to stay at her current location if the number of agents is strictly below nz ; chooses to switch her location if the number of agents at her current location is strictly above nz; and stays with probability nz - nz and switches with the remaining probability if the number of agents is equal to nz . Our eventual goal is to show that there exists an equilibrium for agents' behavior where all agents follow (the same) threshold strategy. For now, we assume that all agents except agent i adopt a threshold strategy (n0, n1), and seek an optimal strategy over the class of all history-dependent strategies (not just the class of threshold strategies) for agent i.
+Note that given the arrival rate  > 0, and the threshold policy (n0, n1), the process (Zt(k), Nt(k)) evolves as a continuous time Markov chain on the state space S = {0, 1} × N with the following transition rate matrix: for each z  {0, 1}, and for all n  N, we have
+Q((z, n)  (1 - z, n)) = µz,1-z,
+Q((z, n)  (z, n + 1)) = ,
+Q((z, n)  (z, n - 1)) = (n - 1) (1 -  +
+ (1{n > nz} + (n + 1 - nz)1{n = nz })) .
+Here, the first equation represents the transitions in Zt(k), which is an independent Markov chain on {0, 1} with holding times µ01 and µ10. The second equation follows from the assumption that agents arrive at location k according to a Poisson process with rate  > 0. The third equation represents a transition where an agent at location k leaves. This transition can occur in two ways: first, the agent could leave the system with probability 1 - ; second, the agent could survive, with probability , but choose to switch to a different location, which happens with probability 1 if n > nz, with probability (n+1-nz) if n = nz , and zero otherwise. Since there are (n - 1) other agents that make this decision to stay or switch at rate , these transitions occur at rate (n - 1). We denote this continuous time Markov chain describing the dynamics of a single location, where all agents adopt the threshold policy (n0, n1) and the rate of arrival of agents is , by MC(n0, n1, ).
+3.2 Agent's decision problem
+We are now ready to describe the decision problem faced by the agent i regarding when to switch from her current location. At each jump time t = T i of Xti, the agent i
+
+receives an immediate payoff of Zt(k)f (Nt(k)) and may leave the system with probability 1 - . If she does not leave the system, then she has to decide between two actions "stay" or "switch". On choosing "stay" continues until the next jump time T i+1; on choosing "switch", the decision problem terminates with an immediate payoff of C > 0, that does not depend on the state of the location k.
+Before proceeding, we provide a brief interpretation of the termination payoff C. Observe that in a finite system, an agent on switching from a location, moves on to a different location that is chosen uniformly at random, and continues to accrue payoffs until she leaves the system. This suggests that one may interpret the termination payoff C as capturing the notion of a continuation payoff on switching in the finite system in the context of the limiting infinite system. Subsequently, we impose conditions on our equilibrium notion that ensure that indeed C denotes the continuation payoff in the infinite system.
+Given these payoffs and actions for agent i, it follows that the decision problem facing agent i is an optimal stopping problem, which we denote by OS(n0, n1, , C). We next specify the dynamic programming formulation of OS(n0, n1, , C).
+Note that in the decision problem, when the Markov chain MC(n0, n1, ) is in state (z, n), events occur at rate  + µz,1-z + n: with rate  a new agent arrives, with rate µz,1-z the resource level changes, with rate (n - 1) one of the other agents either leaves the system or survives and makes the decision to stay or switch, and finally with rate , agent i arrives at a jump time to make a decision herself. Thus, we define the following transition probabilities for the state transition:
+
+
+
+Pdec(z, n)
+
+=
+
+n
+
++ µz,1-z
+
++
+
+, 
+
+(n - 1)(1 - )
+
+Pexit(z, n)
+
+=
+
+n
+
++ µz,1-z
+
++
+
+, 
+
+(n - 1)
+
+Psur(z, n)
+
+=
+
+n
+
++ µz,1-z
+
++
+
+, 
+
+Pres(z, n)
+
+=
+
+n
+
+µz,1-z + µz,1-z
+
++
+
+, 
+
+
+
+Parr(z, n)
+
+=
+
+n
+
++ µz,1-z
+
++
+
+. 
+
+(1)
+
+Here, Pdec(z, n) denotes the probability that the next event corresponds to agent i's decision epoch, Pexit denotes the probability the next event corresponds to one of the other
+agents exiting the system, Psur denotes the probability the next event corresponds to one of the other agents persisting
+in the system, Pres denotes the probability the next event corresponds to change in the resource level, and finally, Parr denotes the probability that the next event corresponds to
+a new arrival. Given (Zt(k), Nt(k)) = (z, n) with T i = t, let V (z, n) de-
+note the optimal expected total reward of agent i just after her associated Poisson process Xti has undergone a jump, but prior to her making a decision or receiving any reward. Similarly, let V^ (z, n) denote the optimal expected total re-
+ward of agent i after a jump time, conditional on the decision
+problem not terminating either due to the agent leaving the
+system or choosing to switch to a different location. Then,
+
+180
+
+we have the following Bellman equation:
+
+V (z, n) = zf (n) +  max{V^ (z, n), C},
+
+V^ (z, n) = Pdec(z, n)V (z, n) + Pexit(z, n)V^ (z, n - 1) + Psur(z, n) (1{n > nz} + (n+1-nz)1{n = nz }) V^ (z, n-1)
+
++ Psur(z, n) (1{n < nz } + (nz -n)1{n = nz }) V^ (z, n)
+
++ Pres(z, n)V^ (1-z, n) + Parr(z, n)V^ (z, n+1).
+
+(2)
+
+Here, the first equation follows from the fact that subsequent
+to a jump time, the agent receives an immediate payoff equal
+to zf (n). Following this, she continues with survival proba-
+bility , and has to make a decision to stay, which gets her expected payoff equal to V^ (z, n) or switch, which gets her
+an expected payoff equal to C. The second equation relates V^ (z, n) to the agent's expected payoff subsequent to various
+events that can occur at the next transition. For a solution V and V^ to the Bellman's equation, an optimal strategy i for the agent i requires agent i to stay if V^ (z, n) > C, and to switch if V^ (z, n) < C (any mixed action is optimal if V^ (z, n) = C). Let OPT (n0, n1, , C) denote the set of all
+optimal strategies (not necessarily threshold strategies) for
+the agent's decision problem OS(n0, n1, , C).
+
+3.3 Mean field equilibrium
+Given the Markov chain MC(n0, n1, ) and an agent's decision problem OS(n0, n1, , C) , we are now ready to state the equilibrium conditions on the limiting system. First, in the infinite system, we require the agents' strategies to be in equilibrium. Since MC(n0, n1, ) describes the dynamics of a location where all agents other than agent i use the threshold policy (n0, n1), for equilibrium we must impose the condition that (n0, n1) is an optimal strategy for the agent's decision problem. This leads to the following condition:
+
+(n0, n1)  OPT (n0, n1, , C).
+
+(3)
+
+If all agents at location k, including agent i, follow the threshold policy (n0, n1), then the transitions in (Zt(k), Nt(k)) = (z, n) follow a Markov chain with transition rate matrix Q that is equal to Q except for the transition Q((z, n)  (z, n - 1)) which is equal to Q((z, n)  (z, n - 1)) = n(1 -  + (1{n > nz} + (n + 1 - nz)1{n = nz })). This is because the arrival and the changes in the resource
+level occur at the same rate, but now any one of the agents
+at location k might choose to leave the location, as opposed
+to any one of the agents other than agent i as defined in Q. Denote this Markov chain by MC(n0, n1, ) and let  denote an invariant distribution of this chain:
+
+TQ = 0.
+
+(4)
+
+In a large system, a natural requirement to impose is that the invariant distribution of a single location k equals the steady state empirical distribution of the resource level and the number of agents across all locations. Requiring this condition to hold leads to two consequences. First, because in the infinite system the "agent density", i.e., mean number of agent across all locations, is equal to , this implies that the expected number of agents at location k must equal :
+
+n(z, n) = .
+(z,n)S
+
+(5)
+
+Note that this equation imposes a restriction on the arrival rate  of the Markov chain MC(n0, n1, ). In particular, it
+
+requires the arrival rate to be such that in steady state the expected number of agents at each location is equal to .
+The second condition imposes a restriction on the immediate termination reward on switching C. Recall that we interpret C as modeling the optimal continuation payoff on switching in the finite system. Since the empirical distribution of the states of other locations is given by , the optimal expected reward an agent can obtain on switching is given by (z,n)S (z, n)V^ (z, n + 1). This is because, after the agent moves to a location in state (z, n), which happens with probability (z, n), the number of agents at that location becomes n + 1, and the expected payoff to that agent is V^ (z, n + 1). We require that this quantity equals the immediate reward C:
+
+C = (z, n)V^ (z, n + 1).
+
+(6)
+
+(z,n)S
+
+Given these consistency conditions, we are now ready to define a mean field equilibrium for the infinite system:
+
+Definition 1 (Mean Field Equilibrium). A mean field equilibrium is characterized by a threshold strategy (n0, n1), an arrival rate  > 0, an distribution  over S, and an immediate reward C > 0, such that the set of equations (3),(4),(5), and (6) hold.
+
+Note that as opposed to a PBE, a mean field equilibrium adopts a fairly natural and simple model of agent behavior, where each agent needs to keep track only of current state and the number of agents at the location she is in, along with the immediate payoff for switching.
+
+4. MAIN RESULTS
+Having defined the equilibrium concept, we now consider the problem of existence of a mean field equilibrium in the infinite system.
+We begin with the following lemma that shows that for any level of resource at a location, the value function V^ (z, n) is non-increasing with the number of agents at that location. The proof may be found in Appendix A.
+Lemma 4.1. For each z  {0, 1}, the value function V^ (z, n) is non-increasing in n.
+Using this lemma, it is straightforward to show that for any level of resource z  {0, 1}, if it is optimal to switch when the number of agents at the location is n, then it is still optimal to switch when the number of agents is greater than n. From this, we obtain the first result of this section.
+Theorem 4.1. For any (n0, n1)  R2+,  > 0 and C > 0, there always exists an optimal strategy with a threshold structure for the decision problem OS(n0, n1, , C).
+The preceding theorem suggests that set of threshold strategies is closed under best-responses: if all agents other than agent i adopt the same threshold strategy, then it is optimal for agent i to also follow a threshold strategy. Thus, it suffices to focus on the set of optimal threshold strategies for the agent decision problem, which we denote by T (n0, n1, , C). Note that T (n0, n1, , C) can be characterized as a subset of R2+ corresponding to the values of the thresholds of the optimal threshold strategies. In Lemma A.1 in the Appendix A, we show that T (n0, n1, , C) is a convex set.
+
+181
+
+Building on this result, we obtain the main theorem of our paper.
+Theorem 4.2. For any  > 0,  > 0 and µ01, µ10 > 0, there exists a mean field equilibrium for the infinite system.
+We emphasize that the existence of a mean field equilibrium is obtained under very general conditions, requiring only that the reward function f (n) is non-increasing in the number of agents n at a location, and converging to zero as n tends to infinity. Our proof technique can be extended to cases where the resource level Zt(k) at any location can take values in any finite subset of R+.
+The full proof of Theorem 4.2 is technical and is omitted due to space constraints. Instead, in the next section, we sketch the main ideas behind the proof and provide a brief outline. Selected portions of the proof may be found in Appendix A, and a full proof will appear later in a longer version of the paper.
+5. PROOF OUTLINE
+The proof of Theorem 4.2 follows by applying Kakutani's fixed point theorem on carefully defined map T , whose fixed points correspond to the mean field equilibria of the infinite system. To define the map T requires a number of intermediate steps, which we outline below.
+The first step of the proof involves showing that given any (n0, n1)  R2+ and C > 0, there exists a unique  and distribution  such that  is the unique invariant distribution of the Markov chain MC(n0, n1, ) (i.e.,  satisfies equation (4)), and for which condition (5) holds. This step itself involves first showing that for any  > 0, the Markov chain MC(n0, n1, ) is irreducible and positive recurrent, and hence has a unique stationary distribution . To show this, we use coupling arguments to bound the Markov chain MC(n0, n1, ) between two M/M/ queues. Then, we show that the quantity (z,n)S n(z, n) is strictly increasing and continuous over an interval of values of , which suffices to show that there exists a value of  satisfying (5).
+We then compute the value function V^ satisfying the Bellman's equation (2) for the decision problem OS(n0, n1, , C), where  is the value of the arrival rate obtained in the first step. Using this value function, we identify the set T (n0, n1, , C) of optimal threshold strategies.
+Finally, using the value function V^ and the invariant distribution  from the first step, we compute the total expected payoff of an agent subsequent to switching to a different location chosen uniformly at random, defined as C~
+(z,n)S (z, n)V^ (z, n + 1). The map T is then defined as follows: for each (n0, n1)  R2+ and C > 0, we define T (n0, n1, C) = T (n0, n1, , C) × {C~}. We depict the map pictorially in Fig. 1. By definition, any fixed point (n0, n1, C) of the map T must satisfy (n0, n1)  T (n0, n1, , C), and C = C~. This implies that (n0, n1) is an optimal threshold strategy for the decision problem OS(n0, n1, , C), and hence is also an optimal strategy and equation (3) holds. Recall that the arrival rate  and the invariant distribution  satisfy equations (4) and (5). Finally, C~ = C implies that equation (6) holds. From this we conclude that (n0, n1), C and resulting  and the invariant distribution  together constitute a mean field equilibrium. Thus each fixed point of the map T corresponds to a mean field equilibrium.
+
+(n0, n1)
+
+
+
+
+
+C V^ C~
+
+T (n0, n1, , C)
+Figure 1: Illustration of the correspondence T (n0, n1, C) = T (n0, n1, , C) × {C~}.
+
+To show that the map T has a fixed point, we apply
+
+Kakutani's fixed point theorem. For this, we first identify a
+
+compact set M > 0, and
+
+X [0, M ]2 ×[C, show that T (X¯)
+
+C¯] of  X.
+
+R30, We
+
+with 0 < C < C¯ and include th¯e proof of
+
+this step in Appendix A.2. Second, we show that the map
+
+is upper hemicontinuous under the Euclidean topology. To
+
+show this, we need to show that each of the intermediate
+
+maps in Fig. 1 is continuous (or upper hemicontinuous if
+
+the map is a correspondence) under appropriate topologies.
+
+We apply Berge's Maximum Theorem [6] to show the map
+
+from (n0, n1, C) to (, ) is continuous, and the continuity
+
+of fixed points of continuous contraction mappings [14] to
+
+show the map from (n0, n1, , C) to the value function V^ is continuous. Finally, we show that the image of T is convex
+
+and non-empty for all values of (n0, n1, C). Then, it follows
+
+by a direct application of Kakutani's fixed point theorem
+
+that the map T has a fixed point, and consequently a mean
+
+field equilibrium exist in the infinite system.
+
+6. COMPARATIVE STATICS
+Having shown the existence of a mean field equilibrium for the infinite system, we now study how the model parameters and the reward function f affect the equilibrium agent behavior. We perform this investigation numerically by computing the mean field equilibrium for a range of parameter values, and studying how the equilibrium thresholds (n0, n1) and the stationary distribution vary.
+As our model is invariant to the proportional scaling of the decision epoch rates , and the holding rates µ0,1 and µ1,0, we assume for our computations that  = 1 and vary the holding rates. Further, we restrict our attention to the symmetric case where the holding rates are equal: µ0,1 = µ1,0 = µ. In all our computation, we set the agent density  = 20, and the survival probability  = 0.95. For this, we study the mean field equilibrium in three reward settings: (1) f (n) =1/n for all n; (2) f (n) = 1/n2 for all n; and (3) f (n) = 1/ n for all n.
+Before we discuss the results of our numerical investigation, we briefly describe our approach to compute an (approximate) mean field equilibrium of the infinite system.
+
+182
+
+µ 0.1 0.5 1.0 10.0 100.0
+
+ f (n) = 1/ n 2.80, (1.0, 43.9) 2.39, (4.3, 43.8) 2.63 , (1.0, 27.2) 2.37, (11.0, 18.2) 2.46, (11.0, 12.0)
+
+f (n) = 1/n 1.98, (1.0, 4.0) 1.72, (1.0, 4.0) 0.96, (1.0, 10.4) 0.93, (4.0, 7.1) 0.97, (4.0, 4.0)
+
+f (n) = 1/n2 0.14, (1.0, 7.7) 0.25, (1.0, 4.7) 0.18, (1.0, 5.0) 0.16, (3.0, 5.0) 0.80, (1.0, 8.0)
+
+Table 1: Computationally determined approximate equilibrium values of the payoff for switching C, and the thresholds n0 and n1 used to decide whether to switch or not. Values are reported in the table as C, (n0, n1), for each value for reward function f and the rate µ at which the resource level changes.
+
+6.1 Computation of MFE
+Recall that the mean field equilibria of our model are the fixed points of the correspondence T . We thus seek to find (approximate) fixed points of this map. To do this, we adopt a brute-force approach. We first truncate the state space S of the agent decision problem to S200 = {0, 1} × {0, 1, · · · , 199}. We restrict the thresholds (n0, n1) to grid of values in [0, 50]2, where we set the grid resolution r adaptively over different runs. We do a similar adaptive meshing of the set of values of the immediate payoff C. Having restricted the set of values of (n0, n1) and C thus, we search over all values to find lie in the image of T , within some pre-specified tolerance . We describe this process in detail:
+1. For each value of (n0, n1), we perform a binary search on  to find a value for which the stationary distribution  of the Markov chain MC(n0, n1, ) restricted to S200 satisfies equation (5) with a tolerance . (The stationary distribution  is obtained by solving the set of linear equations (4).)
+2. For this value of , (n0, n1) and each value of C, we perform value iteration to compute the value function V^ , again with a tolerance of , and compute the set of optimal thresholds T (n0, n1, , C). Let dist(n0, n1) denote the distance between (n0, n1) and the T (n0, n1, , C) under the Euclidean norm. (Note that the latter set is convex and the distance is well defined.)
+3. Next, using the stationary distribution  and the value function V^ , we compute the immediate payoff C~.
+4. For each value of n0, n1 and C, we compute d(n0, n1, C) C-C~ +dist(n0, n1). We output the value of (n0, n1, C)
+that minimizes d(n0, n1, C) over all values.
+To make the brute-force search efficient, we run this algorithm sequentially and adaptively by first identifying candidate regions where equilibria might exist, and restricting the search to those regions with lower tolerance and finer grid values.
+6.2 Numerical results
+In Table 1 we report computationally determined values for three different reward functions, obtained over five different rates for the underlying resource process.
+For large values of µ, we see n0 and n1 are close. This is natural because large values of µ imply that the resource level is changing very quickly, and so the level of resource
+
+at the time of the decision has little impact on what the re-
+
+source level will be at the next time the agent receives a re-
+
+ward. Thus, the current level of resource z has little impact
+
+on the threshold nz. On the other hand, for small values of
+
+µ, the thresholds differ significantly with the resource level.
+
+f
+
+We (n)
+
+=also1/obsne,rv1e/tnh,ata,nwd h1e/nnc2o, mwphaerinngf
+
+reward functions decreases more
+
+quickly, agents are more willing to switch (the threshold
+
+for switching is lower), and the payoff for switching is also
+
+lower.
+
+7. CONCLUSION
+We have studied a multi-agent location-specific resourcesharing game, and have established the existence of an equilibrium in this game, and have characterized each agent's policy in this equilibrium as being a threshold policy. This result provides economic insight into such multi-agent resourcesharing games, and also allows evaluating the effects of designing and modifying these games, through subsidies or penalties added to natural occurring rewards and costs.
+This work also sets the stage for studying information sharing in multi-agent resource-sharing systems. Our current analysis assumes that agents observe only the number of other agents and resource level at their current location, and the locations they have visited in the past. One may extend this model to allow for information sharing among the agents as well as between the agents and a central planner who has access to the current state(s) of the location(s) that the agent mights switch to. A first question of interest would then be whether such information sharing necessarily improves social welfare, or whether it can in fact degrade it. A second question is how this information sharing mechanism should be designed to maximize social welfare.
+
+8. ACKNOWLEDGEMENTS
+Peter Frazier was partially supported by NSF CAREER CMMI-1254298, NSF CMMI-1536895, NSF IIS-1247696, AFOSR FA9550-12-1-0200, AFOSR FA9550-15-1-0038.
+
+9. REFERENCES
+[1] S. Adlakha, R. Johari, and G. Y. Weintraub. Equilibria of dynamic games with many players: Existence, approximation, and market structure. Journal of Economic Theory, 156:269­316, March 2015.
+[2] N. Arnosti, R. Johari, and Y. Kanoria. Managing congestion in decentralized matching markets. In Proceedings of the Fifteenth ACM Conference on Economics and Computation, EC '14, pages 451­451, New York, NY, USA, 2014. ACM.
+[3] W. B. Arthur. Inductive reasoning and bounded rationality. The American economic review, pages 406­411, 1994.
+[4] P. Auer, N. Cesa-Bianchi, and P. Fischer. Finite-time analysis of the multiarmed bandit problem. Machine learning, 47(2):235­256, 2002.
+[5] S. R. Balseiro, O. Besbes, and G. Y. Weintraub. Repeated auctions with budgets in ad exchanges: Approximations and design. Management Science, 61(4):864­884, 2015.
+
+183
+
+[6] C. Berge. Topological Spaces: Including a treatment of multi-valued functions, vector spaces, and convexity, translated by E. M. Patterson. Dover, 1963.
+[7] A. S. Chakrabarti, B. K. Chakrabarti, A. Chatterjee, and M. Mitra. The kolkata paise restaurant problem and resource utilization. Physica A: Statistical Mechanics and its Applications, 388(12):2420­2426, 2009.
+[8] B. K. Chakrabarti. Kolkata restaurant problem as a generalised el farol bar problem. In Econophysics of Markets and Business Networks, pages 239­246. Springer, 2007.
+[9] P. I. Frazier, D. Kempe, J. Kleinberg, and R. Kleinberg. Incentivizing exploration. In Proceedings of the 15th ACM Conference on Economics and Computation (EC'14), pages 5­22, New York, NY, USA, 2014. Association for Computing Machinery.
+[10] D. Fudenberg and J. Tirole. Game theory. The MIT Press, Cambridge, Massachusetts, 1991.
+[11] D. Fudenberg and J. Tirole. Perfect bayesian equilibrium and sequential equilibrium. Journal of Economic Theory, 53(2):236­260, 1991.
+[12] A. Ghosh, A. Chatterjee, M. Mitra, and B. K. Chakrabarti. Statistics of the kolkata paise restaurant problem. New Journal of Physics, 12(7):075033, 2010.
+[13] J. Gittins. Multi-Armed Bandit Allocation Indices. John Wiley and Sons, New York, 1989.
+[14] A. Granas and J. Dugundji. Fixed point theory. Springer Monographs in Mathematics. Springer-Verlag, New York, 2003.
+[15] H. A. Hopenhayn. Entry, exit and firm dynamics in long run equilibrium. Econometrica, 60(5):1127 ­ 1150, 1992.
+[16] M. Huang, P. E. Caines, and R. P. Malham´e. Large-population cost-coupled LQG problems with nonuniform agents: Individual-mass behavior and decentralized -Nash equilibria. IEEE Transactions on Automatic Control, 52(9):1560­1571, 2007.
+[17] J. R. Ilan Lobel, Ankur Mani. Learning via external sales networks. in preparation, 2014.
+[18] K. Iyer, R. Johari, and M. Sundararajan. Mean field equilibria of dynamic auctions with learning. Management Science, 60(12):2949­2970, 2014.
+[19] B. Jovanovic and R. W. Rosenthal. Anonymous sequential games. Journal of Mathematical Economics, 17:77­87, 1988.
+[20] L. Kaelbling. Learning in embedded systems. MIT Press, Cambridge, MA, 1993.
+[21] J. M. Lasry and P. L. Lions. Mean field games. Japanese Journal of Mathematics, 2:229­260, 2007.
+[22] N. Nisan, T. Roughgarden, E. Tardos, and V. V. Vazirani. Algorithmic game theory. Cambridge University Press Cambridge, 2007.
+[23] W. Powell and I. Ryzhov. Optimal Learning. Wiley, 2012.
+[24] R. W. Rosenthal. A class of games possessing pure-strategy nash equilibria. International Journal of Game Theory, 2(1):65­67, 1973.
+[25] G. Y. Weintraub, C. L. Benkard, and B. van Roy. Industry dynamics: Foundations for models with an
+
+infinite number of firms. Journal of Economic Theory, 146(5):1965 ­ 1994, 2011. [26] G. Y. Weintraub, C. L. Benkard, and B. VanRoy. Markov perfect industry dynamics with many firms. Econometrica, 76(6):1375­1411, 2008. [27] J. Xu, B. Hajek, et al. The supermarket game. Stochastic Systems, 3(2):405­441, 2013.
+APPENDIX
+A. PROOFS
+In this appendix we provide proofs of selected results discussed in the main text. A full proof of the main theorem is technical, and is omitted due to space constraints. This full proof will appear in a future version of the paper.
+A.1 Structure of optimal strategies
+Proof of Lemma 4.1. By Markov property we may assume at t = 0 the agent makes his current decision, and let t be the time his next decision epoch starts. We denote (z,n) as the distribution of (Zt , Nt ) given (Z0, N0) = (z, n), then we can write
+V^ (z, n) = E(z,n) V (Zt , Nt ).
+Let V^ (0)(z, n) = 0 for all z and n. Compute V (m)(z, n) and V^ (m+1)(z, n) using value iteration for the Bellman's equation (2).
+V (m)(z, n) = zf (n) +  max{V^ (m)(z, n), C},
+V^ (m+1)(z, n) = E(z,n) V (m)(Zt , Nt ).
+By convergence of value iteration we have V (m) -V   0 and V^ (m) - V^   0 as m  . Therefore, it suffices to show m  N0, for z  {0, 1}, V (m)(z, n) and V^ (m)(z, n) are non-increasing in n. We can prove this by induction on m.
+The base case follows trivially. Now assume V^ (m)(z, n) is non-increasing in n for z  {0, 1}, for some m  N0. From this it is straightforward to conclude that V (m)(z, n) = zf (n) +  max{V^ (m)(z, n), C} must be non-increasing in n since both f (n) and V^ (m)(z, n) are non-increasing in n. Thus, we only need to show that V^ (m+1)(z, n) is also nonincreasing in n.
+Observe showing V^ (m+1)(z, n)  V^ (m+1)(z, n+1) is equivalent to showing E(z,n) V (m)(Zt , Nt )  E V(z,n+1) (m)(Zt , Nt ). We show this using a sample path argument by considering two processes. Let (Zt1, Nt1) be a copy of MC(n0, n1, ) that starts at (Z01, N01) = (z, n) and let (Zt2, Nt2) be a copy of MC(n0, n1, ) that starts at (Z02, N02) = (z, n + 1). By carefully coupling the two processes, the details of which we omit due to space restrictions, it can be shown that for all t  0, Zt1 = Zt2 and Nt1  Nt2. Since (Zt1 , Nt1 )  (z,n) and (Zt2 , Nt2 )  (z,n+1), we have
+E(z,n) V (m)(Zt , Nt ) = E[V (m)(Zt1, Nt1)],
+and
+E V(z,n+1) (m)(Zt , Nt ) = E[V (m)(Zt2, Nt2)].
+Since V (m)(z, n) is non-increasing in n for both z = 0, 1, V (m)(Zt2, Nt2)  V (m)(Zt1, Nt1) in all sample paths, and
+
+184
+
+therefore E[V (m)(Zt1, Nt1)]  E[V (m)(Zt2, Nt2)], which completes the proof.
+
+Theorem A.1. For all (n0, n1, C)  X , T (n0, n1, C)  X.
+
+We now consider the set of optimal thresholds T (n0, n1, , C).
+
+Lemma A.1. For each (n0, n1),  > 0, and C > 0, the set of optimal thresholds T (n0, n1, , C), as a subset of R2+,
+is convex.
+
+Proof. From Lemma 4.1, we know that the value function V^ (z, n) is non-increasing in n for each z  {0, 1}. Now
+
+for z n¯z =
+
+ {0, 1}, denote min{n : V^ (z, n)
+
+<n¯ zC
+
+= }.
+
+max{n For all
+
+: n
+
+action is to stay at the current location
+
+V^ (z, n) > andn¯ zfo, rtahlel
+
+C} and
+optimal n  n¯z,
+
+the optimal action is to switch to a different location. For
+
+aagneynitntisegienrdinffere[nn¯tz
+
+, n¯z], we between
+
+have V^ (z, n) = staying in the
+
+C, meaning the current location
+
+or switching to a different location when the state at the
+
+current location is (z, n).
+
+Let (n10, n11) and (n20, n21) be two threshold strategies that are both optimal: (n0, n1)  T (n0, n1, , C) for  {1, 2}.
+By the definition of the threshold strategy, this implies that
+
+thnrzesholn¯dz
+
+, and nz strategy
+
+ (n0,
+
+n¯z n1
+
+for each . ), at state
+
+This is because in the (z, n), the agent stays
+
+at her current location for all n < nz , switches to a differ-
+
+ent location for all n > nz and and stays with probability
+
+nz - nz and switches with the remaining probability if the
+
+number of agents n is equal to nz . Since this is true for
+
+each and
+
+, we have for any n1z + (1 - )n2z
+
+  (0, 1), n1z + (1  n¯z. This implies
+
+- )n2z that a
+
+thren¯shz-,
+
+old strategy that at state (z, n) stays in the current loca-
+
+tion if n < n1z + (1 - )n2z , switches to a different location if n > n1z + (1 - )n2z , and stays with probability (n + 1 - n1z + (1 - )n2z ) and switches otherwise if n = n1z + (1 - )n2z is also optimal. This implies that (n10 + (1 - )n20, n11 + (1 - )n21) also lies in the set T (n0, n1, , C), and hence the latter set is convex.
+
+A.2 Restriction of T to a compact set
+
+In this section, we show that the map T can be restricted
+
+to a compact subset X of R3+, whose image T (X ) is a subset of X .
+
+Towards that goal, we define C¯, C as follows: ¯
+
+C¯
+
+f (1) 1-
+
+,
+
+ C
+
+µ0,1
+
+e-
+
+ 1-
+
+f
+
+(1).
+
+¯  + µ1,0 +   + µ0,1 + 
+
+It is straightforward that 0 < C < f (1) < C¯. Also, for
+
+n  N0, define
+
+¯
+
+
+
+g(n)
+
+1 1-
+
+f ( n ) + exp(- n ) +  2 2 8 log n
+
+ (log n)1/2 + f (1).
+1-
+
+(7)
+
+Note g(n) is decreasing in n and g(n)  0 as n  +. We pick M such that
+
+M min{n : g(n) < (1 - )C}. ¯
+Define X = [0, M ]2 × [C, C¯]. The following theorem shows that the image of map ¯T is a subset of X for all values
+therein.
+
+We prove this theorem in two steps. First, in Lemma A.2,
+we show that for all values of (n0, n1, C) in X , the value of C~ lies in [C, C¯]. Then, we show in Lemma A.3, that for all values of ¯(n0, n1, C) in X , the optimal thresholds must
+always be less than M . We begin with the first lemma.
+
+
+
+Lemma  [(1
+
+A.2. For any - ), ], let
+
+(n0 V^
+
+, n1, C be the
+
+)  [0, +)2 solution of
+
+× [C, C¯] and the¯Bellman
+
+equation (2) with given parameters (n0, n1, C, ). Let  be
+
+the unique stationary distribution of MC(n0, n1, ). Let C~
+
+(z,n)S (z, n)V^ (z, n + 1).
+
+Then
+
+C~
+
+ [C, C¯]. ¯
+
+Proof. We first show C~  C¯. We have
+
+C~ = (z, n)V^ (z, n + 1)
+(z,n)S
+ max V^ (z, n + 1)
+(z,n)S
+= max V^ (z, 1),
+z{0,1}
+
+(8)
+
+where the last equality is implied by Lemma 4.1. Also note Pexit(z, 1) = Psur(z, 1) = 0 for z  {0, 1}, therefore
+
+V^ (z, 1) = Pdec(z, 1)V (z, 1) + Pres(z, 1)V^ (1 - z, 1)
+
++ Parr(z, 1)V^ (z, 2), for z  {0, 1}.
+
+(9)
+
+From Lemma 4.1 we have V^ (z, 2)  V^ (z, 1) for z  {0, 1}. Further, assume z  {0, 1} attains maxz{0,1} V^ (z, 1), then V^ (1 - z, 1)  V^ (z, 1), and (9) becomes
+
+V^ (z, 1)  Pdec(z, 1)V (z, 1) + Pres(z, 1)V^ (z, 1)
+
++ Parr(z, 1)V^ (z, 1).
+
+(10)
+
+We have 1 - Pres(z, 1) - Parr(z, 1) = Pdec(z, 1) = /( +
+µz,1-z + ) > 0, along with (10) this gives V^ (z, 1)  V (z, 1). Thus, we have
+
+V^ (z, 1)  V (z, 1) = zf (1) +  max{C, V^ (z, 1)}  zf (1) +  max{C, V^ (z, 1)}.
+
+(11)
+
+If V^ (z, 1) < C, then by (8) we have
+
+C~  max V^ (z, 1) = V^ (z, 1) < C  C¯.
+z{0,1}
+
+Otherwise C  V^ (z, 1) and (11) becomes
+
+V^ (z, 1)  zf (1) + V^ (z, 1),
+
+which gives us
+
+V^ (z, 1)
+
+
+
+zf (1) 1-
+
+
+
+f (1) 1-
+
+=
+
+C¯.
+
+Hence in both cases we have C~  C¯. Next we show C~  C. We have ¯
+
+C~ =
+
+(z, n)V^ (z, n + 1) 
+
+(z, 0)V^ (z, 1). (12)
+
+(z,n)S
+
+z=0,1
+
+185
+
+Note that
+V^ (1, 1) = Pdec(1, 1)V (1, 1) + Pres(1, 1)V^ (0, 1) + Parr(1, 1)V^ (1, 2)
+ Pdec(1, 1)V (1, 1) = Pdec(1, 1)[f (1) +  max{V^ (1, 1), C}]  Pdec(1, 1)f (1),
+
+and
+V^ (0, 1) = Pdec(0, 1)V (0, 1) + Pres(0, 1)V^ (1, 1) + Parr(0, 1)V^ (0, 2)
+ Pres(0, 1)V^ (1, 1)  Pres(0, 1)Pdec(1, 1)f (1).
+
+Therefore, with (12) we have
+
+C~  Pres(0, 1)Pdec(1, 1)f (1)
+
+(z, 0).
+
+z=0,1
+
+Let Nt1 be the number of agents in our system at time t, and Nt2 be that of an M/M/ queue with arrival rate  and service rate (1 - ). Assume N01 = N02. Using a coupling argument, which we omit due to space limitations, it can be shown that Nt2 stochastically dominates Nt1 for all t  0. Therefore,
+
+(z, 0) =
+
+lim
+t+
+
+P(Nt1
+
+=
+
+0,
+
+Zt
+
+=
+
+z)
+
+z=0,1
+
+z=0,1
+
+=
+
+lim
+t+
+
+P(Nt1
+
+=
+
+0)
+
+
+
+lim
+t+
+
+P(Nt2
+
+=
+
+0)
+
+=
+
+e-
+
+ (1-)
+
+,
+
+where the last equality follows from the steady state distribution of the M/M/ queue.
+Therefore we have
+
+C~  Pdec(1, 1)Pres(0, 1)f (1)
+
+(z, 0)
+
+z=0,1
+
+ =
+ + µ1,0 + 
+
+µ0,1
+
+e-
+
+ (1-
+
+)
+
+f
+
+(1)
+
+ + µ0,1 + 
+
+  + µ1,0 + 
+
+µ0,1
+
+e-
+
+ 1-
+
+f
+
+(1)
+
+=
+
+C,
+
+ + µ0,1 + 
+
+¯
+
+where the last inequality is achieved on picking  = .
+
+Next we restrict our choice of thresholds (n0, n1) to a compact set.
+
+
+
+Lemma  [(1
+
+A.3. - ),
+
+Given (n0, n1)  ], for any (n~0,
+
+[0, +)2, C n~1)  T (n0,
+
+ n1
+
+[C, , ¯,
+
+C¯ C
+
+] and ), we
+
+have n~0  M and n~1  M .
+
+Proof. Suppose at t = 0 the 0th decision epoch the agent starts, and there are n agents at the node. We show for large
+enough n, the total expected payoff the agent receives if he
+chooses to stay at t = 0 will be less than what he would
+receive if he chooses to switch to a different location. Let   N0 be the first decision epoch the agent chooses to
+leave. We seek to show that  = 0. Suppose, for the sake of arriving at a contradiction,   1. Let Ri be the immediate reward the agent receives at his ith decision epoch if he is
+
+still at the current node at the time he makes his ith decision, and R be the total reward he receives on choosing to stay at t = 0. We have:
+
++
+E[R] = iE[Ri1{ > i}] + E[ C]
+i=0
++
+ iE[Ri1{ > i}] + C.
+i=0
+
+(13)
+
+The first term in the first equation of (13) is the expected
+
+total reward until the agent chooses to leave, and the sec-
+
+ond term is the aggregated expected payoff on leaving. The
+
+inequality follows from the assumption that   1. Our
+
+goal is to show E[Ri1{ > i}] vanishes as n  +, hence
+
+E[R]  C < C as n  +, and since C is the aggregated
+
+expected payoff on leaving at t = 0, we would have  = 0. Let Ti be the time the ith decision epoch of the agent
+
+starts. We have Ti  Gamma(i, ) since the interval be-
+
+tween two consecutive decision epochs are i.i.d. exp() and
+
+Ti is the Let n
+
+=sum21 onf .i
+
+such intervals. We have for all
+
+i
+
+
+
+N+,
+
+E[Ri1{  i}] = E[Ri1{  i}|NTi  n ]P(NTi  n )
+
++ E[Ri1{  i}|NTi < n ]P(NTi < n )
+
+ f (n )P(NTi  n ) + P(NTi < n )f (1)
+
+ f (n ) + P(NTi < n )f (1).
+
+(14)
+
+We first show P(NTi < n ) vanishes as n  +. Consider an alternative system with n agents at t = 0 where each
+
+agent stays an exp() time and then leaves the system. Let
+
+Nt be the number of agents in the system at time t. For
+any agent in this alternative system, the probability he is still in the system at time Ti is e-Ti , therefore we have NTi  Bin(n, e-Ti ).
+Using a similar argument as in the proof of Lemma 4.1,
+
+we can show for all t  0, Nt is no less than Nt in all sample
+
+paths, i.e., Nt stochastically dominates Nt in the first order.
+
+Let k =
+
+1
+(log n) 2
+
+. Note NTi  NTk , for all i  k. Thus,
+
+pick
+
+tk
+
+=
+
+1 2
+
+log n.
+
+We
+
+have
+
+P(NTi < n )  P(NTi < n )
+
+ P(NTk < n )
+
+ P(NTk < n |Tk < tk)P(Tk < tk) + P (Tk  tk)
+
+ P(Ntk < n |Tk < tk)P(Tk < tk) + P(Tk  tk)
+
+ P(Ntk < n ) + P(Tk  tk).
+
+1 2
+
+We have n=n,
+
+Ntk  we can
+
+Bin(n, e-tk ).
+
+Given
+
+ne-tk
+
+=
+
+ n
+
+apply the Chernoff bound to obtain,
+
+>
+
+P(Ntk
+
+<
+
+n
+
+)
+
+
+
+exp(-
+
+(ne-tk - n 2ne-tk
+
+)2 )
+
+= exp(- n )
+
+4
+
+= exp(-
+
+n ).
+
+8
+
+Also, by Markov's inequality we have
+
+1
+
+P (Tk
+
+ tk) 
+
+E[Tk ] tk
+
+=
+
+k tk
+
+=
+
+2
+
+(log n) 2 log n
+
+2 . log n
+
+186
+
+Therefore,
+
+
+
+P(NTi < n )  exp(-
+
+n)+  2 . 8 log n
+
+By (14) and using the fact that n
+
+=
+
+1 2
+
+ n,
+
+we
+
+have
+
+
+
+E[Ri1{ > i}]  f (
+
+n ) + exp(- 2
+
+n )
+
++
+
+
+
+2
+
+,
+
+8 log n
+
+for all i = 1, . . . , k. Therefore, we have
+
+
+iE[Ri1{ > i}]
+
+i=0
+
+k-1
+
+
+
+= iE[Ri1{ > i}] + iE[Ri1{ > i}]
+
+i=0
+k-1
+ i
+i=0
+
+i=k
+
+
+
+f(
+
+n ) + exp(-
+
+n )
+
++
+
+
+
+2
+
+2 8 log n
+
+
++ if (1)
+i=k
+
+1 1-
+
+ f ( n ) + exp(- n ) +  2
+2 8 log n
+
+k + 1 -  f (1).
+
+The righthand side is denoted as g(n) in (7). As n  +, g(n) goes to 0. Hence by picking M such that
+
+M
+
+min{n
+
+:
+
+1 1-
+
+g(n) 
+
++
+
+k 1 -  f (1)
+
+<
+
+(1
+
+- )C}, ¯
+
+we have
+
+E[R] < (1 - )C + C < C, ¯
+for all n  M . Thus we have proved choosing to stay at t = 0 when there are more than M agents at the location is suboptimal no matter what the resource level is. This contradicts the assumption that   1.
+
+187
+
+
